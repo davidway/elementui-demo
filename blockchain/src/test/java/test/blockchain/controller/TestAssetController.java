@@ -62,7 +62,7 @@ public class TestAssetController {
 		JSONObject content = JSONObject.parseObject("{\"wsy2\":\"test\"}");
 		String sourceId = "test123";
 		String createUserAccountAddress = "1LbJjxYAK2ceZksgKxepzCA9skyHuZ5BvE";
-
+		String test="1234";
 		JSONObject json = new JSONObject();
 		json.put("amount", amount);
 		json.put("unit", unit);
