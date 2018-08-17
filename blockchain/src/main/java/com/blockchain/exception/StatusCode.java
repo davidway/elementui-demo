@@ -68,6 +68,9 @@ public class StatusCode {
 	/**提交业务错误*/
 	public static final int SUBMIT_ERROR = 201001;
 	public static final String SUBMIT_ERROR_MESSAGE="后端：业务执行提交时错误";
+	/**申请业务错误*/
+	public static final int APPLY_ERROR = 201002;
+	public static final String APPLY_ERROR_MESSAGE="后端：业务执行申请时错误";
 	
 	/**线程溢出并发异常**/
 	public static final int THREAD_ERROR = 301000;
@@ -76,4 +79,7 @@ public class StatusCode {
 	public static final String APPLY_THREAD_ERROR_MESSAGE="申请得不到执行权限";
 	public static final int SUBMIT_THREAD_ERROR = 301002;
 	public static final String SUBMIT_THREAD_ERROR_MESSAGE="提交得不到执行权限";
+	public static final int PAIR_KEY_ERROR = 100004;
+	public static final String PAIR_KEY_ERROR_MESSAGE = "公私钥匹配失败";
+	
 }

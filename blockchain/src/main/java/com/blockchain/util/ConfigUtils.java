@@ -130,12 +130,7 @@ public class ConfigUtils {
 		String ledgerId = config.getLedgerId();
 		String mchId = config.getMchId();
 		String nodeId = config.getNodeId();
-		try {
-			TrustSDK.checkPairKey(createUserPrivateKey, createUserPublicKey);
-		} catch (TrustSDKException e) {
-			String string = new ErrorMessage(Integer.valueOf(201000), "配置文件配置中", "发行方公私钥不匹配").toJsonString();
-			throw new ServiceException(string);
-		}
+		
 		if (StringUtils.isBlank(chainId)) {
 			lessName.append("配置文件中的联盟链id不能为空，");
 		}
@@ -158,7 +153,13 @@ public class ConfigUtils {
 			lessName.append("配置文件中的节点id不能为空，");
 		}
 		if (StringUtils.isNotBlank(lessName.toString())) {
-			String string = new ErrorMessage(Integer.valueOf(StatusCode.CONFIG_NOT_SET), "配置文件配置异常", lessName.toString()).toJsonString();
+			String string = new ErrorMessage(Integer.valueOf(StatusCode.CONFIG_NOT_SET), StatusCode.CONFIG_NOT_SET_MESSAGE, lessName.toString()).toJsonString();
+			throw new ServiceException(string);
+		}
+		try {
+			TrustSDK.checkPairKey(createUserPrivateKey, createUserPublicKey);
+		} catch (TrustSDKException e) {
+			String string = new ErrorMessage(Integer.valueOf(StatusCode.PAIR_KEY_ERROR), StatusCode.PAIR_KEY_ERROR_MESSAGE, lessName.toString()).toJsonString();
 			throw new ServiceException(string);
 		}
 	}
