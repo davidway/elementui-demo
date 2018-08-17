@@ -1,12 +1,5 @@
 package com.blockchain.util;
 
-import com.blockchain.exception.ErrorMessage;
-import com.blockchain.exception.ServiceException;
-import com.blockchain.exception.StatusCode;
-import com.tencent.trustsql.sdk.TrustSDK;
-import com.tencent.trustsql.sdk.exception.TrustSDKException;
-
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -20,6 +13,11 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
+
+import com.blockchain.exception.ServiceException;
+import com.blockchain.exception.StatusCode;
+import com.tencent.trustsql.sdk.TrustSDK;
+import com.tencent.trustsql.sdk.exception.TrustSDKException;
 
 public class ConfigUtils {
 	static Logger logger = Logger.getLogger(ConfigUtils.class);
@@ -153,14 +151,14 @@ public class ConfigUtils {
 			lessName.append("配置文件中的节点id不能为空，");
 		}
 		if (StringUtils.isNotBlank(lessName.toString())) {
-			String string = new ErrorMessage(Integer.valueOf(StatusCode.CONFIG_NOT_SET), StatusCode.CONFIG_NOT_SET_MESSAGE, lessName.toString()).toJsonString();
-			throw new ServiceException(string);
+			//String string = new ErrorMessage(Integer.valueOf(StatusCode.CONFIG_NOT_SET), StatusCode.CONFIG_NOT_SET_MESSAGE, lessName.toString()).toJsonString();
+			throw new ServiceException().errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
 		}
 		try {
 			TrustSDK.checkPairKey(createUserPrivateKey, createUserPublicKey);
 		} catch (TrustSDKException e) {
-			String string = new ErrorMessage(Integer.valueOf(StatusCode.PAIR_KEY_ERROR), StatusCode.PAIR_KEY_ERROR_MESSAGE, lessName.toString()).toJsonString();
-			throw new ServiceException(string);
+		//	String string = new ErrorMessage(Integer.valueOf(StatusCode.PAIR_KEY_ERROR), StatusCode.PAIR_KEY_ERROR_MESSAGE, lessName.toString()).toJsonString();
+			throw new ServiceException().errorCode(StatusCode.PAIR_KEY_ERROR).errorMessage(StatusCode.PAIR_KEY_ERROR_MESSAGE);
 		}
 	}
 

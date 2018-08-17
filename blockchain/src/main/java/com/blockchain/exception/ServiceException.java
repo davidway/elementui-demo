@@ -2,15 +2,61 @@ package com.blockchain.exception;
 
 public class ServiceException extends Exception {
 
+	private Integer errorCode;
+	private String errorMessage;
+	private  Object data;
+	private String pos;
+	
+	
+
+	public Integer getErrorCode() {
+		return errorCode;
+	}
+
+	public void setErrorCode(Integer errorCode) {
+		this.errorCode = errorCode;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
+	public Object getData() {
+		return data;
+	}
+
+	public void setData(Object data) {
+		this.data = data;
+	}
 
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
-	public ServiceException(String message) {
-		super(message);
+
+	public ServiceException errorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+		return this;
+	}	public ServiceException data(Object data) {
+		this.data = data;
+		return this;
+	}
+
+
+
+	public ServiceException errorCode(int errorCode) {
+		this.errorCode = errorCode;
+		return this;
+	}
+
+	public String getPos() {
+		return pos;
+	}
+
+	public void setPos(String pos) {
+		this.pos = pos;
 	}
 
 

@@ -4,7 +4,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -21,15 +20,12 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.blockchain.VO.ConfigPropertiesFormVO;
 import com.blockchain.VO.PhpSystemJsonContentVO;
 import com.blockchain.exception.ServiceException;
-import com.blockchain.exception.ParameterErrorException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.ConfigPropertiesService;
 import com.blockchain.util.ResponseUtil;
 import com.blockchain.util.TrustSDKUtil;
 import com.blockchain.util.ValidatorUtil;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
-import com.wordnik.swagger.annotations.ApiImplicitParam;
-import com.wordnik.swagger.annotations.ApiImplicitParams;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 @Controller
@@ -65,13 +61,8 @@ public class ConfigController {
 		try {
 			ValidatorUtil.validate(bindingResult);
 			TrustSDKUtil.checkPariKeyMatch(configPropertiesFormVO.getCreateUserPublicKey(), configPropertiesFormVO.getCreateUserPrivateKey());
-		} catch (ParameterErrorException e1) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e1.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		} catch (ServiceException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+		}  catch (ServiceException e) {
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;

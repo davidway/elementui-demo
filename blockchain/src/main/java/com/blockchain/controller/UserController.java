@@ -30,7 +30,6 @@ import com.blockchain.VO.AssetTransQueryFormVO;
 import com.blockchain.VO.KeyInfoVO;
 import com.blockchain.VO.PhpSystemJsonContentVO;
 import com.blockchain.VO.UserFormVO;
-import com.blockchain.exception.ParameterErrorException;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.UserService;
@@ -119,15 +118,9 @@ public class UserController {
 		try {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
-		} catch (ParameterErrorException e) {
-
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
 			logger.error(e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -180,13 +173,8 @@ public class UserController {
 		try {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
-		} catch (ParameterErrorException e1) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e1.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -231,14 +219,9 @@ public class UserController {
 		try {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
-		} catch (ParameterErrorException e1) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e1.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
 			logger.error(e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -281,7 +264,8 @@ public class UserController {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 
 		if (StringUtils.isBlank(privateKey)) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError("用户私钥不能为空");
+			ServiceException e = new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage("用户私钥不能为空");
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			String jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -325,12 +309,6 @@ public class UserController {
 		try {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
-		} catch (ParameterErrorException e) {
-
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setServiceError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -383,12 +361,6 @@ public class UserController {
 		try {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
-		} catch (ParameterErrorException e) {
-
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
 
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setServiceError(e.getMessage());
@@ -442,9 +414,9 @@ public class UserController {
 		try {
 
 			ValidatorUtil.validate(bindingResult);
-		} catch (ParameterErrorException e) {
+		} catch (ServiceException e) {
 
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;

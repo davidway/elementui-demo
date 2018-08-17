@@ -1,7 +1,6 @@
 package com.blockchain.controller;
 
 import javax.annotation.Resource;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -26,12 +25,8 @@ import com.blockchain.VO.AssetSubmitFormVO;
 import com.blockchain.VO.AssetTransferFormVO;
 import com.blockchain.VO.AssetTransferSubmitFormVO;
 import com.blockchain.VO.PhpSystemJsonContentVO;
-import com.blockchain.exception.ErrorMessage;
-import com.blockchain.exception.ParameterErrorException;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
-import com.blockchain.exception.SubmitException;
-import com.blockchain.exception.ThreadException;
 import com.blockchain.service.AssetService;
 import com.blockchain.util.ConfigUtils;
 import com.blockchain.util.ParamUtils;
@@ -40,8 +35,8 @@ import com.blockchain.util.TrustSDKUtil;
 import com.blockchain.util.ValidatorUtil;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiResponses;
 import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 
 @Controller
 @RequestMapping(value = "/asset")
@@ -71,23 +66,18 @@ public class AssetController {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-			
+
 			ValidatorUtil.validate(bindingResult);
 			ConfigUtils.check();
 			ParamUtils.checkAssetNum(assetTransferFormVO.getSrcAsset());
 			TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetTransferFormVO.getUserPrivateKey(), assetTransferFormVO.getSrcAccount());
-		} catch (ParameterErrorException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (TrustSDKException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(new ServiceException().errorCode(StatusCode.SYSTEM_UNKOWN_ERROR).errorMessage(StatusCode.SYSTEM_UNKOWN_ERROR_MESSAGE));
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (ServiceException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -106,26 +96,15 @@ public class AssetController {
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 
-		} catch (SubmitException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setSubmitException(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
 			logger.error("业务错误", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		} catch (ThreadException e) {
-			logger.error("并发异常", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
 			logger.error("未知错误", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(new ServiceException().errorCode(StatusCode.SYSTEM_UNKOWN_ERROR).errorMessage(StatusCode.SYSTEM_UNKOWN_ERROR_MESSAGE));
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -154,19 +133,14 @@ public class AssetController {
 			TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetSettleFormVO.getUserPrivateKey(), assetSettleFormVO.getOwnerAccount());
 			ValidatorUtil.validate(bindingResult);
 			ParamUtils.checkAssetNum(assetSettleFormVO.getSrcAsset());
-		} catch (ParameterErrorException e1) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e1.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
 			logger.error("未知错误", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setUnkownError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(new ServiceException().errorCode(StatusCode.SYSTEM_UNKOWN_ERROR).errorMessage(StatusCode.SYSTEM_UNKOWN_ERROR_MESSAGE));
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -178,24 +152,9 @@ public class AssetController {
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 
-		} catch (SubmitException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setSubmitException(e);
-
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
 			logger.error("业务错误", e);
-			ErrorMessage errorMessage = new ErrorMessage();
-
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		} catch (ThreadException e) {
-			logger.error("并发异常", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
-
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -222,7 +181,7 @@ public class AssetController {
 			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
-			
+
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
 	public void issue(@Valid @RequestBody AssetFormVO assetFormVO, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
@@ -231,13 +190,8 @@ public class AssetController {
 			ConfigUtils.check();
 
 			ValidatorUtil.validate(bindingResult);
-		} catch (ParameterErrorException e1) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e1.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -249,23 +203,9 @@ public class AssetController {
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 
-		} catch (SubmitException e) {
-			phpSystemJsonContentVO.setSubmitException(e);
-
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
 			logger.error("业务错误", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		} catch (ThreadException e) {
-			logger.error("并发异常", e);
-
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
-
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -292,7 +232,7 @@ public class AssetController {
 			@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
-			
+
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
 	public void issueSubmit(@Valid @RequestBody AssetSubmitFormVO assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
@@ -300,14 +240,9 @@ public class AssetController {
 		try {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
-		} catch (ParameterErrorException e1) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e1.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		} catch (ServiceException e) {
+		}  catch (ServiceException e) {
 			logger.error("业务错误", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -321,18 +256,11 @@ public class AssetController {
 
 		} catch (ServiceException e) {
 			logger.error("业务错误", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		} catch (ThreadException e) {
-			logger.error("并发异常", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
-
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		} catch (Exception e) {
+		}  catch (Exception e) {
 			logger.error("未知错误", e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
@@ -361,14 +289,9 @@ public class AssetController {
 		try {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
-		} catch (ParameterErrorException e1) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e1.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
 			logger.error("业务错误", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -382,14 +305,7 @@ public class AssetController {
 
 		} catch (ServiceException e) {
 			logger.error("未知错误", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		} catch (ThreadException e) {
-			logger.error("并发异常", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
-
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -422,14 +338,9 @@ public class AssetController {
 		try {
 			ValidatorUtil.validate(bindingResult);
 			ConfigUtils.check();
-		} catch (ParameterErrorException e1) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e1.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (ServiceException e) {
 			logger.error("业务错误", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -443,14 +354,7 @@ public class AssetController {
 
 		} catch (ServiceException e) {
 
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		} catch (ThreadException e) {
-			logger.error("并发异常", e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
-
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;

@@ -22,7 +22,6 @@ import com.blockchain.VO.AccountQueryFormVO;
 import com.blockchain.VO.AssetTransQueryFormVO;
 import com.blockchain.VO.KeyInfoVO;
 import com.blockchain.VO.UserFormVO;
-import com.blockchain.exception.ErrorMessage;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.UserService;
@@ -223,8 +222,8 @@ public class UserServiceImpl implements UserService {
 
 		}
 		if (StringUtils.isBlank(assetIdList)) {
-			String s = new ErrorMessage(StatusCode.SERVICE_EXCEPTION, "资产查询", "该用户没有资产，可能都在待申请").toJsonString();
-			throw new ServiceException(s);
+			//String s = new ErrorMessage(StatusCode.SERVICE_EXCEPTION, "资产查询", "该用户没有资产，可能都在待申请").toJsonString();
+			throw new ServiceException().errorCode(StatusCode.SERVICE_EXCEPTION).errorMessage("该用户没有资产，可能都在待申请");
 		}
 		return assetIdList.toString();
 	}
@@ -285,7 +284,7 @@ public class UserServiceImpl implements UserService {
 		String publicKey = keyInfo.getPublicKey().trim();
 		boolean isPair = TrustSDK.checkPairKey(privateKey, publicKey);
 		if ( isPair==false){
-			throw new ServiceException("公私钥匹配错误");
+			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage("公私钥匹配错误");
 		}
 	}
 }

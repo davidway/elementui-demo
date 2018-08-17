@@ -25,6 +25,8 @@ public class StatusCode {
 
 	/** 系统错误 */
 	public static final int SYSTEM_UNKOWN_ERROR = 100001;
+	public static final String SYSTEM_UNKOWN_ERROR_MESSAGE = "系统发生未知错误";
+	
 	/** {参数名称}取值错误或者不可为空 */
 	public static final int PARAM_ERROR= 100002;
 	public static final String PARAM_ERROR_MESSAGE="前端：参数出错";
