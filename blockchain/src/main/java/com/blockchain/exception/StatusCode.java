@@ -23,13 +23,14 @@ public class StatusCode {
 	 */
 
 
-	/** 系统位置错误，提示系统繁忙，请稍后再试 */
+	/** 系统错误 */
 	public static final int SYSTEM_UNKOWN_ERROR = 100001;
 	/** {参数名称}取值错误或者不可为空 */
 	public static final int PARAM_ERROR= 100002;
 	public static final String PARAM_ERROR_MESSAGE="前端：参数出错";
 	/**{参数名称}格式不正确 */
-	public static final int PARAM_FORMAT_ERROR = 100003;	
+	public static final int CONFIG_NOT_SET = 100003;	
+	public static final String CONFIG_NOT_SET_MESSAGE ="配置文件内容暂未设置";
 	/** {参数名称}长度超过限制 */
 	public static final int PARAM_LENGTH_ERROR = 100004;		
 	/** Token错误 */

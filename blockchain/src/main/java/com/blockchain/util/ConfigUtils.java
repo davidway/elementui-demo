@@ -2,8 +2,10 @@ package com.blockchain.util;
 
 import com.blockchain.exception.ErrorMessage;
 import com.blockchain.exception.ServiceException;
+import com.blockchain.exception.StatusCode;
 import com.tencent.trustsql.sdk.TrustSDK;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -155,7 +158,7 @@ public class ConfigUtils {
 			lessName.append("配置文件中的节点id不能为空，");
 		}
 		if (StringUtils.isNotBlank(lessName.toString())) {
-			String string = new ErrorMessage(Integer.valueOf(201001), "配置文件配置异常", lessName.toString()).toJsonString();
+			String string = new ErrorMessage(Integer.valueOf(StatusCode.CONFIG_NOT_SET), "配置文件配置异常", lessName.toString()).toJsonString();
 			throw new ServiceException(string);
 		}
 	}

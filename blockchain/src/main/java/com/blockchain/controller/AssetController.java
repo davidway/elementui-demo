@@ -44,25 +44,26 @@ import com.wordnik.swagger.annotations.ApiResponse;
 
 @Controller
 @RequestMapping(value = "/asset")
-
 public class AssetController {
-	    Logger logger  =  LoggerFactory.getLogger(AssetController.class);
+	Logger logger = LoggerFactory.getLogger(AssetController.class);
 	@Resource
 	HttpServletResponse response;
 	@Resource
 	AssetService assetService;
 
-	
-	
 	@ResponseBody
 	@RequestMapping(value = { "/transfer" }, method = RequestMethod.POST)
-	@ApiOperation(value = "转账申请且提交", httpMethod = "POST", response = AssetTransferDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class),@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE,response=StatusCode.class)
+	@ApiOperation(value = "转账申请且提交", httpMethod = "POST", response = AssetTransferDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class),
+
 	})
 	public void transfer(@Valid @RequestBody AssetTransferFormVO assetTransferFormVO, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
@@ -72,7 +73,7 @@ public class AssetController {
 			ValidatorUtil.validate(bindingResult);
 			ConfigUtils.check();
 			ParamUtils.checkAssetNum(assetTransferFormVO.getSrcAsset());
-		
+
 		} catch (ParameterErrorException e) {
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -89,7 +90,7 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
-			logger.error("未知错误",e);
+			logger.error("未知错误", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setUnkownError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -104,24 +105,24 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (SubmitException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setSubmitException(e);	
+			phpSystemJsonContentVO = phpSystemJsonContentVO.setSubmitException(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (ServiceException e) {
-			logger.error("业务错误",e);
+			logger.error("业务错误", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (ThreadException e) {
-			logger.error("并发异常",e);
+			logger.error("并发异常", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		}catch (Exception e) {
-			logger.error("未知错误",e);
+		} catch (Exception e) {
+			logger.error("未知错误", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -132,14 +133,15 @@ public class AssetController {
 
 	@ResponseBody
 	@RequestMapping(value = { "/settle" }, method = RequestMethod.POST)
-	@ApiOperation(value = "资产兑付申请且提交", httpMethod = "POST", response = AssetSettleDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class),@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE,response=StatusCode.class)
-	})
+	@ApiOperation(value = "资产兑付申请且提交", httpMethod = "POST", response = AssetSettleDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
 	public void settle(@Valid @RequestBody AssetSettleFormVO assetSettleFormVO, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
@@ -159,7 +161,7 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
-			logger.error("未知错误",e);
+			logger.error("未知错误", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setUnkownError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -179,23 +181,22 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (ServiceException e) {
-			logger.error("业务错误",e);
+			logger.error("业务错误", e);
 			ErrorMessage errorMessage = new ErrorMessage();
 
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		}catch (ThreadException e) {
-			logger.error("并发异常",e);
+		} catch (ThreadException e) {
+			logger.error("并发异常", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
-
 
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
-			logger.error("未知错误",e);
+			logger.error("未知错误", e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -207,27 +208,28 @@ public class AssetController {
 
 	@ResponseBody
 	@RequestMapping(value = { "/issue" }, method = RequestMethod.POST)
-	@ApiOperation(value = "资产发行申请且提交", httpMethod = "POST", response = AssetIssueDTO.class, consumes = "application/json",produces="application/json")
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class),@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE,response=StatusCode.class)
-	})
+	@ApiOperation(value = "资产发行申请且提交", httpMethod = "POST", response = AssetIssueDTO.class, consumes = "application/json", produces = "application/json")
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
 	public void issue(@Valid @RequestBody AssetFormVO assetFormVO, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
 			ConfigUtils.check();
-			
+
 			ValidatorUtil.validate(bindingResult);
 		} catch (ParameterErrorException e1) {
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e1.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		}catch (ServiceException e) {
+		} catch (ServiceException e) {
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -242,26 +244,26 @@ public class AssetController {
 
 		} catch (SubmitException e) {
 			phpSystemJsonContentVO.setSubmitException(e);
-			
+
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (ServiceException e) {
-			logger.error("业务错误",e);
+			logger.error("业务错误", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (ThreadException e) {
-			logger.error("并发异常",e);
+			logger.error("并发异常", e);
 
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
-			
+
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		}catch (Exception e) {
-			logger.error("未知错误",e);
+		} catch (Exception e) {
+			logger.error("未知错误", e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -273,19 +275,20 @@ public class AssetController {
 
 	@ResponseBody
 	@RequestMapping(value = { "/issueSubmit" }, method = RequestMethod.POST)
-	@ApiOperation(value = "资产发行只提交", httpMethod = "POST", response = AssetIssueDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class),@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE,response=StatusCode.class)
-	})
+	@ApiOperation(value = "资产发行只提交", httpMethod = "POST", response = AssetIssueDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
 	public void issueSubmit(@Valid @RequestBody AssetSubmitFormVO assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-		ConfigUtils.check();
+			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 		} catch (ParameterErrorException e1) {
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e1.getMessage());
@@ -293,7 +296,7 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (ServiceException e) {
-			logger.error("业务错误",e);
+			logger.error("业务错误", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -307,21 +310,20 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-			logger.error("业务错误",e);
+			logger.error("业务错误", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		}catch (ThreadException e) {
-			logger.error("并发异常",e);
+		} catch (ThreadException e) {
+			logger.error("并发异常", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
-
 
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
-			logger.error("未知错误",e);
+			logger.error("未知错误", e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -333,14 +335,15 @@ public class AssetController {
 
 	@ResponseBody
 	@RequestMapping(value = { "/transferSubmit" }, method = RequestMethod.POST)
-	@ApiOperation(value = "资产转让只提交", httpMethod = "POST", response = AssetTransferDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class),@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE,response=StatusCode.class)
-	})
+	@ApiOperation(value = "资产转让只提交", httpMethod = "POST", response = AssetTransferDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
 	public void transferSubmit(@Valid @RequestBody AssetTransferSubmitFormVO assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
@@ -353,7 +356,7 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (ServiceException e) {
-			logger.error("业务错误",e);
+			logger.error("业务错误", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -367,21 +370,20 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-			logger.error("未知错误",e);
+			logger.error("未知错误", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (ThreadException e) {
-			logger.error("并发异常",e);
+			logger.error("并发异常", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
-
 
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		}catch (Exception e) {
-			logger.error("未知错误",e);
+		} catch (Exception e) {
+			logger.error("未知错误", e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -393,14 +395,15 @@ public class AssetController {
 
 	@ResponseBody
 	@RequestMapping(value = { "/settleSubmit" }, method = RequestMethod.POST)
-	@ApiOperation(value = "资产兑付只提交", httpMethod = "POST", response = AssetSettleDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class),@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE,response=StatusCode.class)
-	})
+	@ApiOperation(value = "资产兑付只提交", httpMethod = "POST", response = AssetSettleDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
 	public void settleSubmit(@Valid @RequestBody AssetSettleSubmitFormVO assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
@@ -413,7 +416,7 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (ServiceException e) {
-			logger.error("业务错误",e);
+			logger.error("业务错误", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -427,21 +430,20 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-			
+
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		}catch (ThreadException e) {
-			logger.error("并发异常",e);
+		} catch (ThreadException e) {
+			logger.error("并发异常", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setThreadException(e);
-
 
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
-			logger.error("未知错误",e);
+			logger.error("未知错误", e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);

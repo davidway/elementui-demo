@@ -49,35 +49,31 @@ import com.wordnik.swagger.annotations.ApiResponses;
 public class UserController {
 	private static Logger logger = Logger.getLogger(UserController.class);
 
-	
 	@Resource
 	HttpServletResponse response;
-	
+
 	@Resource
 	UserService userService;
 
-
-	@ExceptionHandler(HttpMessageNotReadableException.class)  
-	@ResponseBody  
-	
-	public PhpSystemJsonContentVO handleHttpMessageNotReadableException(  
-	        HttpMessageNotReadableException ex) {  
-		PhpSystemJsonContentVO response = new PhpSystemJsonContentVO();  
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	@ResponseBody
+	public PhpSystemJsonContentVO handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+		PhpSystemJsonContentVO response = new PhpSystemJsonContentVO();
 		response.setData("");
 		response.setRetcode(StatusCode.PARAM_ERROR);
 		response.setRetmsg("json格式错误，请检查是否为合法json");
-	    return response;  
-	}  
-	
+		return response;
+	}
+
 	@ResponseBody
 	@RequestMapping(value = { "/generatePariKey" }, method = RequestMethod.POST)
-	@ApiOperation(value = "生成用户公私钥", httpMethod = "POST", response = UserKeyDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message =StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class) })
-
+	@ApiOperation(value = "生成用户公私钥", httpMethod = "POST", response = UserKeyDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
 	public void generatePariKey() {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
@@ -108,22 +104,21 @@ public class UserController {
 	}
 
 	@ResponseBody
-	@RequestMapping(value = { "/addUserHasBaseAndHostAccount" }, method = RequestMethod.POST,consumes="application/json")
-	@ApiOperation(value = "创建用户时有基础和代理账户", httpMethod = "POST", response = UserInfoDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message =StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = "公私钥匹配失败",response=StatusCode.class) 
-		})
-
-	public void addUserHasBaseAndHostAccount(@Valid @RequestBody UserFormVO userFormVO,BindingResult bindingResult) {
+	@RequestMapping(value = { "/addUserHasBaseAndHostAccount" }, method = RequestMethod.POST, consumes = "application/json")
+	@ApiOperation(value = "创建用户时有基础和代理账户", httpMethod = "POST", response = UserInfoDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = "公私钥匹配失败", response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
+	public void addUserHasBaseAndHostAccount(@Valid @RequestBody UserFormVO userFormVO, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 		} catch (ParameterErrorException e) {
-			
+
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -135,13 +130,13 @@ public class UserController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
-		
+
 		try {
 			UserInfoDTO userInfoDTO = userService.addUserHasBaseAndHostAccount(userFormVO);
 			phpSystemJsonContentVO.setData(userInfoDTO);
 		} catch (ServiceException e) {
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setServiceError(e.getMessage());
-		
+
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -154,7 +149,7 @@ public class UserController {
 		}
 
 		try {
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO,true);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVO, true);
 		} catch (JSONException e) {
 			logger.error(e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParseJsonError();
@@ -165,14 +160,16 @@ public class UserController {
 		ResponseUtil.echo(response, jsonString);
 		return;
 	}
+
 	@ResponseBody
 	@RequestMapping(value = { "/accountQuery" }, method = RequestMethod.POST)
-	@ApiOperation(value = "资产批量查询", httpMethod = "POST", response = AssetDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message =StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class) })
+	@ApiOperation(value = "资产批量查询", httpMethod = "POST", response = AssetDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
 	public void accountQuery(@Valid @RequestBody AccountQueryFormVO assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
@@ -216,13 +213,14 @@ public class UserController {
 
 	@ResponseBody
 	@RequestMapping(value = { "/transQuery" }, method = RequestMethod.POST)
-	@ApiOperation(value = "交易批量查询", httpMethod = "POST", response = TransInfoDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message =StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class) })
-	public void transQuery(@Valid  @RequestBody AssetTransQueryFormVO assetForm, BindingResult bindingResult) {
+	@ApiOperation(value = "交易批量查询", httpMethod = "POST", response = TransInfoDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
+	public void transQuery(@Valid @RequestBody AssetTransQueryFormVO assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
@@ -248,7 +246,7 @@ public class UserController {
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-		
+
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setServiceError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -263,25 +261,26 @@ public class UserController {
 		}
 		return;
 	}
+
 	@ResponseBody
 	@RequestMapping(value = { "/getUserInfo" }, method = RequestMethod.POST)
-	@ApiOperation(value = "查询用户信息", httpMethod = "POST", response = UserInfoDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message =StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class) })
-	public void getUserInfo(@RequestParam("privateKey") @ApiParam(value="用户私钥",defaultValue="{\"privateKey\":\"\"}") String privateKey){
-		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO(); 
-		
-		if (StringUtils.isBlank(privateKey)){
+	@ApiOperation(value = "查询用户信息", httpMethod = "POST", response = UserInfoDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
+	public void getUserInfo(@RequestParam("privateKey") @ApiParam(value = "用户私钥", defaultValue = "{\"privateKey\":\"\"}") String privateKey) {
+		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
+
+		if (StringUtils.isBlank(privateKey)) {
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError("用户私钥不能为空");
 			String jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
-		
-	
+
 		UserInfoDTO userInfoDTO = new UserInfoDTO();
 		try {
 			String baseAccoutAddress = TrustSDK.generateAddrByPrvkey(privateKey);
@@ -290,7 +289,7 @@ public class UserController {
 			userInfoDTO.setBasePrivateKey(privateKey);
 			userInfoDTO.setBasePublicKey(publicKey);
 			phpSystemJsonContentVO.setData(userInfoDTO);
-			
+
 			String jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -303,23 +302,24 @@ public class UserController {
 			return;
 		}
 	}
-	
+
 	@ResponseBody
-	@RequestMapping(value = { "/addUserHasBaseAccount" }, method = RequestMethod.POST,consumes="application/json")
-	@ApiOperation(value = "创建用户只有基础钱包账户", httpMethod = "POST", response = UserInfoDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message =StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class) })
-	public void addUserHasBaseAccount(@Valid @RequestBody UserFormVO userFormVO,BindingResult bindingResult) {
+	@RequestMapping(value = { "/addUserHasBaseAccount" }, method = RequestMethod.POST, consumes = "application/json")
+	@ApiOperation(value = "创建用户只有基础钱包账户", httpMethod = "POST", response = UserInfoDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
+	public void addUserHasBaseAccount(@Valid @RequestBody UserFormVO userFormVO, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 		} catch (ParameterErrorException e) {
-			
+
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -330,7 +330,7 @@ public class UserController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
-		
+
 		try {
 			UserInfoDTO userInfoDTO = userService.addUserHasBaseAccount(userFormVO);
 			phpSystemJsonContentVO.setData(userInfoDTO);
@@ -348,7 +348,7 @@ public class UserController {
 		}
 
 		try {
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO,true);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVO, true);
 		} catch (JSONException e) {
 			logger.error(e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParseJsonError();
@@ -359,34 +359,36 @@ public class UserController {
 		ResponseUtil.echo(response, jsonString);
 		return;
 	}
+
 	@ResponseBody
-	@RequestMapping(value = { "/addUserHostAccount" }, method = RequestMethod.POST,consumes="application/json")
-	@ApiOperation(value = "添加用户任意代理钱包账户", httpMethod = "POST", response = UserInfoDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message =StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class) })
-	public void addUserHostAccount(@Valid @RequestBody UserFormVO userFormVO,BindingResult bindingResult) {
+	@RequestMapping(value = { "/addUserHostAccount" }, method = RequestMethod.POST, consumes = "application/json")
+	@ApiOperation(value = "添加用户任意代理钱包账户", httpMethod = "POST", response = UserInfoDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
+	public void addUserHostAccount(@Valid @RequestBody UserFormVO userFormVO, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 		} catch (ParameterErrorException e) {
-			
+
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (ServiceException e) {
-	
+
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setServiceError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
-		
+
 		try {
 			UserInfoDTO userInfoDTO = userService.addUserHostAccount(userFormVO);
 			phpSystemJsonContentVO.setData(userInfoDTO);
@@ -404,7 +406,7 @@ public class UserController {
 		}
 
 		try {
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO,true);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVO, true);
 		} catch (JSONException e) {
 			logger.error(e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParseJsonError();
@@ -415,33 +417,33 @@ public class UserController {
 		ResponseUtil.echo(response, jsonString);
 		return;
 	}
-	
-	
+
 	@ResponseBody
-	@RequestMapping(value = { "/checkPairKey" }, method = RequestMethod.POST,consumes="application/json")
-	@ApiOperation(value = "验证用户公私是否匹配", httpMethod = "POST", response = UserInfoDTO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message =StatusCode.PARAM_ERROR_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE,response=StatusCode.class),
-			@ApiResponse(code =  StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE,response=StatusCode.class) ,
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE,response=StatusCode.class) })
-	public void checkPairKey(@Valid @RequestBody KeyInfoVO keyInfo,BindingResult bindingResult) {
+	@RequestMapping(value = { "/checkPairKey" }, method = RequestMethod.POST, consumes = "application/json")
+	@ApiOperation(value = "验证用户公私是否匹配", httpMethod = "POST", response = UserInfoDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
+	public void checkPairKey(@Valid @RequestBody KeyInfoVO keyInfo, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-			
+
 			ValidatorUtil.validate(bindingResult);
 		} catch (ParameterErrorException e) {
-			
+
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParameterError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
-		
+
 		try {
 			userService.checkPairKey(keyInfo);
-		
+
 		} catch (ServiceException e) {
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setServiceError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -456,7 +458,7 @@ public class UserController {
 		}
 
 		try {
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO,true);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVO, true);
 		} catch (JSONException e) {
 			logger.error(e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParseJsonError();
