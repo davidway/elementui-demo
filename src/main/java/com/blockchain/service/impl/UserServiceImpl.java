@@ -20,9 +20,8 @@ import com.blockchain.DTO.AssetTransQueryFormDTO;
 import com.blockchain.DTO.KeyInfoDTO;
 import com.blockchain.DTO.TransInfoDTO;
 import com.blockchain.DTO.UserFormDTO;
-import com.blockchain.DTO.UserInfoDTO;
 import com.blockchain.DTO.UserKeyDTO;
-import com.blockchain.exception.ErrorMessage;
+import com.blockchain.VO.UserInfoVO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.UserService;
@@ -62,17 +61,17 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserInfoDTO addUserHasBaseAndHostAccount(UserFormDTO userFormVO) throws ServiceException,UnsupportedEncodingException, TrustSDKException, Exception {
+	public UserInfoVO addUserHasBaseAndHostAccount(UserFormDTO userFormDTO) throws ServiceException,UnsupportedEncodingException, TrustSDKException, Exception {
 		//申请原始帐号
-		UserInfoDTO userInfoDTO = generateUserInfo(userFormVO);
-		String userRegistRequestString = UserUtil.generateUserRequest(userInfoDTO,userFormVO);
+		UserInfoVO userInfoVO = generateUserInfo(userFormDTO);
+		String userRegistRequestString = UserUtil.generateUserRequest(userInfoVO,userFormDTO);
 		SimpleHttpClient httpClient = new SimpleHttpClient();
 		String userRegistResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/user_cert/register", userRegistRequestString);
 		ResultUtil.checkResultIfSuccess("申请用户", userRegistResult);
 		JSONObject userRegistRetData = JSON.parseObject(userRegistResult).getJSONObject("retdata");
 	
 		//注册原始帐号的账户
-		String userBaseAccoutForm = UserUtil.generateuserAccoutForm(userInfoDTO,userRegistRetData, false);
+		String userBaseAccoutForm = UserUtil.generateuserAccoutForm(userInfoVO,userRegistRetData, false);
 		String userBaseAccountRegistResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/account_cert/register", userBaseAccoutForm);
 		logger.debug("注册原始帐号的账户返回结果:"+userBaseAccountRegistResult);
 		ResultUtil.checkResultIfSuccess("申请账户",userBaseAccountRegistResult);
@@ -82,10 +81,10 @@ public class UserServiceImpl implements UserService {
 		if ( StringUtils.isBlank(userBaseAccount)){
 			userBaseAccount = userAccoutData.getString("account_address");
 		}
-		userInfoDTO.setBaseAccountAddress(userBaseAccount);
+		userInfoVO.setBaseAccountAddress(userBaseAccount);
 		
 		//再设置一个新的账号作为代理账号
-		 String userHostAccoutForm = UserUtil.generateuserAccoutForm(userInfoDTO,userRegistRetData, true);
+		 String userHostAccoutForm = UserUtil.generateuserAccoutForm(userInfoVO,userRegistRetData, true);
 		String userHostAccountFormResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/account_cert/register", userHostAccoutForm);
 		ResultUtil.checkResultIfSuccess("申请代理账户",userHostAccountFormResult);
 		logger.debug("注册申请代理账户返回结果:"+userHostAccountFormResult);
@@ -95,16 +94,16 @@ public class UserServiceImpl implements UserService {
 		if ( StringUtils.isBlank(userHostAccount)){
 			userHostAccount = userHostAccoutData.getString("account_address");
 		}
-		userInfoDTO.setHostWalletAccountAddress(userHostAccount);
+		userInfoVO.setHostWalletAccountAddress(userHostAccount);
 
-		return userInfoDTO;
+		return userInfoVO;
 	}
 
-	private UserInfoDTO generateUserInfo(UserFormDTO userFormVO) {
-		UserInfoDTO userInfoDTO = new UserInfoDTO();
-		userInfoDTO.setId(userFormVO.getId());
-		userInfoDTO.setName(userFormVO.getName());
-		return userInfoDTO;
+	private UserInfoVO generateUserInfo(UserFormDTO userFormDTO) {
+		UserInfoVO userInfoVO = new UserInfoVO();
+		userInfoVO.setId(userFormDTO.getId());
+		userInfoVO.setName(userFormDTO.getName());
+		return userInfoVO;
 	}
 	@Override
 	public List<AssetDTO> accountQuery(AccountQueryFormDTO assetFormVO) throws TrustSDKException, Exception {
@@ -182,7 +181,7 @@ public class UserServiceImpl implements UserService {
 			transInfoDTO.setTransactionId(o.getString("transaction_id"));
 			transInfoDTO.setTransState(o.getInteger("trans_state"));
 			transInfoDTO.setTransTime(o.getString("trans_time"));
-			
+			transInfoDTO.setHash(o.getString("hash"));
 			transInfoDTO.setTransType(o.getInteger("trans_type"));
 			transInfoDTO.setSignList(o.getString("sign_str_list"));
 			transInfoList.add(transInfoDTO);
@@ -224,25 +223,25 @@ public class UserServiceImpl implements UserService {
 
 		}
 		if (StringUtils.isBlank(assetIdList)) {
-			String s = new ErrorMessage(StatusCode.SERVICE_EXCEPTION, "资产查询", "该用户没有资产，可能都在待申请").toJsonString();
-			throw new ServiceException(s);
+			//String s = new ErrorMessage(StatusCode.SERVICE_EXCEPTION, "资产查询", "该用户没有资产，可能都在待申请").toJsonString();
+			throw new ServiceException().errorCode(StatusCode.SERVICE_EXCEPTION).errorMessage("该用户没有资产，可能都在待申请");
 		}
 		return assetIdList.toString();
 	}
 
 	@Override
-	public UserInfoDTO addUserHasBaseAccount(UserFormDTO userFormVO) throws ServiceException,UnsupportedEncodingException, TrustSDKException, Exception {
+	public UserInfoVO addUserHasBaseAccount(UserFormDTO userFormDTO) throws ServiceException,UnsupportedEncodingException, TrustSDKException, Exception {
 
 		//申请原始帐号
-		UserInfoDTO userInfoDTO = generateUserInfo(userFormVO);
-		String userRegistRequestString = UserUtil.generateUserRequest(userInfoDTO,userFormVO);
+		UserInfoVO userInfoVO = generateUserInfo(userFormDTO);
+		String userRegistRequestString = UserUtil.generateUserRequest(userInfoVO,userFormDTO);
 		SimpleHttpClient httpClient = new SimpleHttpClient();
 		String userRegistResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/user_cert/register", userRegistRequestString);
 		ResultUtil.checkResultIfSuccess("申请用户", userRegistResult);
 		JSONObject userRegistRetData = JSON.parseObject(userRegistResult).getJSONObject("retdata");
 	
 		//注册原始帐号的账户
-		String userBaseAccoutForm = UserUtil.generateuserAccoutForm(userInfoDTO,userRegistRetData, false);
+		String userBaseAccoutForm = UserUtil.generateuserAccoutForm(userInfoVO,userRegistRetData, false);
 		String userBaseAccountRegistResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/account_cert/register", userBaseAccoutForm);
 		logger.debug("注册原始帐号的账户返回结果:"+userBaseAccountRegistResult);
 		ResultUtil.checkResultIfSuccess("申请账户",userBaseAccountRegistResult);
@@ -252,19 +251,19 @@ public class UserServiceImpl implements UserService {
 		if ( StringUtils.isBlank(userBaseAccount)){
 			userBaseAccount = userAccoutData.getString("account_address");
 		}
-		userInfoDTO.setBaseAccountAddress(userBaseAccount);
+		userInfoVO.setBaseAccountAddress(userBaseAccount);
 		
-		return userInfoDTO;
+		return userInfoVO;
 	}
 
 	@Override
-	public UserInfoDTO addUserHostAccount(UserFormDTO userFormVO) throws ServiceException, TrustSDKException, UnsupportedEncodingException, Exception {
+	public UserInfoVO addUserHostAccount(UserFormDTO userFormDTO) throws ServiceException, TrustSDKException, UnsupportedEncodingException, Exception {
 		//再设置一个新的账号作为代理账号
-		UserInfoDTO userInfoDTO = new UserInfoDTO();
-		userInfoDTO.setId(userFormVO.getId());
-		userInfoDTO.setName(userFormVO.getName());
+		UserInfoVO userInfoVO = new UserInfoVO();
+		userInfoVO.setId(userFormDTO.getId());
+		userInfoVO.setName(userFormDTO.getName());
 		
-		String userHostAccoutForm = UserUtil.generateuserAccoutFormOnlyHostAccount(userInfoDTO, userFormVO);
+		String userHostAccoutForm = UserUtil.generateuserAccoutFormOnlyHostAccount(userInfoVO, userFormDTO);
 		SimpleHttpClient httpClient = new SimpleHttpClient();
 		String userHostAccountFormResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/account_cert/register", userHostAccoutForm);
 		ResultUtil.checkResultIfSuccess("申请代理账户",userHostAccountFormResult);
@@ -275,9 +274,9 @@ public class UserServiceImpl implements UserService {
 		if ( StringUtils.isBlank(userHostAccount)){
 			userHostAccount = userHostAccoutData.getString("account_address");
 		}
-		userInfoDTO.setHostWalletAccountAddress(userHostAccount);
+		userInfoVO.setHostWalletAccountAddress(userHostAccount);
 
-		return userInfoDTO;
+		return userInfoVO;
 	}
 
 	@Override
@@ -286,7 +285,7 @@ public class UserServiceImpl implements UserService {
 		String publicKey = keyInfo.getPublicKey().trim();
 		boolean isPair = TrustSDK.checkPairKey(privateKey, publicKey);
 		if ( isPair==false){
-			throw new ServiceException("公私钥匹配错误");
+			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage("公私钥匹配错误");
 		}
 	}
 }

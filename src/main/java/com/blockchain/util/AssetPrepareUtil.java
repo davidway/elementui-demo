@@ -18,20 +18,20 @@ public class AssetPrepareUtil {
 
 	public AssetSubmitFormDTO prepareAssetSubmitForm(String applyResultString) {
 		JSONObject o = JSON.parseObject(applyResultString);
-		AssetSubmitFormDTO assetSubmitFormVO = new AssetSubmitFormDTO();
+		AssetSubmitFormDTO assetSubmitFormDTO = new AssetSubmitFormDTO();
 		String signStrList = o.getString("sign_str_list");
-		assetSubmitFormVO.setSignStr(signStrList);
+		assetSubmitFormDTO.setSignStr(signStrList);
 		String transactionId = o.getString("transaction_id");
-		assetSubmitFormVO.setTransactionId(transactionId);
+		assetSubmitFormDTO.setTransactionId(transactionId);
 		String assetId = o.getString("asset_id");
-		assetSubmitFormVO.setAssetId(assetId);
-		return assetSubmitFormVO;
+		assetSubmitFormDTO.setAssetId(assetId);
+		return assetSubmitFormDTO;
 		
 	}
 
-	public AssetTransferSubmitFormDTO perpareTransferSubmitForm(AssetTransferFormDTO assetTransferFormVO, String applyResultString) {
+	public AssetTransferSubmitFormDTO perpareTransferSubmitForm(AssetTransferFormDTO assetTransferFormDTO, String applyResultString) {
 		AssetTransferSubmitFormDTO s = new AssetTransferSubmitFormDTO();
-		s.setUserPrivateKey(assetTransferFormVO.getUserPrivateKey());
+		s.setUserPrivateKey(assetTransferFormDTO.getUserPrivateKey());
 		
 		JSONObject o = JSON.parseObject(applyResultString);
 		String transtionId = o.getString("transaction_id");
@@ -41,21 +41,21 @@ public class AssetPrepareUtil {
 		
 		s.setTransactionId(transtionId);
 		s.setSrcAssetId(leftAssetId);
-		s.setUserPrivateKey(assetTransferFormVO.getUserPrivateKey());
+		s.setUserPrivateKey(assetTransferFormDTO.getUserPrivateKey());
 		s.setDstAssetId(dstAsssetId);
 		s.setSignList(signList);
 		return s;
 	}
 
-	public AssetSettleSubmitFormDTO perpareTransferSubmitForm(AssetSettleFormDTO assetSettleFormVO, String applyResultString) {
+	public AssetSettleSubmitFormDTO perpareTransferSubmitForm(AssetSettleFormDTO assetSettleFormDTO, String applyResultString) {
 		AssetSettleSubmitFormDTO s = new AssetSettleSubmitFormDTO();
-		s.setUserPrivateKey(assetSettleFormVO.getUserPrivateKey());
+		s.setUserPrivateKey(assetSettleFormDTO.getUserPrivateKey());
 		
 		JSONObject o = JSON.parseObject(applyResultString);
 		String transtionId = o.getString("transaction_id");
 		String signList = o.getString("sign_str_list");
 		
-		String userPrivateKey = assetSettleFormVO.getUserPrivateKey();
+		String userPrivateKey = assetSettleFormDTO.getUserPrivateKey();
 		s.setUserPrivateKey(userPrivateKey);
 		s.setTransactionId(transtionId);
 		s.setSignList(signList);
@@ -86,10 +86,10 @@ public class AssetPrepareUtil {
 		return assetTransferDTO;
 	}
 
-	public AssetSettleDTO generateAssetSettleDTO(AssetSettleSubmitFormDTO assetSettleSubmitFormVO, String submitResultString) {
+	public AssetSettleDTO generateAssetSettleDTO(AssetSettleSubmitFormDTO assetSettleSubmitFormDTO, String submitResultString) {
 		AssetSettleDTO assetSettleDTO = new AssetSettleDTO();
 		
-		String transactionId = assetSettleSubmitFormVO.getTransactionId();
+		String transactionId = assetSettleSubmitFormDTO.getTransactionId();
 		JSONObject json = JSONObject.parseObject(submitResultString);
 		String leftAssetId = json.getString("left_asset_id");
 		String transHash = json.getString("trans_hash");
@@ -99,10 +99,10 @@ public class AssetPrepareUtil {
 		 return assetSettleDTO;
 	}
 
-	public AssetIssueDTO generateAssetIssueDto(AssetSubmitFormDTO assetSubmitFormVO, String submitResultString) {
+	public AssetIssueDTO generateAssetIssueDto(AssetSubmitFormDTO assetSubmitFormDTO, String submitResultString) {
 		AssetIssueDTO assetIssueDTO = new AssetIssueDTO();
 		
-		String transactionId = assetSubmitFormVO.getTransactionId();
+		String transactionId = assetSubmitFormDTO.getTransactionId();
 		String assetId = JSON.parseObject(submitResultString).getString("asset_id");
 		String transHash = JSON.parseObject(submitResultString).getString("trans_hash");
 		

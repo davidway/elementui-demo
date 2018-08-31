@@ -23,13 +23,16 @@ public class StatusCode {
 	 */
 
 
-	/** 系统位置错误，提示系统繁忙，请稍后再试 */
+	/** 系统错误 */
 	public static final int SYSTEM_UNKOWN_ERROR = 100001;
+	public static final String SYSTEM_UNKOWN_ERROR_MESSAGE = "系统发生未知错误";
+	
 	/** {参数名称}取值错误或者不可为空 */
 	public static final int PARAM_ERROR= 100002;
 	public static final String PARAM_ERROR_MESSAGE="前端：参数出错";
 	/**{参数名称}格式不正确 */
-	public static final int PARAM_FORMAT_ERROR = 100003;	
+	public static final int CONFIG_NOT_SET = 100003;	
+	public static final String CONFIG_NOT_SET_MESSAGE ="配置文件内容暂未设置";
 	/** {参数名称}长度超过限制 */
 	public static final int PARAM_LENGTH_ERROR = 100004;		
 	/** Token错误 */
@@ -67,6 +70,9 @@ public class StatusCode {
 	/**提交业务错误*/
 	public static final int SUBMIT_ERROR = 201001;
 	public static final String SUBMIT_ERROR_MESSAGE="后端：业务执行提交时错误";
+	/**申请业务错误*/
+	public static final int APPLY_ERROR = 201002;
+	public static final String APPLY_ERROR_MESSAGE="后端：业务执行申请时错误";
 	
 	/**线程溢出并发异常**/
 	public static final int THREAD_ERROR = 301000;
@@ -75,4 +81,8 @@ public class StatusCode {
 	public static final String APPLY_THREAD_ERROR_MESSAGE="申请得不到执行权限";
 	public static final int SUBMIT_THREAD_ERROR = 301002;
 	public static final String SUBMIT_THREAD_ERROR_MESSAGE="提交得不到执行权限";
+	public static final int PAIR_KEY_ERROR = 100004;
+	public static final String PAIR_KEY_ERROR_MESSAGE = "公私钥匹配失败";
+	public static final String AUTHORITY_ERROR_MESSAGE = "缺少权限";
+	
 }

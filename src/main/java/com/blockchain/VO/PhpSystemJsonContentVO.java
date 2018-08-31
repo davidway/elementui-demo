@@ -1,11 +1,8 @@
 package com.blockchain.VO;
 
 
-import javax.net.ssl.SSLEngineResult.Status;
-
+import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
-import com.blockchain.exception.SubmitException;
-import com.blockchain.exception.ThreadException;
 
 public class PhpSystemJsonContentVO {
 	Integer retcode;
@@ -44,10 +41,10 @@ public class PhpSystemJsonContentVO {
 	}
 
 
-	public PhpSystemJsonContentVO setParameterError(String s ) {
-		this.retcode=StatusCode.PARAM_ERROR;
-		this.retmsg=s;
-	
+	public PhpSystemJsonContentVO setKnownError(ServiceException e ) {
+		this.retcode=e.getErrorCode();
+		this.retmsg=e.getErrorMessage();
+		this.data = e.getData();
 		return this;
 	}
 
@@ -83,31 +80,10 @@ public class PhpSystemJsonContentVO {
 	}
 
 
-	public PhpSystemJsonContentVO setServiceError(String message) {
-		this.retcode=StatusCode.SERVICE_EXCEPTION;;
-		this.retmsg=message;
-		
-		return this;
-	}
+	
 
 
-	public PhpSystemJsonContentVO setSubmitException(SubmitException e) {
-
-		this.setData(e.getData());
-		this.setRetmsg(e.getMessage());
-		this.setRetcode(StatusCode.SUBMIT_ERROR);
-		return this;
-		
-	}
-
-
-	public PhpSystemJsonContentVO setThreadException(ThreadException e) {
-		this.setData(e.getData());
-		this.setRetmsg(e.getMessage());
-		this.setRetcode(e.getErrorCode());
-		return this;
-		
-	}
+	
 	
 	
 }

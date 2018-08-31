@@ -18,7 +18,7 @@ public interface AssetService {
 
 	AssetIssueDTO issue(AssetFormDTO assetFormDTO) throws Exception;
 
-	AssetTransferDTO transfer(AssetTransferFormDTO assetTransferFormVO) throws TrustSDKException, Exception;
+	AssetTransferDTO transfer(AssetTransferFormDTO assetTransferFormDTO) throws TrustSDKException, Exception;
 
 	AssetSettleDTO settle(AssetSettleFormDTO assetSettleFormDTO) throws UnsupportedEncodingException, TrustSDKException, Exception;
 

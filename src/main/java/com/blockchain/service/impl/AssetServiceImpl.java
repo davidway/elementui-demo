@@ -38,10 +38,10 @@ public class AssetServiceImpl implements AssetService {
 	AssetPrepareUtil assetPrepareUtil;
 	
 	@Override
-	public AssetIssueDTO issue(AssetFormDTO assetFormVO) throws Exception {
+	public AssetIssueDTO issue(AssetFormDTO assetFormDTO) throws Exception {
 		issueLogger.info("issue调试");
-		issueLogger.info("传入的参数{}" , assetFormVO);
-		String applyString = assetUtil.generateIssueApplyParam(assetFormVO);
+		issueLogger.info("传入的参数{}" , assetFormDTO);
+		String applyString = assetUtil.generateIssueApplyParam(assetFormDTO);
 
 		issueLogger.info("调用【发行申请】前的参数:{}" , applyString);
 		String applyUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_issue_apply_v1.cgi";
@@ -49,27 +49,27 @@ public class AssetServiceImpl implements AssetService {
 		issueLogger.info("调用【发行申请】后的参数{}" , applyResultString);
 		ResultUtil.checkResultIfSuccess("资产申请接口", applyResultString);
 
-		AssetSubmitFormDTO assetSubmitFormVO = assetPrepareUtil.prepareAssetSubmitForm(applyResultString);
-		String submitString = assetUtil.generateIssueSubmitParam(assetSubmitFormVO);
+		AssetSubmitFormDTO assetSubmitFormDTO = assetPrepareUtil.prepareAssetSubmitForm(applyResultString);
+		String submitString = assetUtil.generateIssueSubmitParam(assetSubmitFormDTO);
 
 		issueLogger.info("调用【发行提交】后的参数" + submitString);
 		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_issue_submit_v1.cgi";
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
 
-		ResultUtil.checkSubmitResultIfSuccess("资产提交接口", JSON.toJSONString(assetSubmitFormVO), submitResultString);
+		ResultUtil.checkSubmitResultIfSuccess("资产提交接口", JSON.toJSONString(assetSubmitFormDTO), submitResultString);
 		issueLogger.debug("issue调试结束");
 
 		AssetIssueDTO assetIssueDTO = new AssetIssueDTO();
-		assetIssueDTO = assetPrepareUtil.generateAssetIssueDto(assetSubmitFormVO, submitResultString);
+		assetIssueDTO = assetPrepareUtil.generateAssetIssueDto(assetSubmitFormDTO, submitResultString);
 		return assetIssueDTO;
 	}
 
 
 	@Override
-	public AssetTransferDTO transfer(AssetTransferFormDTO assetTransferFormVO) throws TrustSDKException, Exception {
+	public AssetTransferDTO transfer(AssetTransferFormDTO assetTransferFormDTO) throws TrustSDKException, Exception {
 
 		transferLogger.info("transfer调试开始");
-		String applyString = assetUtil.generateTransferApplyParam(assetTransferFormVO);
+		String applyString = assetUtil.generateTransferApplyParam(assetTransferFormDTO);
 		transferLogger.info("调用【转账申请前】的参数" + applyString);
 		String applyUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_transfer_apply_v1.cgi";
 		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
@@ -77,7 +77,7 @@ public class AssetServiceImpl implements AssetService {
 
 		ResultUtil.checkResultIfSuccess("资产转让申请接口", applyResultString);
 
-		AssetTransferSubmitFormDTO asseTransfertSubmitForm = assetPrepareUtil.perpareTransferSubmitForm(assetTransferFormVO, applyResultString);
+		AssetTransferSubmitFormDTO asseTransfertSubmitForm = assetPrepareUtil.perpareTransferSubmitForm(assetTransferFormDTO, applyResultString);
 		String submitString = assetUtil.generateTransferSubmitParam(asseTransfertSubmitForm);
 		transferLogger.info("调用【转账提交前】的参数" + submitString);
 		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_transfer_submit_v1.cgi";
@@ -94,9 +94,9 @@ public class AssetServiceImpl implements AssetService {
 	}
 
 	@Override
-	public AssetSettleDTO settle(AssetSettleFormDTO assetSettleFormVO) throws UnsupportedEncodingException, TrustSDKException, Exception {
+	public AssetSettleDTO settle(AssetSettleFormDTO assetSettleFormDTO) throws UnsupportedEncodingException, TrustSDKException, Exception {
 		settleLogger.info("settle调试开始");
-		String applyString = assetUtil.generateSettleApplyParam(assetSettleFormVO);
+		String applyString = assetUtil.generateSettleApplyParam(assetSettleFormDTO);
 
 		settleLogger.info("调用【兑换申请前】" + applyString);
 		String applyUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_settle_apply_v1.cgi";
@@ -105,19 +105,19 @@ public class AssetServiceImpl implements AssetService {
 
 		ResultUtil.checkResultIfSuccess("资产兑换申请接口", applyResultString);
 
-		AssetSettleSubmitFormDTO assetSettleSubmitFormVO = assetPrepareUtil.perpareTransferSubmitForm(assetSettleFormVO, applyResultString);
-		String submitString = assetUtil.generateSettleSubmitParam(assetSettleSubmitFormVO);
+		AssetSettleSubmitFormDTO assetSettleSubmitFormDTO = assetPrepareUtil.perpareTransferSubmitForm(assetSettleFormDTO, applyResultString);
+		String submitString = assetUtil.generateSettleSubmitParam(assetSettleSubmitFormDTO);
 
 		settleLogger.info("【兑换【调用提交前】" + submitString);
 		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_settle_submit_v1.cgi";
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
 		settleLogger.info("【兑换【调用提交】后" + submitResultString);
 
-		ResultUtil.checkSubmitResultIfSuccess("资产提交接口", JSON.toJSONString(assetSettleSubmitFormVO), submitResultString);
+		ResultUtil.checkSubmitResultIfSuccess("资产提交接口", JSON.toJSONString(assetSettleSubmitFormDTO), submitResultString);
 		settleLogger.info("settle调试结束");
 
 		AssetSettleDTO assetSettleDTO = new AssetSettleDTO();
-		assetSettleDTO = assetPrepareUtil.generateAssetSettleDTO(assetSettleSubmitFormVO, submitResultString);
+		assetSettleDTO = assetPrepareUtil.generateAssetSettleDTO(assetSettleSubmitFormDTO, submitResultString);
 		return assetSettleDTO;
 	}
 
@@ -128,9 +128,9 @@ public class AssetServiceImpl implements AssetService {
 
 
 	@Override
-	public AssetIssueDTO issueSubmit(AssetSubmitFormDTO assetSubmitFormVO) throws UnsupportedEncodingException, TrustSDKException, Exception {
-		issueLogger.debug("传入的参数" + assetSubmitFormVO);
-		String submitString = assetUtil.generateIssueSubmitParam(assetSubmitFormVO);
+	public AssetIssueDTO issueSubmit(AssetSubmitFormDTO assetSubmitFormDTO) throws UnsupportedEncodingException, TrustSDKException, Exception {
+		issueLogger.debug("传入的参数" + assetSubmitFormDTO);
+		String submitString = assetUtil.generateIssueSubmitParam(assetSubmitFormDTO);
 		issueLogger.debug("调用【资产发行前】" + submitString);
 
 		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_issue_submit_v1.cgi";
@@ -141,7 +141,7 @@ public class AssetServiceImpl implements AssetService {
 
 	
 		AssetIssueDTO assetIssueDTO = new AssetIssueDTO();
-		assetIssueDTO = assetPrepareUtil.generateAssetIssueDto(assetSubmitFormVO, submitResultString);
+		assetIssueDTO = assetPrepareUtil.generateAssetIssueDto(assetSubmitFormDTO, submitResultString);
 		return assetIssueDTO;
 	}
 
@@ -152,7 +152,7 @@ public class AssetServiceImpl implements AssetService {
 		String submitString = assetUtil.generateTransferSubmitParam(asseTransfertSubmitForm);
 
 		transferLogger.info("调用【转账只提交前】" + submitString);
-		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_transfer_submit_v1.cgi";
+ 		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_transfer_submit_v1.cgi";
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
 		transferLogger.info("调用【转账只提交后】" + submitResultString);
 
@@ -168,9 +168,9 @@ public class AssetServiceImpl implements AssetService {
 
 
 	@Override
-	public AssetSettleDTO settleSubmit(AssetSettleSubmitFormDTO assetSettleSubmitFormVO) throws Exception {
+	public AssetSettleDTO settleSubmit(AssetSettleSubmitFormDTO assetSettleSubmitFormDTO) throws Exception {
 
-		String submitString = assetUtil.generateSettleSubmitParam(assetSettleSubmitFormVO);
+		String submitString = assetUtil.generateSettleSubmitParam(assetSettleSubmitFormDTO);
 		settleLogger.info("调用【兑换只提交前】" + submitString);
 		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_settle_submit_v1.cgi";
 
@@ -181,7 +181,7 @@ public class AssetServiceImpl implements AssetService {
 		settleLogger.info("settle调试结束");
 
 		AssetSettleDTO assetSettleDTO = new AssetSettleDTO();
-		assetSettleDTO = assetPrepareUtil.generateAssetSettleDTO(assetSettleSubmitFormVO, submitResultString);
+		assetSettleDTO = assetPrepareUtil.generateAssetSettleDTO(assetSettleSubmitFormDTO, submitResultString);
 		return assetSettleDTO;
 	}
 

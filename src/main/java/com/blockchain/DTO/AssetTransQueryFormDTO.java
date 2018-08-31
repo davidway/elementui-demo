@@ -30,6 +30,9 @@ public class AssetTransQueryFormDTO {
 	@ApiModelProperty(value="页码,最小值不能小于1",required=true)
 	@Min(value=1,message="最小值不能小于1")
 	private Integer pageNo;
+	
+
+	
 	public String getSrcAccount() {
 		return srcAccount;
 	}

@@ -9,8 +9,8 @@ import com.blockchain.DTO.AssetTransQueryFormDTO;
 import com.blockchain.DTO.KeyInfoDTO;
 import com.blockchain.DTO.TransInfoDTO;
 import com.blockchain.DTO.UserFormDTO;
-import com.blockchain.DTO.UserInfoDTO;
 import com.blockchain.DTO.UserKeyDTO;
+import com.blockchain.VO.UserInfoVO;
 import com.blockchain.exception.ServiceException;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
 
@@ -24,7 +24,7 @@ public interface UserService {
 
 	public UserKeyDTO generatePairKey(UserKeyDTO userKeyModel) throws TrustSDKException, UnsupportedEncodingException;
 
-	public UserInfoDTO addUserHasBaseAndHostAccount(UserFormDTO userFormVO) throws UnsupportedEncodingException, TrustSDKException, Exception;
+	public UserInfoVO addUserHasBaseAndHostAccount(UserFormDTO userFormDTO) throws UnsupportedEncodingException, TrustSDKException, Exception;
 
 	List<AssetDTO> accountQuery(AccountQueryFormDTO assetForm) throws TrustSDKException, Exception;
 
@@ -32,9 +32,9 @@ public interface UserService {
 
 	String getSrcAssetListBySrcAccount(String srcAccount, String content) throws TrustSDKException, Exception;
 
-	public UserInfoDTO addUserHasBaseAccount(UserFormDTO userFormVO) throws ServiceException, TrustSDKException, UnsupportedEncodingException, Exception;
+	public UserInfoVO addUserHasBaseAccount(UserFormDTO userFormDTO) throws ServiceException, TrustSDKException, UnsupportedEncodingException, Exception;
 
-	public UserInfoDTO addUserHostAccount(UserFormDTO userFormVO)  throws ServiceException, TrustSDKException, UnsupportedEncodingException, Exception;
+	public UserInfoVO addUserHostAccount(UserFormDTO userFormDTO)  throws ServiceException, TrustSDKException, UnsupportedEncodingException, Exception;
 
 	public void checkPairKey(KeyInfoDTO keyInfo) throws TrustSDKException, ServiceException;
 

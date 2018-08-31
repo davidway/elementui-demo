@@ -26,10 +26,10 @@ public class TransInfoDTO {
 	private String transactionId;
 	@ApiModelProperty(   value = "待签名串列表", dataType = "String")
 	private String signList;
-	@ApiModelProperty(   value = "交易hash值", dataType = "String")
+
+	@ApiModelProperty(   value = "返回串hash", dataType = "String")
 	private String hash;
-	
-	
+
 
 	public String getHash() {
 		return hash;

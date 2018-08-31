@@ -10,9 +10,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.blockchain.DTO.AccountQueryFormDTO;
 import com.blockchain.DTO.AssetTransQueryFormDTO;
-import com.blockchain.DTO.BaseParamDTO;
 import com.blockchain.DTO.UserFormDTO;
-import com.blockchain.DTO.UserInfoDTO;
+import com.blockchain.VO.UserInfoVO;
 import com.tencent.trustsql.sdk.TrustSDK;
 import com.tencent.trustsql.sdk.bean.AccountCert;
 import com.tencent.trustsql.sdk.bean.PairKey;
@@ -26,16 +25,16 @@ public class UserUtil {
 
 	static boolean isTest = false;
 
-	public static String generateUserRequest(UserInfoDTO userInfoDTO, UserFormDTO userFormVO) throws Exception {
+	public static String generateUserRequest(UserInfoVO userInfoVO, UserFormDTO userFormDTO) throws Exception {
 		String requestString = "";
-
+		ConfigUtils configUtils = ConfigUtils.getSingleton();
 		RequestData req = new RequestData();
-		ConfigUtils configUtil = ConfigUtils.getSingleton();
-		String sequenceNumber = RequestUtil.getSequenceNumber();
-		String mchId = isTest ? BaseParamDTO.mchId : configUtil.getMchId();
 
-		String userId = userFormVO.getId();
-		String name = userFormVO.getName();
+		String sequenceNumber = RequestUtil.getSequenceNumber();
+		String mchId =  configUtils.getMchId();
+
+		String userId = userFormDTO.getId();
+		String name = userFormDTO.getName();
 
 		req.setMch_id(mchId);
 		req.setProduct_code("productA");
@@ -51,23 +50,23 @@ public class UserUtil {
 
 		req.setReq_data(JSONObject.toJSONString(user));
 		req.setTime_stamp(System.currentTimeMillis() / 1000L);
-
-		String prvKey = isTest ? BaseParamDTO.create_user_privateKey : configUtil.getCreateUserPrivateKey();
+	
+		String prvKey = configUtils.getCreateUserPrivateKey();
 		String signSrc = SignUtil.genSignSrc(req);
 		String sign = TrustSDK.signString(prvKey, signSrc.getBytes("UTF-8"), false);
 		req.setSign(sign);
 
-		userInfoDTO.setBasePrivateKey(pairKey.getPrivateKey());
-		userInfoDTO.setBasePublicKey(pairKey.getPublicKey());
+		userInfoVO.setBasePrivateKey(pairKey.getPrivateKey());
+		userInfoVO.setBasePublicKey(pairKey.getPublicKey());
 
 		return JSON.toJSONString(req);
 	}
 
 	public static String generateRegisterAccountRequest(UserCert userCert, boolean isHost) throws Exception {
-		ConfigUtils configUtil = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = ConfigUtils.getSingleton();
 		RequestData req = new RequestData();
 		String sqeNo = RequestUtil.getSequenceNumber();
-		req.setMch_id(isTest ? BaseParamDTO.mchId : configUtil.getMchId());
+		req.setMch_id( configUtils.getMchId());
 		req.setProduct_code("productA");
 		req.setSeq_no(sqeNo);
 		req.setType("sign");
@@ -84,7 +83,7 @@ public class UserUtil {
 
 		req.setReq_data(JSONObject.toJSONString(account));
 		req.setTime_stamp(System.currentTimeMillis() / 1000L);
-		String prvKey = isTest ? BaseParamDTO.create_user_privateKey : configUtil.getCreateUserPrivateKey();
+		String prvKey = configUtils.getCreateUserPrivateKey();
 		// String prvKey = "gaxUIUD76vmEaJwxUZEcqoM0LDESKtpc3M4FDSlPSV0";
 		String signSrc = SignUtil.genSignSrc(req);
 		System.out.println(signSrc);
@@ -94,11 +93,11 @@ public class UserUtil {
 		return JSONObject.toJSONString(req);
 	}
 
-	public static String generateuserAccoutForm(UserInfoDTO userInfoDTO, JSONObject userRegistRetData, boolean isHost) throws Exception {
+	public static String generateuserAccoutForm(UserInfoVO userInfoVO, JSONObject userRegistRetData, boolean isHost) throws Exception {
 		String sequenceNumber = RequestUtil.getSequenceNumber();
-		ConfigUtils configUtil = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = ConfigUtils.getSingleton();
 		RequestData req = new RequestData();
-		req.setMch_id(isTest ? BaseParamDTO.mchId : configUtil.getMchId());
+		req.setMch_id( configUtils.getMchId());
 		req.setProduct_code("productA");
 		req.setSeq_no(sequenceNumber);
 		req.setType("sign");
@@ -111,15 +110,15 @@ public class UserUtil {
 			accountPublicKey = pairKey.getPublicKey();
 			accountPrivateKey = pairKey.getPrivateKey();
 			account.setPublic_key(accountPublicKey);
-			userInfoDTO.setHostWalletPublicKey(accountPublicKey);
-			userInfoDTO.setHostWalletPrivateKey(accountPrivateKey);
+			userInfoVO.setHostWalletPublicKey(accountPublicKey);
+			userInfoVO.setHostWalletPrivateKey(accountPrivateKey);
 		} else {
 			account.setPublic_key(accountPublicKey);
 		}
 
 		req.setReq_data(JSONObject.toJSONString(account));
 		req.setTime_stamp(System.currentTimeMillis() / 1000L);
-		String prvKey = isTest ? BaseParamDTO.create_user_privateKey : configUtil.getCreateUserPrivateKey();
+		String prvKey = configUtils.getCreateUserPrivateKey();
 		// String prvKey = "gaxUIUD76vmEaJwxUZEcqoM0LDESKtpc3M4FDSlPSV0";
 		String signSrc = SignUtil.genSignSrc(req);
 
@@ -130,13 +129,13 @@ public class UserUtil {
 	}
 
 	public static String generateAccountQueryParam(AccountQueryFormDTO assetForm) throws TrustSDKException, Exception {
-		ConfigUtils configUtil = ConfigUtils.getSingleton();
-		String mchId = isTest ? BaseParamDTO.mchId : configUtil.getMchId();
-		String prvKey = isTest ? BaseParamDTO.create_user_privateKey : configUtil.getCreateUserPrivateKey();
+		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		String mchId =  configUtils.getMchId();
+		String prvKey = configUtils.getCreateUserPrivateKey();
 
-		String nodeId = isTest ? BaseParamDTO.nodeId : configUtil.getNodeId();
-		String chainId = isTest ? BaseParamDTO.chainId : configUtil.getChainId();
-		String ledgerId = isTest ? BaseParamDTO.leadgerId : configUtil.getLedgerId();
+		String nodeId =  configUtils.getNodeId();
+		String chainId = configUtils.getChainId();
+		String ledgerId =  configUtils.getLedgerId();
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 		paramMap.put("version", "1.0");
 		paramMap.put("sign_type", "ECDSA");
@@ -169,15 +168,15 @@ public class UserUtil {
 	}
 
 	public static String generateTransQueryParam(AssetTransQueryFormDTO assetForm) throws TrustSDKException, Exception {
-		ConfigUtils configUtil = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = ConfigUtils.getSingleton();
 		JSONArray resultJsonArr = new JSONArray();
 
-		String mchId = isTest ? BaseParamDTO.mchId : configUtil.getMchId();
-		String prvKey = isTest ? BaseParamDTO.create_user_privateKey : configUtil.getCreateUserPrivateKey();
+		String mchId =  configUtils.getMchId();
+		String prvKey = configUtils.getCreateUserPrivateKey();
 
-		String nodeId = isTest ? BaseParamDTO.nodeId : configUtil.getNodeId();
-		String chainId = isTest ? BaseParamDTO.chainId : configUtil.getChainId();
-		String ledgerId = isTest ? BaseParamDTO.leadgerId : configUtil.getLedgerId();
+		String nodeId =  configUtils.getNodeId();
+		String chainId = configUtils.getChainId();
+		String ledgerId =  configUtils.getLedgerId();
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 		paramMap.put("version", "1.0");
 		paramMap.put("sign_type", "ECDSA");
@@ -213,29 +212,29 @@ public class UserUtil {
 		return postJson.toJSONString();
 	}
 
-	public static String generateuserAccoutFormOnlyHostAccount(UserInfoDTO userInfoDTO, UserFormDTO userFormVO) throws Exception {
+	public static String generateuserAccoutFormOnlyHostAccount(UserInfoVO userInfoVO, UserFormDTO userFormDTO) throws Exception {
+		ConfigUtils configUtils = ConfigUtils.getSingleton();
 		String sequenceNumber = RequestUtil.getSequenceNumber();
-		ConfigUtils configUtil = ConfigUtils.getSingleton();
 		String accountPublicKey = "";
 		String accountPrivateKey = "";
 		RequestData req = new RequestData();
-		req.setMch_id(isTest ? BaseParamDTO.mchId : configUtil.getMchId());
+		req.setMch_id( configUtils.getMchId());
 		req.setProduct_code("productA");
 		req.setSeq_no(sequenceNumber);
 		req.setType("sign");
 		AccountCert account = new AccountCert();
-		account.setUser_id(userFormVO.getId());
+		account.setUser_id(userFormDTO.getId());
 
 		PairKey pairKey = TrustSDK.generatePairKey(true);
 		accountPublicKey = pairKey.getPublicKey();
 		accountPrivateKey = pairKey.getPrivateKey();
 		account.setPublic_key(accountPublicKey);
-		userInfoDTO.setHostWalletPublicKey(accountPublicKey);
-		userInfoDTO.setHostWalletPrivateKey(accountPrivateKey);
+		userInfoVO.setHostWalletPublicKey(accountPublicKey);
+		userInfoVO.setHostWalletPrivateKey(accountPrivateKey);
 
 		req.setReq_data(JSONObject.toJSONString(account));
 		req.setTime_stamp(System.currentTimeMillis() / 1000L);
-		String prvKey = isTest ? BaseParamDTO.create_user_privateKey : configUtil.getCreateUserPrivateKey();
+		String prvKey = configUtils.getCreateUserPrivateKey();
 		// String prvKey = "gaxUIUD76vmEaJwxUZEcqoM0LDESKtpc3M4FDSlPSV0";
 		String signSrc = SignUtil.genSignSrc(req);
 
