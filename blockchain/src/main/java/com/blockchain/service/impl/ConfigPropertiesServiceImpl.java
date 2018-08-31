@@ -1,12 +1,11 @@
 package com.blockchain.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.blockchain.VO.ConfigPropertiesFormVO;
+import com.blockchain.DTO.ConfigPropertiesFormDTO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.service.ConfigPropertiesService;
 import com.blockchain.util.ConfigUtils;
@@ -17,13 +16,13 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 
 	Logger logger = LoggerFactory.getLogger(ConfigPropertiesServiceImpl.class);
 	@Override
-	public void add(ConfigPropertiesFormVO configPropertiesFormVO) throws TrustSDKException, ServiceException {
-		String chainId = configPropertiesFormVO.getChainId();
-		String ledgerId = configPropertiesFormVO.getLedgerId();
-		String mchId = configPropertiesFormVO.getMchId();
-		String nodeId = configPropertiesFormVO.getNodeId();
-		String createUserPrivateKey = configPropertiesFormVO.getCreateUserPrivateKey();
-		String createUserPublicKey = configPropertiesFormVO.getCreateUserPublicKey();
+	public void add(ConfigPropertiesFormDTO configPropertiesFormDTO) throws TrustSDKException, ServiceException {
+		String chainId = configPropertiesFormDTO.getChainId();
+		String ledgerId = configPropertiesFormDTO.getLedgerId();
+		String mchId = configPropertiesFormDTO.getMchId();
+		String nodeId = configPropertiesFormDTO.getNodeId();
+		String createUserPrivateKey = configPropertiesFormDTO.getCreateUserPrivateKey();
+		String createUserPublicKey = configPropertiesFormDTO.getCreateUserPublicKey();
 		ConfigUtils configUtils  = ConfigUtils.getSingleton();
 	
 		if (StringUtils.isNotBlank(chainId)) {
@@ -50,8 +49,8 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 	}
 
 	@Override
-	public ConfigPropertiesFormVO get() {
-		ConfigPropertiesFormVO configPropertiesFormVO = new ConfigPropertiesFormVO();
+	public ConfigPropertiesFormDTO get() {
+		ConfigPropertiesFormDTO configPropertiesFormDTO = new ConfigPropertiesFormDTO();
 		ConfigUtils configUtils  = ConfigUtils.getSingleton();
 		String chainId = configUtils.getChainId();
 		String ledgerId = configUtils.getLedgerId();
@@ -60,18 +59,18 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 		String createUserPrivateKey = configUtils.getCreateUserPrivateKey();
 		String createUserPublicKey = configUtils.getCreateUserPublicKey();
 		
-		configPropertiesFormVO.setChainId(chainId);
+		configPropertiesFormDTO.setChainId(chainId);
 
-		configPropertiesFormVO.setLedgerId(ledgerId);
+		configPropertiesFormDTO.setLedgerId(ledgerId);
 
-		configPropertiesFormVO.setMchId(mchId);
+		configPropertiesFormDTO.setMchId(mchId);
 
-		configPropertiesFormVO.setNodeId(nodeId);
+		configPropertiesFormDTO.setNodeId(nodeId);
 
-		configPropertiesFormVO.setCreateUserPrivateKey(createUserPrivateKey);
+		configPropertiesFormDTO.setCreateUserPrivateKey(createUserPrivateKey);
 
-		configPropertiesFormVO.setCreateUserPublicKey(createUserPublicKey);
-		return configPropertiesFormVO;
+		configPropertiesFormDTO.setCreateUserPublicKey(createUserPublicKey);
+		return configPropertiesFormDTO;
 		
 	}
 

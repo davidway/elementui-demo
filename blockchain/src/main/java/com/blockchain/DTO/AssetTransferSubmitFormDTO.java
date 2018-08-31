@@ -1,4 +1,4 @@
-package com.blockchain.VO;
+package com.blockchain.DTO;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -6,7 +6,7 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value="转让仅提交表单")
-public class AssetTransferSubmitFormVO {
+public class AssetTransferSubmitFormDTO {
 	@NotEmpty(message="平台唯一标识一次交易的ID不能为空")
 	@ApiModelProperty(value="平台唯一标识一次交易的ID")
 	private String transactionId;

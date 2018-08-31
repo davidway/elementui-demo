@@ -8,11 +8,11 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.blockchain.DTO.AccountQueryFormDTO;
+import com.blockchain.DTO.AssetTransQueryFormDTO;
 import com.blockchain.DTO.BaseParamDTO;
-import com.blockchain.DTO.UserInfoDTO;
-import com.blockchain.VO.AccountQueryFormVO;
-import com.blockchain.VO.AssetTransQueryFormVO;
-import com.blockchain.VO.UserFormVO;
+import com.blockchain.DTO.UserFormDTO;
+import com.blockchain.VO.UserInfoVO;
 import com.tencent.trustsql.sdk.TrustSDK;
 import com.tencent.trustsql.sdk.bean.AccountCert;
 import com.tencent.trustsql.sdk.bean.PairKey;
@@ -26,7 +26,7 @@ public class UserUtil {
 
 	static boolean isTest = false;
 
-	public static String generateUserRequest(UserInfoDTO userInfoDTO, UserFormVO userFormVO) throws Exception {
+	public static String generateUserRequest(UserInfoVO userInfoVO, UserFormDTO userFormDTO) throws Exception {
 		String requestString = "";
 		ConfigUtils configUtils = ConfigUtils.getSingleton();
 		RequestData req = new RequestData();
@@ -34,8 +34,8 @@ public class UserUtil {
 		String sequenceNumber = RequestUtil.getSequenceNumber();
 		String mchId = isTest ? BaseParamDTO.mchId : configUtils.getMchId();
 
-		String userId = userFormVO.getId();
-		String name = userFormVO.getName();
+		String userId = userFormDTO.getId();
+		String name = userFormDTO.getName();
 
 		req.setMch_id(mchId);
 		req.setProduct_code("productA");
@@ -57,8 +57,8 @@ public class UserUtil {
 		String sign = TrustSDK.signString(prvKey, signSrc.getBytes("UTF-8"), false);
 		req.setSign(sign);
 
-		userInfoDTO.setBasePrivateKey(pairKey.getPrivateKey());
-		userInfoDTO.setBasePublicKey(pairKey.getPublicKey());
+		userInfoVO.setBasePrivateKey(pairKey.getPrivateKey());
+		userInfoVO.setBasePublicKey(pairKey.getPublicKey());
 
 		return JSON.toJSONString(req);
 	}
@@ -94,7 +94,7 @@ public class UserUtil {
 		return JSONObject.toJSONString(req);
 	}
 
-	public static String generateuserAccoutForm(UserInfoDTO userInfoDTO, JSONObject userRegistRetData, boolean isHost) throws Exception {
+	public static String generateuserAccoutForm(UserInfoVO userInfoVO, JSONObject userRegistRetData, boolean isHost) throws Exception {
 		String sequenceNumber = RequestUtil.getSequenceNumber();
 		ConfigUtils configUtils = ConfigUtils.getSingleton();
 		RequestData req = new RequestData();
@@ -111,8 +111,8 @@ public class UserUtil {
 			accountPublicKey = pairKey.getPublicKey();
 			accountPrivateKey = pairKey.getPrivateKey();
 			account.setPublic_key(accountPublicKey);
-			userInfoDTO.setHostWalletPublicKey(accountPublicKey);
-			userInfoDTO.setHostWalletPrivateKey(accountPrivateKey);
+			userInfoVO.setHostWalletPublicKey(accountPublicKey);
+			userInfoVO.setHostWalletPrivateKey(accountPrivateKey);
 		} else {
 			account.setPublic_key(accountPublicKey);
 		}
@@ -129,7 +129,7 @@ public class UserUtil {
 		return JSONObject.toJSONString(req);
 	}
 
-	public static String generateAccountQueryParam(AccountQueryFormVO assetForm) throws TrustSDKException, Exception {
+	public static String generateAccountQueryParam(AccountQueryFormDTO assetForm) throws TrustSDKException, Exception {
 		ConfigUtils configUtils = ConfigUtils.getSingleton();
 		String mchId = isTest ? BaseParamDTO.mchId : configUtils.getMchId();
 		String prvKey = isTest ? BaseParamDTO.create_user_privateKey : configUtils.getCreateUserPrivateKey();
@@ -168,7 +168,7 @@ public class UserUtil {
 		return postJson.toJSONString();
 	}
 
-	public static String generateTransQueryParam(AssetTransQueryFormVO assetForm) throws TrustSDKException, Exception {
+	public static String generateTransQueryParam(AssetTransQueryFormDTO assetForm) throws TrustSDKException, Exception {
 		ConfigUtils configUtils = ConfigUtils.getSingleton();
 		JSONArray resultJsonArr = new JSONArray();
 
@@ -213,7 +213,7 @@ public class UserUtil {
 		return postJson.toJSONString();
 	}
 
-	public static String generateuserAccoutFormOnlyHostAccount(UserInfoDTO userInfoDTO, UserFormVO userFormVO) throws Exception {
+	public static String generateuserAccoutFormOnlyHostAccount(UserInfoVO userInfoVO, UserFormDTO userFormDTO) throws Exception {
 		ConfigUtils configUtils = ConfigUtils.getSingleton();
 		String sequenceNumber = RequestUtil.getSequenceNumber();
 		String accountPublicKey = "";
@@ -224,14 +224,14 @@ public class UserUtil {
 		req.setSeq_no(sequenceNumber);
 		req.setType("sign");
 		AccountCert account = new AccountCert();
-		account.setUser_id(userFormVO.getId());
+		account.setUser_id(userFormDTO.getId());
 
 		PairKey pairKey = TrustSDK.generatePairKey(true);
 		accountPublicKey = pairKey.getPublicKey();
 		accountPrivateKey = pairKey.getPrivateKey();
 		account.setPublic_key(accountPublicKey);
-		userInfoDTO.setHostWalletPublicKey(accountPublicKey);
-		userInfoDTO.setHostWalletPrivateKey(accountPrivateKey);
+		userInfoVO.setHostWalletPublicKey(accountPublicKey);
+		userInfoVO.setHostWalletPrivateKey(accountPrivateKey);
 
 		req.setReq_data(JSONObject.toJSONString(account));
 		req.setTime_stamp(System.currentTimeMillis() / 1000L);

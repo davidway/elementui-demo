@@ -1,4 +1,4 @@
-package com.blockchain.VO;
+package com.blockchain.DTO;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -15,7 +15,7 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 
 
 @ApiModel(value="资产查询")
-public class AccountQueryFormVO {
+public class AccountQueryFormDTO {
 
 	@ApiModelProperty(value= "用户id")
 	private String ownerUid;

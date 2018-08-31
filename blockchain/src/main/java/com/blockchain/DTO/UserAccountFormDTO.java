@@ -1,6 +1,6 @@
-package com.blockchain.VO;
+package com.blockchain.DTO;
 
-public class UserAccountFormVO {
+public class UserAccountFormDTO {
 	String public_key;
 	String user_id;
 	public String getPublic_key() {

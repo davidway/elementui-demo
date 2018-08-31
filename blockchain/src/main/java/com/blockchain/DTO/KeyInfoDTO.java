@@ -1,11 +1,11 @@
-package com.blockchain.VO;
+package com.blockchain.DTO;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 @ApiModel(value="验证公私钥json")
-public class KeyInfoVO {
+public class KeyInfoDTO {
 	@ApiModelProperty(value="用户私钥")
 	@NotEmpty(message="私钥不能为空")
 	private String privateKey;

@@ -1,11 +1,11 @@
-package com.blockchain.DTO;
+package com.blockchain.VO;
 
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 
 @ApiModel(description="返回信息",value="申请用户返回的申请返回json")
-public class UserInfoDTO {
+public class UserInfoVO {
 	@ApiModelProperty(   value = "用户id", dataType = "String")
 	private String Id;
 	@ApiModelProperty(   value = "用户名", dataType = "String")

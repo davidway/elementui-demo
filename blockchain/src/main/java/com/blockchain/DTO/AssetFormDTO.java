@@ -1,4 +1,4 @@
-package com.blockchain.VO;
+package com.blockchain.DTO;
 
 
 import javax.validation.constraints.Max;
@@ -15,7 +15,7 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 
 
 @ApiModel("资产发行列表")
-public class AssetFormVO {
+public class AssetFormDTO {
 	@ApiModelProperty(value="原资产唯一ID，由业务系统自己维护",required=true)
 	@NotEmpty(message="资产id不能为空")
 	private String sourceId;

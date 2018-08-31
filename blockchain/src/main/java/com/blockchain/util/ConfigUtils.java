@@ -29,6 +29,8 @@ public class ConfigUtils {
 	private String ledgerId;
 	private String mchId;
 	private String coin_privateKey;
+	private String serverId;
+	private String serverCode;
 	private static final ConfigUtils config = new ConfigUtils();
 
 	public static ConfigUtils getSingleton() {
@@ -128,7 +130,7 @@ public class ConfigUtils {
 		String ledgerId = config.getLedgerId();
 		String mchId = config.getMchId();
 		String nodeId = config.getNodeId();
-		
+
 		if (StringUtils.isBlank(chainId)) {
 			lessName.append("配置文件中的联盟链id不能为空，");
 		}
@@ -147,17 +149,21 @@ public class ConfigUtils {
 		if (StringUtils.isBlank(mchId)) {
 			lessName.append("配置文件中的机构id不能为空，");
 		}
-		if (StringUtils.isBlank(nodeId)) {
-			lessName.append("配置文件中的节点id不能为空，");
-		}
+
 		if (StringUtils.isNotBlank(lessName.toString())) {
-			//String string = new ErrorMessage(Integer.valueOf(StatusCode.CONFIG_NOT_SET), StatusCode.CONFIG_NOT_SET_MESSAGE, lessName.toString()).toJsonString();
+			// String string = new
+			// ErrorMessage(Integer.valueOf(StatusCode.CONFIG_NOT_SET),
+			// StatusCode.CONFIG_NOT_SET_MESSAGE,
+			// lessName.toString()).toJsonString();
 			throw new ServiceException().errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
 		}
 		try {
 			TrustSDK.checkPairKey(createUserPrivateKey, createUserPublicKey);
 		} catch (TrustSDKException e) {
-		//	String string = new ErrorMessage(Integer.valueOf(StatusCode.PAIR_KEY_ERROR), StatusCode.PAIR_KEY_ERROR_MESSAGE, lessName.toString()).toJsonString();
+			// String string = new
+			// ErrorMessage(Integer.valueOf(StatusCode.PAIR_KEY_ERROR),
+			// StatusCode.PAIR_KEY_ERROR_MESSAGE,
+			// lessName.toString()).toJsonString();
 			throw new ServiceException().errorCode(StatusCode.PAIR_KEY_ERROR).errorMessage(StatusCode.PAIR_KEY_ERROR_MESSAGE);
 		}
 	}
@@ -211,4 +217,37 @@ public class ConfigUtils {
 		}
 		return value;
 	}
+
+	public String getServerCode() {
+		config.serverCode = getProperties("serverCode");
+
+		return config.serverCode;
+	}
+
+	public String getServerId() {
+		config.serverId = getProperties("serverId");
+
+		return config.serverId;
+	}
+
+	public void setServerCode(String serverCode) {
+		config.serverCode = serverCode;
+
+		setProperties("serverCode", serverCode);
+
+	}
+
+	public void setServerId(String serverId) {
+		config.serverId = serverId;
+
+		setProperties("serverId", serverId);
+
+	}
+
+	public String getCrmBaseUrls() {
+		config.serverId = getProperties("crmBaseUrls");
+
+		return config.serverId;
+	}
+
 }

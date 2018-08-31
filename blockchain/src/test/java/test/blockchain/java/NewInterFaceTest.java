@@ -9,8 +9,8 @@ import org.junit.Test;
 import test.blockchain.test.TestUtil;
 
 import com.alibaba.fastjson.JSONObject;
+import com.blockchain.DTO.AssetTransferFormDTO;
 import com.blockchain.DTO.BaseParamDTO;
-import com.blockchain.VO.AssetTransferFormVO;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.tencent.trustsql.sdk.util.HttpClientUtil;
 
@@ -73,19 +73,19 @@ public class NewInterFaceTest {
 
 	@Test
 	public void test_dam_asset_transfer_mid_apply_v1_cgi() throws TrustSDKException, Exception {
-		AssetTransferFormVO assetTransferFormVO = new AssetTransferFormVO();
-		assetTransferFormVO.setAmount(5L);
-		assetTransferFormVO.setDstAccount(BaseParamDTO.second_user_account_address);
-		assetTransferFormVO.setSrcAccount(BaseParamDTO.user_account_address);
-		assetTransferFormVO.setFeeAccount(BaseParamDTO.third_user_account_address);
+		AssetTransferFormDTO assetTransferFormDTO = new AssetTransferFormDTO();
+		assetTransferFormDTO.setAmount(5L);
+		assetTransferFormDTO.setDstAccount(BaseParamDTO.second_user_account_address);
+		assetTransferFormDTO.setSrcAccount(BaseParamDTO.user_account_address);
+		assetTransferFormDTO.setFeeAccount(BaseParamDTO.third_user_account_address);
 
-		assetTransferFormVO.setFeeAmount(5L);
-		assetTransferFormVO.setSrcAsset("26aDRaBnj3VqFKoGdYz6i3Qb1PqZRBnPLvEqYkYnPfieUUh");
+		assetTransferFormDTO.setFeeAmount(5L);
+		assetTransferFormDTO.setSrcAsset("26aDRaBnj3VqFKoGdYz6i3Qb1PqZRBnPLvEqYkYnPfieUUh");
 		
 		TransferMidApply transferMidAppy = new TransferMidApply();
 		
-		assetTransferFormVO.setMultAsset(transferMidAppy);
-		String submitString = TestUtil.generateDamAssetTransferMidAppy(assetTransferFormVO);
+		assetTransferFormDTO.setMultAsset(transferMidAppy);
+		String submitString = TestUtil.generateDamAssetTransferMidAppy(assetTransferFormDTO);
 		log.debug(submitString);
 
 		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_multtransmid_apply_v1.cgi";

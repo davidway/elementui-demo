@@ -1,14 +1,13 @@
 package test.blockchain.test;
 
 import java.util.Map;
-
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.blockchain.DTO.AssetTransferFormDTO;
 import com.blockchain.DTO.BaseParamDTO;
-import com.blockchain.VO.AssetTransferFormVO;
 import com.blockchain.util.ConfigUtils;
 import com.tencent.trustsql.sdk.TrustSDK;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
@@ -152,7 +151,7 @@ public class TestUtil {
 		return postJson.toJSONString();
 	}
 
-	public static String generateDamAssetTransferMidAppy(AssetTransferFormVO assetTransferFormVO) throws TrustSDKException, Exception {
+	public static String generateDamAssetTransferMidAppy(AssetTransferFormDTO assetTransferFormDTO) throws TrustSDKException, Exception {
 
 		String mchId = isTest ? BaseParamDTO.mchId : ConfigUtils.getMchId();
 		String prvKey = isTest ? BaseParamDTO.create_user_privateKey : ConfigUtils.getCreateUserPrivateKey();
@@ -169,20 +168,20 @@ public class TestUtil {
 
 		paramMap.put("chain_id", chainId);
 		paramMap.put("ledger_id", ledgerId);
-		paramMap.put("src_account", assetTransferFormVO.getSrcAccount());
-		paramMap.put("dst_account", assetTransferFormVO.getDstAccount());
-		if (StringUtils.isNotBlank(assetTransferFormVO.getFeeAccount())) {
-			paramMap.put("fee_account", assetTransferFormVO.getFeeAccount());
+		paramMap.put("src_account", assetTransferFormDTO.getSrcAccount());
+		paramMap.put("dst_account", assetTransferFormDTO.getDstAccount());
+		if (StringUtils.isNotBlank(assetTransferFormDTO.getFeeAccount())) {
+			paramMap.put("fee_account", assetTransferFormDTO.getFeeAccount());
 		}
-		if (null != assetTransferFormVO.getFeeAmount()) {
-			paramMap.put("fee_amount", assetTransferFormVO.getFeeAmount());
+		if (null != assetTransferFormDTO.getFeeAmount()) {
+			paramMap.put("fee_amount", assetTransferFormDTO.getFeeAmount());
 		}
 		// TODO 区块链工作人员称暂时不支持多个客户提交
 
-		paramMap.put("src_asset_id", assetTransferFormVO.getSrcAsset());
+		paramMap.put("src_asset_id", assetTransferFormDTO.getSrcAsset());
 
 		paramMap.put("asset_type", "1");
-		paramMap.put("amount",  assetTransferFormVO.getAmount());
+		paramMap.put("amount",  assetTransferFormDTO.getAmount());
 		JSONObject jsonObj = new JSONObject();
 		jsonObj.put("测试信息", "呵呵");
 		paramMap.put("extra_info", jsonObj);

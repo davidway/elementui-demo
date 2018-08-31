@@ -14,7 +14,6 @@ public class TrustSDKUtil {
 		ownerAccount = ownerAccount.trim();
 		String generateAccountAddress = TrustSDK.generateAddrByPrvkey(userPrivateKey);
 		if (ownerAccount.equals(generateAccountAddress) == false) {
-
 			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage("私钥校验地址失败");
 		}
 	}

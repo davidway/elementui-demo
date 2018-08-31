@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 
 
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -18,10 +19,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.util.Log4jConfigurer;
 
+import com.blockchain.DTO.AssetFormDTO;
+import com.blockchain.DTO.AssetTransferFormDTO;
 import com.blockchain.DTO.BaseParamDTO;
-import com.blockchain.VO.AccountQueryFormVO;
-import com.blockchain.VO.AssetFormVO;
-import com.blockchain.VO.AssetTransferFormVO;
+import com.blockchain.VO.AccountQueryFormDTO;
 import com.blockchain.controller.AssetController;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.service.AssetService;
@@ -40,21 +41,21 @@ public class ServiceTest {
 	@Test
 	public void testIssue() throws Exception {
 		AssetUtil assetUtil = new AssetUtil();
-		AssetFormVO assetFormVO = new AssetFormVO();
+		AssetFormDTO assetFormDTO = new AssetFormDTO();
 		// amount=3000&unit=wsy&sourceId=23123&createUserAccountAddress=1LbJjxYAK2ceZksgKxepzCA9skyHuZ5BvE
-		assetFormVO.setAmount(9999);
-		assetFormVO.setUnit("wsy");
-		assetFormVO.setSourceId("wsy1234");
-		assetFormVO.setContent("{test:1004}");
-		assetFormVO.setCreateUserAccountAddress(BaseParamDTO.user_account_address);
+		assetFormDTO.setAmount(9999);
+		assetFormDTO.setUnit("wsy");
+		assetFormDTO.setSourceId("wsy1234");
+		assetFormDTO.setContent("{test:1004}");
+		assetFormDTO.setCreateUserAccountAddress(BaseParamDTO.user_account_address);
 
-		assetService.issue(assetFormVO);
+		assetService.issue(assetFormDTO);
 
 	}
 	
 	@Test
 	public void testTansferToMyself() throws ServiceException, TrustSDKException, Exception{
-		AssetTransferFormVO myselfTransFerForm = new AssetTransferFormVO();
+		AssetTransferFormDTO myselfTransFerForm = new AssetTransferFormDTO();
 		myselfTransFerForm.setAmount("1");
 	
 		myselfTransFerForm.setSrcAccount(BaseParamDTO.user_account_address);
@@ -65,8 +66,8 @@ public class ServiceTest {
 	
 	@Test
 	public void testSeachAmount() throws ServiceException, TrustSDKException, Exception{
-		AssetTransferFormVO assetTransferFormVO = new AssetTransferFormVO();
-		assetTransferFormVO.setSrcAccount(BaseParamDTO.user_account_address);
+		AssetTransferFormDTO assetTransferFormDTO = new AssetTransferFormDTO();
+		assetTransferFormDTO.setSrcAccount(BaseParamDTO.user_account_address);
 	
 
 		

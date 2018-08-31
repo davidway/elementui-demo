@@ -1,4 +1,4 @@
-package com.blockchain.VO;
+package com.blockchain.DTO;
 
 import javax.validation.constraints.NotNull;
 
@@ -8,7 +8,7 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description="配置信息",value="配置信息返回json数据")
-public class ConfigPropertiesFormVO {
+public class ConfigPropertiesFormDTO {
 	
 	@ApiModelProperty( value = "发行方私钥")
 	private String createUserPrivateKey;

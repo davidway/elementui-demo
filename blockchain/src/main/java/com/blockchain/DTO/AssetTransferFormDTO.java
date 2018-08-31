@@ -1,4 +1,4 @@
-package com.blockchain.VO;
+package com.blockchain.DTO;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -12,12 +12,13 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "转账表单")
-public class AssetTransferFormVO {
+public class AssetTransferFormDTO {
 	@NotEmpty(message = "金额不能为空")
 	@ApiModelProperty(value = "份额", required = true)
 	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为18个9")
 	@Max(value=999999999999999999L,message="金额必须大于0,而且为整数，最大数字为18个9")
 	private String amount;
+	
 	@NotEmpty(message = "资产转出帐户不能为空")
 	@ApiModelProperty(value = "资产转出帐户", required = true)
 	private String srcAccount;
@@ -31,6 +32,8 @@ public class AssetTransferFormVO {
 	@ApiModelProperty(value = "手续费转入帐户", required = false)
 	private String feeAccount;
 	@ApiModelProperty(value = "手续费份额,64位长", required = false)
+	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为18个9")
+	@Max(value=999999999999999999L,message="金额必须大于0,而且为整数，最大数字为18个9")
 	private String feeAmount;
 	@NotEmpty(message = "转出账户用户私钥")
 	@ApiModelProperty(value = "转出账户用户私钥", required = false)

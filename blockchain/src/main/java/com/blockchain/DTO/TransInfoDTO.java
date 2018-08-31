@@ -27,7 +27,17 @@ public class TransInfoDTO {
 	@ApiModelProperty(   value = "待签名串列表", dataType = "String")
 	private String signList;
 
-	
+	@ApiModelProperty(   value = "返回串hash", dataType = "String")
+	private String hash;
+
+
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
 
 	public long getAmount() {
 		return amount;

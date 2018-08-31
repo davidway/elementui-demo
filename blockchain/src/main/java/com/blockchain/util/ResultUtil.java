@@ -39,25 +39,16 @@ public class ResultUtil {
 
 		Integer retcode = submitResultObject.getInteger("retcode");
 		if (retcode.equals(83590142)) {
-			// String s = new
-			// ErrorMessage(submitResultObject.getInteger("retcode"), "BAAS系统的"
-			// + pos, submitResultObject.getString("retmsg") +
-			// "").toJsonString();
-			//JSONObject jsonObject = JSON.parseObject(submitParamString);
-
+			
 			Integer errorCode = StatusCode.SUBMIT_THREAD_ERROR;
 			throw new ServiceException().errorCode(errorCode).errorMessage(submitResultObject.getString("retmsg"));
-			// throw new ThreadException(s, errorCode, jsonObject);
+		
 		} else if (retcode != 0 && retcode.equals(83590142) == false) {
-			// String s = new
-			// ErrorMessage(submitResultObject.getInteger("retcode"), "BAAS系统的"
-			// + pos, submitResultObject.getString("retmsg") +
-			// "").toJsonString();
-			// JSONObject jsonObject = JSON.parseObject(submitParamString);
+			
 			Integer errorCode = StatusCode.SYSTEM_UNKOWN_ERROR;
 			throw new ServiceException().errorCode(errorCode).errorMessage(submitResultObject.getString("retmsg"));
 
-			// throw new SubmitException(s, jsonObject);
+	
 		} else {
 			log.debug(pos + "成功！结果为" + submitParamString);
 		}

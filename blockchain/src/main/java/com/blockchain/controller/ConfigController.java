@@ -17,16 +17,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.blockchain.VO.ConfigPropertiesFormVO;
+import com.blockchain.DTO.ConfigPropertiesFormDTO;
 import com.blockchain.VO.PhpSystemJsonContentVO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.ConfigPropertiesService;
+import com.blockchain.util.CrmUtils;
 import com.blockchain.util.ResponseUtil;
 import com.blockchain.util.TrustSDKUtil;
 import com.blockchain.util.ValidatorUtil;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 
 @Controller
 @RequestMapping(value = "/configProperties")
@@ -37,39 +40,41 @@ public class ConfigController {
 	@Resource
 	ConfigPropertiesService configPropertiesService;
 
-	@ExceptionHandler(HttpMessageNotReadableException.class)  
-	@ResponseBody  
-	public PhpSystemJsonContentVO handleHttpMessageNotReadableException(  
-	        HttpMessageNotReadableException ex) {  
-		PhpSystemJsonContentVO response = new PhpSystemJsonContentVO();  
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	@ResponseBody
+	public PhpSystemJsonContentVO handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+		PhpSystemJsonContentVO response = new PhpSystemJsonContentVO();
 		response.setData("");
 		response.setRetcode(StatusCode.PARAM_ERROR);
 		response.setRetmsg("json格式错误，请检查是否为合法json");
-	    return response;  
-	}  
-	
-	
+		return response;
+	}
+
 	@ResponseBody
 	@RequestMapping(value = { "/add" }, method = RequestMethod.POST)
-	@ApiOperation(value = "生成/修改 公共配置信息", httpMethod = "POST", response = ConfigPropertiesFormVO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
-	public void add(@Valid @RequestBody ConfigPropertiesFormVO configPropertiesFormVO, BindingResult bindingResult) throws TrustSDKException {
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.AUTHORITY_ERROR, message = StatusCode.AUTHORITY_ERROR_MESSAGE, response = StatusCode.class),
+
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
+	@ApiOperation(value = "生成/修改 公共配置信息", httpMethod = "POST", response = ConfigPropertiesFormDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	public void add(@Valid @RequestBody ConfigPropertiesFormDTO configPropertiesFormDTO, BindingResult bindingResult) throws TrustSDKException {
 
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 
-	
 		try {
 			ValidatorUtil.validate(bindingResult);
-			TrustSDKUtil.checkPariKeyMatch(configPropertiesFormVO.getCreateUserPublicKey(), configPropertiesFormVO.getCreateUserPrivateKey());
-		}  catch (ServiceException e) {
+			CrmUtils.checkAuth();
+			TrustSDKUtil.checkPariKeyMatch(configPropertiesFormDTO.getCreateUserPublicKey(), configPropertiesFormDTO.getCreateUserPrivateKey());
+		} catch (ServiceException e) {
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
-	
+
 		try {
-			configPropertiesService.add(configPropertiesFormVO);
+			configPropertiesService.add(configPropertiesFormDTO);
 		} catch (Exception e) {
 			logger.error(e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
@@ -78,21 +83,21 @@ public class ConfigController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
-		configPropertiesFormVO = configPropertiesService.get();
-		phpSystemJsonContentVO.setData(configPropertiesFormVO);
-		jsonString = JSON.toJSONString(phpSystemJsonContentVO,SerializerFeature.WriteMapNullValue);
+		configPropertiesFormDTO = configPropertiesService.get();
+		phpSystemJsonContentVO.setData(configPropertiesFormDTO);
+		jsonString = JSON.toJSONString(phpSystemJsonContentVO, SerializerFeature.WriteMapNullValue);
 		ResponseUtil.echo(response, jsonString);
 		return;
 	}
 
 	@ResponseBody
 	@RequestMapping(value = { "/get" }, method = RequestMethod.POST)
-	@ApiOperation(value = "获取公共配置信息", httpMethod = "POST", response = ConfigPropertiesFormVO.class, consumes = "application/json",produces=MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "获取公共配置信息", httpMethod = "POST", response = ConfigPropertiesFormDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	public void get() {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
-		ConfigPropertiesFormVO configPropertiesFormVO = configPropertiesService.get();
-		phpSystemJsonContentVO.setData(configPropertiesFormVO);
-		String jsonString = JSON.toJSONString(phpSystemJsonContentVO,SerializerFeature.WriteMapNullValue);
+		ConfigPropertiesFormDTO configPropertiesFormDTO = configPropertiesService.get();
+		phpSystemJsonContentVO.setData(configPropertiesFormDTO);
+		String jsonString = JSON.toJSONString(phpSystemJsonContentVO, SerializerFeature.WriteMapNullValue);
 		ResponseUtil.echo(response, jsonString);
 		return;
 

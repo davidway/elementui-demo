@@ -1,4 +1,4 @@
-package com.blockchain.VO;
+package com.blockchain.DTO;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -13,7 +13,7 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 
 
 @ApiModel(value="兑换表单")
-public class AssetSettleFormVO {
+public class AssetSettleFormDTO {
 	@ApiModelProperty(value="转账金额",required=true)
 	@NotNull(message="金额不能为空")
 	@Min(value=1,message="金额必须为正整数")

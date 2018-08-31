@@ -83,5 +83,6 @@ public class StatusCode {
 	public static final String SUBMIT_THREAD_ERROR_MESSAGE="提交得不到执行权限";
 	public static final int PAIR_KEY_ERROR = 100004;
 	public static final String PAIR_KEY_ERROR_MESSAGE = "公私钥匹配失败";
+	public static final String AUTHORITY_ERROR_MESSAGE = "缺少权限";
 	
 }

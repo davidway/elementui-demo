@@ -80,12 +80,7 @@ public class PhpSystemJsonContentVO {
 	}
 
 
-	public PhpSystemJsonContentVO setServiceError(String message) {
-		this.retcode=StatusCode.SERVICE_EXCEPTION;;
-		this.retmsg=message;
-		
-		return this;
-	}
+	
 
 
 	

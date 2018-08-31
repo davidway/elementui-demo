@@ -15,20 +15,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.blockchain.DTO.AssetFormDTO;
 import com.blockchain.DTO.AssetIssueDTO;
 import com.blockchain.DTO.AssetSettleDTO;
+import com.blockchain.DTO.AssetSettleFormDTO;
+import com.blockchain.DTO.AssetSettleSubmitFormDTO;
+import com.blockchain.DTO.AssetSubmitFormDTO;
 import com.blockchain.DTO.AssetTransferDTO;
-import com.blockchain.VO.AssetFormVO;
-import com.blockchain.VO.AssetSettleFormVO;
-import com.blockchain.VO.AssetSettleSubmitFormVO;
-import com.blockchain.VO.AssetSubmitFormVO;
-import com.blockchain.VO.AssetTransferFormVO;
-import com.blockchain.VO.AssetTransferSubmitFormVO;
+import com.blockchain.DTO.AssetTransferFormDTO;
+import com.blockchain.DTO.AssetTransferSubmitFormDTO;
+import com.blockchain.DTO.CrmServiceDTO;
 import com.blockchain.VO.PhpSystemJsonContentVO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.AssetService;
 import com.blockchain.util.ConfigUtils;
+import com.blockchain.util.CrmUtils;
 import com.blockchain.util.ParamUtils;
 import com.blockchain.util.ResponseUtil;
 import com.blockchain.util.TrustSDKUtil;
@@ -62,15 +64,14 @@ public class AssetController {
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class),
 
 	})
-	public void transfer(@Valid @RequestBody AssetTransferFormVO assetTransferFormVO, BindingResult bindingResult) {
+	public void transfer(@Valid @RequestBody AssetTransferFormDTO assetTransferFormDTO, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-
 			ValidatorUtil.validate(bindingResult);
 			ConfigUtils.check();
-			ParamUtils.checkAssetNum(assetTransferFormVO.getSrcAsset());
-			TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetTransferFormVO.getUserPrivateKey(), assetTransferFormVO.getSrcAccount());
+			ParamUtils.checkAssetNum(assetTransferFormDTO.getSrcAsset());
+			TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetTransferFormDTO.getUserPrivateKey(), assetTransferFormDTO.getSrcAccount());
 		} catch (TrustSDKException e) {
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(new ServiceException().errorCode(StatusCode.SYSTEM_UNKOWN_ERROR).errorMessage(StatusCode.SYSTEM_UNKOWN_ERROR_MESSAGE));
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -91,7 +92,7 @@ public class AssetController {
 
 		try {
 
-			AssetTransferDTO assetTransferDTO = assetService.transfer(assetTransferFormVO);
+			AssetTransferDTO assetTransferDTO = assetService.transfer(assetTransferFormDTO);
 			phpSystemJsonContentVO.setData(assetTransferDTO);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -125,14 +126,14 @@ public class AssetController {
 			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	public void settle(@Valid @RequestBody AssetSettleFormVO assetSettleFormVO, BindingResult bindingResult) {
+	public void settle(@Valid @RequestBody AssetSettleFormDTO assetSettleFormDTO, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
 			ConfigUtils.check();
-			TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetSettleFormVO.getUserPrivateKey(), assetSettleFormVO.getOwnerAccount());
+			TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetSettleFormDTO.getUserPrivateKey(), assetSettleFormDTO.getOwnerAccount());
 			ValidatorUtil.validate(bindingResult);
-			ParamUtils.checkAssetNum(assetSettleFormVO.getSrcAsset());
+			ParamUtils.checkAssetNum(assetSettleFormDTO.getSrcAsset());
 		} catch (ServiceException e) {
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -147,7 +148,7 @@ public class AssetController {
 		}
 
 		try {
-			AssetSettleDTO assetSettleDTO = assetService.settle(assetSettleFormVO);
+			AssetSettleDTO assetSettleDTO = assetService.settle(assetSettleFormDTO);
 			phpSystemJsonContentVO.setData(assetSettleDTO);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -181,16 +182,18 @@ public class AssetController {
 			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.AUTHORITY_ERROR, message = StatusCode.AUTHORITY_ERROR_MESSAGE, response = StatusCode.class),
 
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	public void issue(@Valid @RequestBody AssetFormVO assetFormVO, BindingResult bindingResult) {
+	public void issue(@Valid @RequestBody AssetFormDTO assetFormDTO, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
 			ConfigUtils.check();
-
+			CrmUtils.checkAuth();
 			ValidatorUtil.validate(bindingResult);
 		} catch (ServiceException e) {
+			logger.error("未知错误{}",e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -198,13 +201,13 @@ public class AssetController {
 		}
 
 		try {
-			AssetIssueDTO assetIssueDTO = assetService.issue(assetFormVO);
+			AssetIssueDTO assetIssueDTO = assetService.issue(assetFormDTO);
 			phpSystemJsonContentVO.setData(assetIssueDTO);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-			logger.error("业务错误", e);
+			logger.error("业务错误{}", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -232,15 +235,17 @@ public class AssetController {
 			@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.AUTHORITY_ERROR, message = StatusCode.AUTHORITY_ERROR_MESSAGE, response = StatusCode.class),
 
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	public void issueSubmit(@Valid @RequestBody AssetSubmitFormVO assetForm, BindingResult bindingResult) {
+	public void issueSubmit(@Valid @RequestBody AssetSubmitFormDTO assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
 			ConfigUtils.check();
+			CrmUtils.checkAuth();
 			ValidatorUtil.validate(bindingResult);
-		}  catch (ServiceException e) {
+		} catch (ServiceException e) {
 			logger.error("业务错误", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -255,13 +260,13 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-			logger.error("业务错误", e);
+			logger.error("业务错误{}", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		}  catch (Exception e) {
-			logger.error("未知错误", e);
+		} catch (Exception e) {
+			logger.error("未知错误{}", e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -283,14 +288,14 @@ public class AssetController {
 			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	public void transferSubmit(@Valid @RequestBody AssetTransferSubmitFormVO assetForm, BindingResult bindingResult) {
+	public void transferSubmit(@Valid @RequestBody AssetTransferSubmitFormDTO assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 		} catch (ServiceException e) {
-			logger.error("业务错误", e);
+			logger.error("业务错误{}", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -304,13 +309,13 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-			logger.error("未知错误", e);
+			logger.error("未知错误{}", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
-			logger.error("未知错误", e);
+			logger.error("未知错误{}", e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -332,14 +337,14 @@ public class AssetController {
 			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	public void settleSubmit(@Valid @RequestBody AssetSettleSubmitFormVO assetForm, BindingResult bindingResult) {
+	public void settleSubmit(@Valid @RequestBody AssetSettleSubmitFormDTO assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
 			ValidatorUtil.validate(bindingResult);
 			ConfigUtils.check();
 		} catch (ServiceException e) {
-			logger.error("业务错误", e);
+			logger.error("业务错误{}", e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -359,7 +364,7 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
-			logger.error("未知错误", e);
+			logger.error("未知错误{}", e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);

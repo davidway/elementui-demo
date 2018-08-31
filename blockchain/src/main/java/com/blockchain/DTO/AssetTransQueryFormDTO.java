@@ -1,4 +1,4 @@
-package com.blockchain.VO;
+package com.blockchain.DTO;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -12,7 +12,7 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 
 
 @ApiModel(value="交易查询表单")
-public class AssetTransQueryFormVO {
+public class AssetTransQueryFormDTO {
 	@ApiModelProperty(value="转入账户",required=false)
 	private String dstAccount;
 	@ApiModelProperty(value="转出账户",required=false)
@@ -30,6 +30,9 @@ public class AssetTransQueryFormVO {
 	@ApiModelProperty(value="页码,最小值不能小于1",required=true)
 	@Min(value=1,message="最小值不能小于1")
 	private Integer pageNo;
+	
+
+	
 	public String getSrcAccount() {
 		return srcAccount;
 	}

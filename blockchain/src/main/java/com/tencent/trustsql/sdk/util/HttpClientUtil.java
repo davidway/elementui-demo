@@ -32,32 +32,29 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-
-
 public class HttpClientUtil {
 
 	private static Log logger = LogFactory.getLog(HttpClientUtil.class);
 	public static PoolingHttpClientConnectionManager poolConnManager;
-	
+
 	static {
 		try {
 			SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
 			X509HostnameVerifier hostnameVerifier = SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, hostnameVerifier);
-			Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
-					.<ConnectionSocketFactory> create()
-					.register("http", PlainConnectionSocketFactory.getSocketFactory()).register("https", sslsf).build();
+			Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create().register("http", PlainConnectionSocketFactory.getSocketFactory()).register(
+					"https", sslsf).build();
 			poolConnManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
 		} catch (Exception e) {
 			logger.error("init http client exception", e);
-			throw new RuntimeException("init http client exception", e);
+			e.printStackTrace();
 		}
 	}
 
-	public static String post(String url, String reqBodyJson) throws RuntimeException {
+	public static String post(String url, String reqBodyJson) throws Exception {
 		try {
 			HttpPost httpPost = new HttpPost(url.trim());
-		
+
 			StringEntity strEntity = new StringEntity(reqBodyJson, "UTF-8");
 			httpPost.setEntity(strEntity);
 			CloseableHttpResponse response = getConnection().execute(httpPost);
@@ -67,19 +64,18 @@ public class HttpClientUtil {
 				return entity != null ? EntityUtils.toString(entity, "UTF-8") : null;
 			} else {
 				logger.error(String.format("Unexpected cft http response statuts: [%s]", status + ""));
-				throw new ClientProtocolException(String.format("Unexpected cft http response statuts: [%s]", status
-						+ ""));
+				throw new ClientProtocolException(String.format("Unexpected cft http response statuts: [%s]", status + ""));
 			}
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException("UnsupportedEncodingException", e);
+			throw new Exception("UnsupportedEncodingException", e);
 		} catch (ClientProtocolException e) {
-			throw new RuntimeException("ClientProtocolException", e);
+			throw new Exception("ClientProtocolException", e);
 		} catch (IOException e) {
-			throw new RuntimeException("IOException", e);
+			throw new Exception("IOException", e);
 		}
 	}
 
-	public String post(String url, Map<String, String> reqbody) throws RuntimeException {
+	public String post(String url, Map<String, String> reqbody) throws Exception {
 		try {
 			HttpPost httpPost = new HttpPost(url.trim());
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -96,15 +92,14 @@ public class HttpClientUtil {
 				return entity != null ? EntityUtils.toString(entity, "UTF-8") : null;
 			} else {
 				logger.error(String.format("Unexpected http response statuts: [%s]", status + ""));
-				throw new ClientProtocolException(String.format("Unexpected http response statuts: [%s]", status
-						+ ""));
+				throw new ClientProtocolException(String.format("Unexpected http response statuts: [%s]", status + ""));
 			}
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException("UnsupportedEncodingException", e);
+			throw new Exception("UnsupportedEncodingException", e);
 		} catch (ClientProtocolException e) {
-			throw new RuntimeException("ClientProtocolException", e);
+			throw new Exception("ClientProtocolException", e);
 		} catch (IOException e) {
-			throw new RuntimeException("IOException", e);
+			throw new Exception("IOException", e);
 		}
 	}
 
