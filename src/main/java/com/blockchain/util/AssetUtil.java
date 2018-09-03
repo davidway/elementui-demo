@@ -25,13 +25,11 @@ import com.tencent.trustsql.sdk.TrustSDK;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.tencent.trustsql.sdk.util.SignStrUtil;
 
-@Component
 public class AssetUtil {
 
 	boolean isTest = false;
 
-	@Resource
-	AssetService assetService;
+
 
 	private static Logger log = Logger.getLogger(AssetUtil.class);
 

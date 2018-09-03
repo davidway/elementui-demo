@@ -43,7 +43,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
-@Controller
+@Controller("UserController")
 @RequestMapping(value = "/user")
 public class UserController {
 	private static Logger logger = Logger.getLogger(UserController.class);

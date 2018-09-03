@@ -26,16 +26,16 @@ import com.blockchain.util.ResultUtil;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.tencent.trustsql.sdk.util.HttpClientUtil;
 
-@Service
+@Service("AssetService")
 public class AssetServiceImpl implements AssetService {
 	public static final Logger issueLogger = LoggerFactory.getLogger("issueLogger");
 	public static final Logger transferLogger = LoggerFactory.getLogger("transferLogger");
 	public static final Logger settleLogger = LoggerFactory.getLogger("settleLogger");
 	
-	@Resource
-	AssetUtil assetUtil;
-	@Resource
-	AssetPrepareUtil assetPrepareUtil;
+
+	AssetUtil assetUtil = new AssetUtil();
+
+	AssetPrepareUtil assetPrepareUtil = new AssetPrepareUtil();
 	
 	@Override
 	public AssetIssueDTO issue(AssetFormDTO assetFormDTO) throws Exception {

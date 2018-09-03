@@ -80,12 +80,7 @@
 	</bean>
 
 
-	<!-- 扫描controller（controller层注入） -->
-	<context:component-scan base-package="com.blockchain.controller" />
 
-	
-	<!-- 自动扫描注解的bean -->
-	<context:component-scan base-package="com.blockchain.service" />
 	<!-- 配置声明式事务：在Service实现类或者public实现方法上使用注解@Transactional，则此类或方法就会启用事务机制 -->
 	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
 	<!-- 定义事务管理器 -->

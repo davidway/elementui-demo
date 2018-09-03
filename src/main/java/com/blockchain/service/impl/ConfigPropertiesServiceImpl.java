@@ -11,7 +11,7 @@ import com.blockchain.service.ConfigPropertiesService;
 import com.blockchain.util.ConfigUtils;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
 
-@Service
+@Service("ConfigPropertiesService")
 public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 
 	Logger logger = LoggerFactory.getLogger(ConfigPropertiesServiceImpl.class);

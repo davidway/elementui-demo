@@ -34,7 +34,7 @@ import com.tencent.trustsql.sdk.util.HttpClientUtil;
 import com.tencent.trustsql.sdk.util.SimpleHttpClient;
 
 
-@Service
+@Service("UserService")
 public class UserServiceImpl implements UserService {
 	private static Logger logger = Logger.getLogger(UserServiceImpl.class);
 

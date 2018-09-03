@@ -40,7 +40,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
-@Controller
+@Controller("AssetController")
 @RequestMapping(value = "/asset")
 public class AssetController {
 	Logger logger = LoggerFactory.getLogger(AssetController.class);
