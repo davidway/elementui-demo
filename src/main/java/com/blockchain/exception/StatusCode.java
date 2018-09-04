@@ -37,8 +37,7 @@ public  class StatusCode {
 	public static final int PARAM_LENGTH_ERROR = 100004;		
 	/** Token错误 */
 	public static final int TOKEN_ERROR = 100005;	
-	/** 权限不足 */
-	public static final int AUTHORITY_ERROR = 100006;	
+	
 	/** 非法请求 */
 	public static final int  ILLEGAL_REQUEST_ERROR= 100007;	
 	/** 接口不存在*/
@@ -87,6 +86,8 @@ public  class StatusCode {
 	
 	public static final int TIME_OUT = 201003;
 	public static final String TIME_OUT_MESSAGE="超时错误";
-	public static final int FILE_NOT_EXISTS = 201004;
-	public static final String FILE_NOT_EXISTS_MESSAGE="配置文件错误";
+	public static final int URL_NOT_EXISTS = 201004;
+	public static final String URL_NOT_EXISTS_MESSAGE="配置文件的URL错误";
+	/** 权限不足 */
+	public static final int AUTHORITY_ERROR = 201005;	
 }

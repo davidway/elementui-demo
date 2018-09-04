@@ -48,7 +48,9 @@ public class CrmUtils {
 				throw new ServiceException().errorCode(StatusCode.TIME_OUT).errorMessage(StatusCode.TIME_OUT_MESSAGE);
 			}
 			if ( result==CrmResultSet.URL_NOT_EXISTS){
-				throw new ServiceException().errorCode(StatusCode.FILE_NOT_EXISTS).errorMessage(StatusCode.FILE_NOT_EXISTS_MESSAGE);
+				throw new ServiceException().errorCode(StatusCode.URL_NOT_EXISTS).errorMessage(StatusCode.URL_NOT_EXISTS_MESSAGE);
+			}else{
+				throw new ServiceException().errorCode(StatusCode.AUTHORITY_ERROR).errorMessage(StatusCode.AUTHORITY_ERROR_MESSAGE);
 			}
 		} else {
 			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage(StatusCode.PARAM_ERROR_MESSAGE);
@@ -77,7 +79,7 @@ public class CrmUtils {
 					return CrmResultSet.SUCCESS;
 				}
 			} catch (SocketTimeoutException e) {
-				crmResultSet.setStatus(StatusCode.TIME_OUT);
+				crmResultSet=crmResultSet.TIME_OUT_ERROR;
 				logger.error(e);
 				continue;
 			}catch(IOException e){
