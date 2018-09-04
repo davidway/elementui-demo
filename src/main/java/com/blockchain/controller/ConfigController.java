@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.blockchain.DTO.ConfigPropertiesFormDTO;
-import com.blockchain.VO.PhpSystemJsonContentVO;
+import com.blockchain.dto.ConfigPropertiesFormDTO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.ConfigPropertiesService;
@@ -26,6 +25,7 @@ import com.blockchain.util.CrmUtils;
 import com.blockchain.util.ResponseUtil;
 import com.blockchain.util.TrustSDKUtil;
 import com.blockchain.util.ValidatorUtil;
+import com.blockchain.vo.PhpSystemJsonContentVO;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;

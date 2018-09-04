@@ -1,4 +1,4 @@
-package com.blockchain.DTO;
+package com.blockchain.dto;
 
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;

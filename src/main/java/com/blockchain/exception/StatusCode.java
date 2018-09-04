@@ -1,9 +1,9 @@
 package com.blockchain.exception;
 
 
-public class StatusCode {
+public  class StatusCode {
 	/** 成功状态 */
-	public static final int  STATUS_SUCCESS = 0;
+	public static final int  SUCCESS = 0;
 	public static final String SUCCESS_MESSAGE="成功";
 	/**
 	 * 0	访问成功
@@ -85,4 +85,8 @@ public class StatusCode {
 	public static final String PAIR_KEY_ERROR_MESSAGE = "公私钥匹配失败";
 	public static final String AUTHORITY_ERROR_MESSAGE = "缺少权限";
 	
+	public static final int TIME_OUT = 201003;
+	public static final String TIME_OUT_MESSAGE="超时错误";
+	public static final int FILE_NOT_EXISTS = 201004;
+	public static final String FILE_NOT_EXISTS_MESSAGE="配置文件错误";
 }

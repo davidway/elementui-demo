@@ -1,7 +1,6 @@
 package com.blockchain.util;
 
 import java.io.UnsupportedEncodingException;
-
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -14,12 +13,12 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.blockchain.DTO.AssetFormDTO;
-import com.blockchain.DTO.AssetSettleFormDTO;
-import com.blockchain.DTO.AssetSettleSubmitFormDTO;
-import com.blockchain.DTO.AssetSubmitFormDTO;
-import com.blockchain.DTO.AssetTransferFormDTO;
-import com.blockchain.DTO.AssetTransferSubmitFormDTO;
+import com.blockchain.dto.AssetFormDTO;
+import com.blockchain.dto.AssetSettleFormDTO;
+import com.blockchain.dto.AssetSettleSubmitFormDTO;
+import com.blockchain.dto.AssetSubmitFormDTO;
+import com.blockchain.dto.AssetTransferFormDTO;
+import com.blockchain.dto.AssetTransferSubmitFormDTO;
 import com.blockchain.service.AssetService;
 import com.tencent.trustsql.sdk.TrustSDK;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;

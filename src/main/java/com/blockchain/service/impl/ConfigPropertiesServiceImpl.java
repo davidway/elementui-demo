@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.blockchain.DTO.ConfigPropertiesFormDTO;
+import com.blockchain.dto.ConfigPropertiesFormDTO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.service.ConfigPropertiesService;
 import com.blockchain.util.ConfigUtils;

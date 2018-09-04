@@ -1,4 +1,4 @@
-package com.blockchain.DTO;
+package com.blockchain.dto;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wordnik.swagger.annotations.ApiModel;

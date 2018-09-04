@@ -1,4 +1,4 @@
-package com.blockchain.DTO;
+package com.blockchain.dto;
 
 import org.hibernate.validator.constraints.NotEmpty;
 

@@ -1,4 +1,4 @@
-package com.blockchain.DTO;
+package com.blockchain.dto;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

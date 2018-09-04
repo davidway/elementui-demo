@@ -1,4 +1,4 @@
-package com.blockchain.VO;
+package com.blockchain.vo;
 
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;

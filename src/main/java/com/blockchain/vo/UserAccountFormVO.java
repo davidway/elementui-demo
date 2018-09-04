@@ -1,4 +1,4 @@
-package com.blockchain.VO;
+package com.blockchain.vo;
 
 public class UserAccountFormVO {
 	String public_key;

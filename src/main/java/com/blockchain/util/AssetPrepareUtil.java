@@ -4,14 +4,14 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.blockchain.DTO.AssetIssueDTO;
-import com.blockchain.DTO.AssetSettleDTO;
-import com.blockchain.DTO.AssetSettleFormDTO;
-import com.blockchain.DTO.AssetSettleSubmitFormDTO;
-import com.blockchain.DTO.AssetSubmitFormDTO;
-import com.blockchain.DTO.AssetTransferDTO;
-import com.blockchain.DTO.AssetTransferFormDTO;
-import com.blockchain.DTO.AssetTransferSubmitFormDTO;
+import com.blockchain.dto.AssetIssueDTO;
+import com.blockchain.dto.AssetSettleDTO;
+import com.blockchain.dto.AssetSettleFormDTO;
+import com.blockchain.dto.AssetSettleSubmitFormDTO;
+import com.blockchain.dto.AssetSubmitFormDTO;
+import com.blockchain.dto.AssetTransferDTO;
+import com.blockchain.dto.AssetTransferFormDTO;
+import com.blockchain.dto.AssetTransferSubmitFormDTO;
 
 @Component
 public class AssetPrepareUtil {

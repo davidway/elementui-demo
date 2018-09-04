@@ -1,7 +1,7 @@
 package com.blockchain.util;
 
 import java.io.BufferedReader;
-
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -17,7 +17,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson.JSONObject;
-import com.blockchain.DTO.CrmServiceDTO;
+import com.blockchain.dto.CrmResultSet;
+import com.blockchain.dto.CrmServiceDTO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 
@@ -37,11 +38,17 @@ public class CrmUtils {
 		String configPath = crmServiceDto.getCrmBaseUrls();
 		String[] ipsPath = configPath == null ? null : configPath.split(";");
 
-		boolean result = false;
+		CrmResultSet result;
 		if (ipsPath != null && ipsPath[0].intern() != "") {
 			result = checkData(ip, serverId, serverCode, ipsPath);
-			if (result == false) {
+			if (result == CrmResultSet.NOT_AUTHORITY) {
 				throw new ServiceException().errorCode(StatusCode.AUTHORITY_ERROR).errorMessage(StatusCode.AUTHORITY_ERROR_MESSAGE);
+			}
+			if ( result==CrmResultSet.TIME_OUT_ERROR){
+				throw new ServiceException().errorCode(StatusCode.TIME_OUT).errorMessage(StatusCode.TIME_OUT_MESSAGE);
+			}
+			if ( result==CrmResultSet.URL_NOT_EXISTS){
+				throw new ServiceException().errorCode(StatusCode.FILE_NOT_EXISTS).errorMessage(StatusCode.FILE_NOT_EXISTS_MESSAGE);
 			}
 		} else {
 			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage(StatusCode.PARAM_ERROR_MESSAGE);
@@ -49,7 +56,9 @@ public class CrmUtils {
 
 	}
 
-	private static boolean checkData(String ip, String serverId, String serverCode, String[] ipsPath) {
+	private static CrmResultSet checkData(String ip, String serverId, String serverCode, String[] ipsPath) {
+		CrmResultSet crmResultSet = null;
+		
 		for (int i = 0; i < ipsPath.length; i++) {
 			String ipPath = ipsPath[i];
 			String path = ipPath + "/code?type=1&codeid=" + serverId + "&codestr=" + serverCode;
@@ -62,25 +71,31 @@ public class CrmUtils {
 				JSONObject jobj = JSONObject.parseObject(jsonData);
 				int result = jobj.getInteger("result");
 				int data = jobj.getInteger("data");
-
-				if (result == 1 && data == 1) {
-					return true;
+				int SUCCESS_STATUS=1;
+		
+				if (result ==SUCCESS_STATUS  && data ==SUCCESS_STATUS) {
+					return CrmResultSet.SUCCESS;
 				}
 			} catch (SocketTimeoutException e) {
+				crmResultSet.setStatus(StatusCode.TIME_OUT);
 				logger.error(e);
 				continue;
-			} catch (Exception e) {
+			}catch(IOException e){
+				crmResultSet=crmResultSet.URL_NOT_EXISTS;
+				continue;
+			}catch (Exception e) {
+				crmResultSet = crmResultSet.ERROR;
 				logger.error(e);
 				continue;
 			}
 		}
-		return false;
+		return crmResultSet;
 	}
 
 	public static String getJsonString(String urlPath) throws Exception {
 		URL url = new URL(urlPath);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		// 设置超时时间为3毫秒，避免程序僵死而不能继续往下执行
+		// 设置超时时间为3秒，避免程序僵死而不能继续往下执行
 		connection.setConnectTimeout(3000); // 连接主机的超时时间
 		connection.setReadTimeout(3000); // 从主机读取数据的超时时间
 		connection.connect();

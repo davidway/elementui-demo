@@ -1,4 +1,4 @@
-package com.blockchain.DTO;
+package com.blockchain.dto;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;

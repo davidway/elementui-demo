@@ -1,4 +1,4 @@
-package com.blockchain.DTO;
+package com.blockchain.dto;
 
 public class UserAccountFormDTO {
 	String public_key;

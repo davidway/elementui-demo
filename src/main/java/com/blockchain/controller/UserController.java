@@ -21,21 +21,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
-import com.blockchain.DTO.AccountQueryFormDTO;
-import com.blockchain.DTO.AssetDTO;
-import com.blockchain.DTO.AssetTransQueryFormDTO;
-import com.blockchain.DTO.KeyInfoDTO;
-import com.blockchain.DTO.TransInfoDTO;
-import com.blockchain.DTO.UserFormDTO;
-import com.blockchain.DTO.UserKeyDTO;
-import com.blockchain.VO.PhpSystemJsonContentVO;
-import com.blockchain.VO.UserInfoVO;
+import com.blockchain.dto.AccountQueryFormDTO;
+import com.blockchain.dto.AssetDTO;
+import com.blockchain.dto.AssetTransQueryFormDTO;
+import com.blockchain.dto.KeyInfoDTO;
+import com.blockchain.dto.TransInfoDTO;
+import com.blockchain.dto.UserFormDTO;
+import com.blockchain.dto.UserKeyDTO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.UserService;
 import com.blockchain.util.ConfigUtils;
 import com.blockchain.util.ResponseUtil;
 import com.blockchain.util.ValidatorUtil;
+import com.blockchain.vo.PhpSystemJsonContentVO;
+import com.blockchain.vo.UserInfoVO;
 import com.tencent.trustsql.sdk.TrustSDK;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -69,7 +69,7 @@ public class UserController {
 	@ApiOperation(value = "生成用户公私钥", httpMethod = "POST", response = UserKeyDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
@@ -108,7 +108,7 @@ public class UserController {
 	@ApiOperation(value = "创建用户时有基础和代理账户", httpMethod = "POST", response = UserInfoVO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = "公私钥匹配失败", response = StatusCode.class),
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
@@ -161,7 +161,7 @@ public class UserController {
 	@ApiOperation(value = "资产批量查询", httpMethod = "POST", response = AssetDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
@@ -208,7 +208,7 @@ public class UserController {
 	@ApiOperation(value = "交易批量查询", httpMethod = "POST", response = TransInfoDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
@@ -255,7 +255,7 @@ public class UserController {
 	@ApiOperation(value = "查询用户信息", httpMethod = "POST", response = UserInfoVO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
@@ -298,7 +298,7 @@ public class UserController {
 	@ApiOperation(value = "创建用户只有基础钱包账户", httpMethod = "POST", response = UserInfoVO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
@@ -350,7 +350,7 @@ public class UserController {
 	@ApiOperation(value = "添加用户任意代理钱包账户", httpMethod = "POST", response = UserInfoVO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
@@ -403,7 +403,7 @@ public class UserController {
 	@ApiOperation(value = "验证用户公私是否匹配", httpMethod = "POST", response = UserInfoVO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.STATUS_SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),

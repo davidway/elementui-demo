@@ -1,4 +1,4 @@
-package com.blockchain.VO;
+package com.blockchain.vo;
 
 
 import com.blockchain.exception.ServiceException;
