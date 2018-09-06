@@ -42,7 +42,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 
 @Controller("AssetController")
 @RequestMapping(value = "/asset")
-public class AssetController implements BaseAssetController{
+public class AssetController{
 	Logger logger = LoggerFactory.getLogger(AssetController.class);
 	@Resource
 	HttpServletResponse response;

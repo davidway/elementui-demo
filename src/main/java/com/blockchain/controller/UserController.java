@@ -45,7 +45,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 
 @Controller("UserController")
 @RequestMapping(value = "/user")
-public class UserController implements BaseUserController{
+public class UserController {
 	private static Logger logger = Logger.getLogger(UserController.class);
 
 	@Resource

@@ -194,15 +194,29 @@ public class ConfigUtils {
 	}
 
 	private String getProperties(String name) {
+		InputStream in =null;
 		try {
 			String path = new ClassPathResource("/config.properties").getFile().getAbsolutePath();
-			InputStream in = new FileInputStream(path);
+			 in = new FileInputStream(path);
 			prop.load(in);
 			return getProperty(prop, name);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException io) {
+			io.printStackTrace();
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return null;
 	}

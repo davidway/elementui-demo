@@ -146,8 +146,8 @@ public class UserServiceImpl implements UserService {
 		}
 		// 从大金额到小金额排序
 		Collections.sort(assetList, new Comparator<AssetDTO>() {
+			@Override
 			public int compare(AssetDTO one, AssetDTO another) {
-
 				return (int) -(one.getAmount() - another.getAmount());
 			}
 		});
@@ -184,6 +184,7 @@ public class UserServiceImpl implements UserService {
 			transInfoList.add(transInfoDTO);
 		}
 		Collections.sort(transInfoList, new Comparator<TransInfoDTO>() {
+			@Override
 			public int compare(TransInfoDTO one, TransInfoDTO another) {
 
 				return (int) -(Timestamp.valueOf(one.getTransTime()).getTime() - Timestamp.valueOf(another.getTransTime()).getTime());
