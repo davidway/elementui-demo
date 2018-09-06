@@ -31,11 +31,8 @@ public class ConfigUtils {
 	private String coin_privateKey;
 	private String serverId;
 	private String serverCode;
-	private static final ConfigUtils config = new ConfigUtils();
 
-	public static ConfigUtils getSingleton() {
-		return config;
-	}
+
 
 	public String getCreateUserPrivateKey() {
 		this.createUserPrivateKey = getProperties("createUserPrivateKey");
@@ -44,7 +41,7 @@ public class ConfigUtils {
 	}
 
 	public void setCreateUserPrivateKey(String createUserPrivateKey) {
-		config.createUserPrivateKey = createUserPrivateKey;
+		this.createUserPrivateKey = createUserPrivateKey;
 
 		setProperties("createUserPrivateKey", createUserPrivateKey);
 	}
@@ -56,81 +53,81 @@ public class ConfigUtils {
 	}
 
 	public void setCreateUserPublicKey(String createUserPublicKey) {
-		config.createUserPrivateKey = this.createUserPrivateKey;
+		this.createUserPrivateKey = this.createUserPrivateKey;
 
 		setProperties("createUserPublicKey", createUserPublicKey);
 	}
 
 	public String getChainId() {
-		config.chainId = getProperties("chainId");
+		this.chainId = getProperties("chainId");
 
 		return this.chainId;
 	}
 
 	public void setChainId(String chainId) {
-		config.chainId = chainId;
+		this.chainId = chainId;
 
 		setProperties("chainId", chainId);
 	}
 
 	public String getNodeId() {
-		config.nodeId = getProperties("nodeId");
+		this.nodeId = getProperties("nodeId");
 
 		return this.nodeId;
 	}
 
 	public void setNodeId(String nodeId) {
-		config.nodeId = nodeId;
+		this.nodeId = nodeId;
 
 		setProperties("nodeId", nodeId);
 	}
 
 	public String getLedgerId() {
-		config.ledgerId = getProperties("ledgerId");
+		this.ledgerId = getProperties("ledgerId");
 
-		return config.ledgerId;
+		return this.ledgerId;
 	}
 
 	public void setLedgerId(String ledgerId) {
-		config.ledgerId = ledgerId;
-		setCoin_privateKey(config.ledgerId);
+		this.ledgerId = ledgerId;
+		setCoin_privateKey(this.ledgerId);
 		setProperties("ledgerId", ledgerId);
 	}
 
 	public String getMchId() {
-		config.mchId = getProperties("mchId");
+		this.mchId = getProperties("mchId");
 
-		return config.mchId;
+		return this.mchId;
 	}
 
 	public void setMchId(String mchId) {
-		config.mchId = mchId;
+		this.mchId = mchId;
 
 		setProperties("mchId", mchId);
 	}
 
 	public String getCoin_privateKey() {
-		config.coin_privateKey = getProperties("coin_privateKey");
+		this.coin_privateKey = getProperties("coin_privateKey");
 
-		return config.coin_privateKey;
+		return this.coin_privateKey;
 	}
 
 	public void setCoin_privateKey(String ledgerId) {
-		config.coin_privateKey = Base64.encodeBase64String(DigestUtils.sha256(ledgerId));
+		this.coin_privateKey = Base64.encodeBase64String(DigestUtils.sha256(ledgerId));
 
 		setProperties("coin_privateKey", this.coin_privateKey);
 	}
 
 	public static void check() throws ServiceException {
-		StringBuffer lessName = new StringBuffer("");
-		String chainId = config.getChainId();
-		String coin_privateKey = config.getCoin_privateKey();
-		String createUserPrivateKey = config.getCreateUserPrivateKey();
-		String createUserPublicKey = config.getCreateUserPublicKey();
-		String ledgerId = config.getLedgerId();
-		String mchId = config.getMchId();
-		String nodeId = config.getNodeId();
-
+		ConfigUtils configUtils = new ConfigUtils();
+		String chainId = configUtils.getChainId();
+		String coin_privateKey = configUtils.getCoin_privateKey();
+		String createUserPublicKey = configUtils.getCreateUserPublicKey();
+		String createUserPrivateKey = configUtils.getCreateUserPrivateKey();
+		String ledgerId = configUtils.getLedgerId();
+		String mchId = configUtils.getMchId();
+		StringBuffer lessName = new StringBuffer();
+		
 		if (StringUtils.isBlank(chainId)) {
 			lessName.append("配置文件中的联盟链id不能为空，");
 		}
@@ -219,35 +216,35 @@ public class ConfigUtils {
 	}
 
 	public String getServerCode() {
-		config.serverCode = getProperties("serverCode");
+		this.serverCode = getProperties("serverCode");
 
-		return config.serverCode;
+		return this.serverCode;
 	}
 
 	public String getServerId() {
-		config.serverId = getProperties("serverId");
+		this.serverId = getProperties("serverId");
 
-		return config.serverId;
+		return this.serverId;
 	}
 
 	public void setServerCode(String serverCode) {
-		config.serverCode = serverCode;
+		this.serverCode = serverCode;
 
 		setProperties("serverCode", serverCode);
 
 	}
 
 	public void setServerId(String serverId) {
-		config.serverId = serverId;
+		this.serverId = serverId;
 
 		setProperties("serverId", serverId);
 
 	}
 
 	public String getCrmBaseUrls() {
-		config.serverId = getProperties("crmBaseUrls");
+		this.serverId = getProperties("crmBaseUrls");
 
-		return config.serverId;
+		return this.serverId;
 	}
 
 }

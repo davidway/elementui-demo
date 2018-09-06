@@ -23,7 +23,7 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 		String nodeId = configPropertiesFormDTO.getNodeId();
 		String createUserPrivateKey = configPropertiesFormDTO.getCreateUserPrivateKey();
 		String createUserPublicKey = configPropertiesFormDTO.getCreateUserPublicKey();
-		ConfigUtils configUtils  = ConfigUtils.getSingleton();
+		ConfigUtils configUtils  = new ConfigUtils();
 	
 		if (StringUtils.isNotBlank(chainId)) {
 			configUtils.setChainId(chainId);
@@ -51,7 +51,7 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 	@Override
 	public ConfigPropertiesFormDTO get() {
 		ConfigPropertiesFormDTO configPropertiesFormDTO = new ConfigPropertiesFormDTO();
-		ConfigUtils configUtils  = ConfigUtils.getSingleton();
+		ConfigUtils configUtils  = new ConfigUtils();
 		String chainId = configUtils.getChainId();
 		String ledgerId = configUtils.getLedgerId();
 		String mchId = configUtils.getMchId();

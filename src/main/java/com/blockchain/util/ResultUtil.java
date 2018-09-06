@@ -41,7 +41,7 @@ public class ResultUtil {
 		if (retcode.equals(83590142)) {
 			
 			Integer errorCode = StatusCode.SUBMIT_THREAD_ERROR;
-			throw new ServiceException().errorCode(errorCode).errorMessage(submitResultObject.getString("retmsg"));
+			throw new ServiceException().errorCode(errorCode).errorMessage(submitResultObject.getString("retmsg")).data(submitResultObject);
 		
 		} else if (retcode != 0 && retcode.equals(83590142) == false) {
 			

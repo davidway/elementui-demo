@@ -31,9 +31,9 @@ public class CrmUtils {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
 		String ip = MyHttpUtils.getIp(request);
-		String serverId = crmServiceDto.getServerId();
-		String serverCode = crmServiceDto.getServerCode();
-		String configPath = crmServiceDto.getCrmBaseUrls();
+		String serverId = crmServiceDto.getServerId().trim();
+		String serverCode = crmServiceDto.getServerCode().trim();
+		String configPath = crmServiceDto.getCrmBaseUrls().trim();
 		String[] ipsPath = configPath == null ? null : configPath.split(";");
 
 		CrmResultSet result;
@@ -44,7 +44,6 @@ public class CrmUtils {
 				throw new ServiceException().pos("配置信息文件鉴权").errorCode(StatusCode.AUTHORITY_ERROR).errorMessage(StatusCode.AUTHORITY_ERROR_MESSAGE);
 			case TIME_OUT_ERROR:
 				throw new ServiceException().pos("配置信息文件鉴权").errorCode(StatusCode.TIME_OUT).errorMessage(StatusCode.TIME_OUT_MESSAGE);
-
 			case URL_NOT_EXISTS:
 				throw new ServiceException().pos("配置信息文件鉴权").errorCode(StatusCode.URL_NOT_EXISTS).errorMessage(StatusCode.URL_NOT_EXISTS_MESSAGE);
 			case SUCCESS:

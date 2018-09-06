@@ -33,7 +33,7 @@ public class AssetUtil {
 	private static Logger log = Logger.getLogger(AssetUtil.class);
 
 	public String generateIssueApplyParam(AssetFormDTO assetFormDTO) throws TrustSDKException, Exception {
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		String mchId =  configUtils.getMchId();
 		String prvKey =  configUtils.getCreateUserPrivateKey();
 		String nodeId = configUtils.getNodeId();
@@ -66,7 +66,7 @@ public class AssetUtil {
 	}
 
 	public String generateIssueSubmitParam(AssetSubmitFormDTO assetSubmitFormDTO) throws UnsupportedEncodingException, TrustSDKException, Exception {
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		String mchId =  configUtils.getMchId();
 		String prvKey =  configUtils.getCreateUserPrivateKey();
 		String coinPrivateKey =  configUtils.getCoin_privateKey();
@@ -124,7 +124,7 @@ public class AssetUtil {
 	}
 
 	public String generateTransferApplyParam(AssetTransferFormDTO assetTransferFormDTO) throws TrustSDKException, Exception {
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		String mchId =  configUtils.getMchId();
 		String prvKey =  configUtils.getCreateUserPrivateKey();
 
@@ -166,7 +166,7 @@ public class AssetUtil {
 	}
 
 	public String generateSettleApplyParam(AssetSettleFormDTO assetSettleFormDTO) throws TrustSDKException, Exception {
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		String mchId =  configUtils.getMchId();
 		String prvKey =  configUtils.getCreateUserPrivateKey();
 
@@ -205,7 +205,7 @@ public class AssetUtil {
 	}
 
 	public String generateTransferSubmitParam(AssetTransferSubmitFormDTO assetSubmitForm) throws Exception {
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		String mchId =  configUtils.getMchId();
 		String prvKey =  configUtils.getCreateUserPrivateKey();
 
@@ -244,7 +244,7 @@ public class AssetUtil {
 	}
 
 	public String generateSettleSubmitParam(AssetSettleSubmitFormDTO assetSettleSubmitFormDTO) throws Exception {
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		String mchId =  configUtils.getMchId();
 		String prvKey =  configUtils.getCreateUserPrivateKey();
 

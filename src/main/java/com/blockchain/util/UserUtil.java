@@ -27,7 +27,7 @@ public class UserUtil {
 
 	public static String generateUserRequest(UserInfoVO userInfoVO, UserFormDTO userFormDTO) throws Exception {
 		String requestString = "";
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		RequestData req = new RequestData();
 
 		String sequenceNumber = RequestUtil.getSequenceNumber();
@@ -63,7 +63,7 @@ public class UserUtil {
 	}
 
 	public static String generateRegisterAccountRequest(UserCert userCert, boolean isHost) throws Exception {
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		RequestData req = new RequestData();
 		String sqeNo = RequestUtil.getSequenceNumber();
 		req.setMch_id( configUtils.getMchId());
@@ -95,7 +95,7 @@ public class UserUtil {
 
 	public static String generateuserAccoutForm(UserInfoVO userInfoVO, JSONObject userRegistRetData, boolean isHost) throws Exception {
 		String sequenceNumber = RequestUtil.getSequenceNumber();
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		RequestData req = new RequestData();
 		req.setMch_id( configUtils.getMchId());
 		req.setProduct_code("productA");
@@ -129,7 +129,7 @@ public class UserUtil {
 	}
 
 	public static String generateAccountQueryParam(AccountQueryFormDTO assetForm) throws TrustSDKException, Exception {
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		String mchId =  configUtils.getMchId();
 		String prvKey = configUtils.getCreateUserPrivateKey();
 
@@ -168,7 +168,7 @@ public class UserUtil {
 	}
 
 	public static String generateTransQueryParam(AssetTransQueryFormDTO assetForm) throws TrustSDKException, Exception {
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		JSONArray resultJsonArr = new JSONArray();
 
 		String mchId =  configUtils.getMchId();
@@ -213,7 +213,7 @@ public class UserUtil {
 	}
 
 	public static String generateuserAccoutFormOnlyHostAccount(UserInfoVO userInfoVO, UserFormDTO userFormDTO) throws Exception {
-		ConfigUtils configUtils = ConfigUtils.getSingleton();
+		ConfigUtils configUtils = new ConfigUtils();
 		String sequenceNumber = RequestUtil.getSequenceNumber();
 		String accountPublicKey = "";
 		String accountPrivateKey = "";
