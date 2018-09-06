@@ -23,10 +23,7 @@ public class CrmServiceDTO {
 	private String serverCode;
 	private String serverId;
 	
-	final static CrmServiceDTO crmServiceDTO = new CrmServiceDTO();
-
-	private CrmServiceDTO() {
-	}
+	
 
 	public String getServerCode() {
 		this.serverCode = getProperties("server_code");
@@ -40,10 +37,7 @@ public class CrmServiceDTO {
 		return serverId;
 	}
 
-	// 使用单例模式
-	public static CrmServiceDTO getSingleton() {
-		return crmServiceDTO;
-	}
+
 
 	private void setProperties(String key, String name) {
 		OutputStream output = null;

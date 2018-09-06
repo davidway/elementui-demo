@@ -34,21 +34,16 @@ public class ResultUtil {
 		if (StringUtils.isBlank(submitResultString)) {
 			throw new ServiceException().errorCode(StatusCode.SYSTEM_UNKOWN_ERROR).errorMessage("调用SDK网络失败，请检查网络");
 		}
-
 		JSONObject submitResultObject = JSONObject.parseObject(submitResultString);
 
 		Integer retcode = submitResultObject.getInteger("retcode");
 		if (retcode.equals(83590142)) {
 			
 			Integer errorCode = StatusCode.SUBMIT_THREAD_ERROR;
-			throw new ServiceException().errorCode(errorCode).errorMessage(submitResultObject.getString("retmsg")).data(submitResultObject);
-		
-		} else if (retcode != 0 && retcode.equals(83590142) == false) {
-			
+			throw new ServiceException().pos(pos).errorCode(errorCode).errorMessage(submitResultObject.getString("retmsg")).data(submitParamString);
+		} else if (retcode != 0 ) {		
 			Integer errorCode = StatusCode.SYSTEM_UNKOWN_ERROR;
-			throw new ServiceException().errorCode(errorCode).errorMessage(submitResultObject.getString("retmsg"));
-
-	
+			throw new ServiceException().pos(pos).errorCode(errorCode).errorMessage(submitResultObject.getString("retmsg")).data(submitParamString);
 		} else {
 			log.debug(pos + "成功！结果为" + submitParamString);
 		}

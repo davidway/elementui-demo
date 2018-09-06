@@ -160,7 +160,7 @@ public class AssetController{
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
-			logger.error("未知错误", e);
+			
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -196,7 +196,7 @@ public class AssetController{
 			CrmUtils.checkAuth();
 			ValidatorUtil.validate(bindingResult);
 		} catch (ServiceException e) {
-			logger.error("未知错误{}",e);
+		
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -210,7 +210,7 @@ public class AssetController{
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-			logger.error("业务错误{}", e);
+		
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -265,7 +265,7 @@ public class AssetController{
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-			logger.error("业务错误{}", e);
+			
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -300,7 +300,7 @@ public class AssetController{
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 		} catch (ServiceException e) {
-			logger.error("业务错误{}", e);
+		
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -314,7 +314,7 @@ public class AssetController{
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-			logger.error("未知错误{}", e);
+		
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -349,7 +349,7 @@ public class AssetController{
 			ValidatorUtil.validate(bindingResult);
 			ConfigUtils.check();
 		} catch (ServiceException e) {
-			logger.error("业务错误{}", e);
+	
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);

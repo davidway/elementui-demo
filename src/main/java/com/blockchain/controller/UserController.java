@@ -221,7 +221,7 @@ public class UserController {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 		} catch (ServiceException e) {
-			logger.error(e);
+		
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -379,7 +379,7 @@ public class UserController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
-			logger.error(e);
+			
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setSDKError();
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -389,7 +389,7 @@ public class UserController {
 		try {
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO, true);
 		} catch (JSONException e) {
-			logger.error(e);
+			
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParseJsonError();
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);

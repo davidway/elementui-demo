@@ -26,7 +26,7 @@ public class CrmUtils {
 	static Logger logger = Logger.getLogger(CrmUtils.class);
 
 	public static void checkAuth() throws ServiceException {
-		CrmServiceDTO crmServiceDto = CrmServiceDTO.getSingleton();
+		CrmServiceDTO crmServiceDto =new CrmServiceDTO();
 		crmServiceDto.check();
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 

@@ -174,6 +174,7 @@ public class ConfigUtils {
 			prop.setProperty(key, name);
 			prop.store(output, "configTest");
 		} catch (IOException io) {
+			logger.error(io);
 			io.printStackTrace();
 			if (output != null) {
 				try {
@@ -195,12 +196,15 @@ public class ConfigUtils {
 
 	private String getProperties(String name) {
 		InputStream in =null;
+		String result = "";
 		try {
 			String path = new ClassPathResource("/config.properties").getFile().getAbsolutePath();
 			 in = new FileInputStream(path);
 			prop.load(in);
-			return getProperty(prop, name);
+			result =  getProperty(prop, name);
+			return result;
 		} catch (IOException io) {
+			logger.error(io);
 			io.printStackTrace();
 			if (in != null) {
 				try {
@@ -218,7 +222,8 @@ public class ConfigUtils {
 				}
 			}
 		}
-		return null;
+		return result;
+
 	}
 
 	private static String getProperty(Properties prop, String key) {
