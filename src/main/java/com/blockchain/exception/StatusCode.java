@@ -32,7 +32,7 @@ public  class StatusCode {
 	public static final String PARAM_ERROR_MESSAGE="前端：参数出错";
 	/**{参数名称}格式不正确 */
 	public static final int CONFIG_NOT_SET = 100003;	
-	public static final String CONFIG_NOT_SET_MESSAGE ="配置文件内容暂未设置";
+	public static final String CONFIG_NOT_SET_MESSAGE ="配置文件内容暂未设置完整";
 	/** {参数名称}长度超过限制 */
 	public static final int PARAM_LENGTH_ERROR = 100004;		
 	/** Token错误 */

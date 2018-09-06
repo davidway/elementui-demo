@@ -4,10 +4,8 @@ public class ServiceException extends Exception {
 
 	private Integer errorCode;
 	private String errorMessage;
-	private  Object data;
+	private Object data;
 	private String pos;
-	
-	
 
 	public Integer getErrorCode() {
 		return errorCode;
@@ -33,18 +31,15 @@ public class ServiceException extends Exception {
 		this.data = data;
 	}
 
-
-
-
 	public ServiceException errorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 		return this;
-	}	public ServiceException data(Object data) {
+	}
+
+	public ServiceException data(Object data) {
 		this.data = data;
 		return this;
 	}
-
-
 
 	public ServiceException errorCode(int errorCode) {
 		this.errorCode = errorCode;
@@ -59,8 +54,18 @@ public class ServiceException extends Exception {
 		this.pos = pos;
 	}
 
+	public ServiceException pos(String pos) {
+		this.pos = pos;
+		return this;
+	}
 
-	
-	
-	
+	public String consistsReturnString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("发生位置：");
+		sb.append(this.pos);
+		sb.append(",错误信息：");
+		sb.append(this.errorMessage);
+		return sb.toString();
+	}
+
 }

@@ -25,12 +25,10 @@ import com.blockchain.exception.StatusCode;
 public class CrmUtils {
 	static Logger logger = Logger.getLogger(CrmUtils.class);
 
-
-	public static  void checkAuth() throws ServiceException {
+	public static void checkAuth() throws ServiceException {
 		CrmServiceDTO crmServiceDto = CrmServiceDTO.getSingleton();
 		crmServiceDto.check();
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-		        .getRequest();
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
 		String ip = MyHttpUtils.getIp(request);
 		String serverId = crmServiceDto.getServerId();
@@ -41,16 +39,18 @@ public class CrmUtils {
 		CrmResultSet result;
 		if (ipsPath != null && ipsPath[0].intern() != "") {
 			result = checkData(ip, serverId, serverCode, ipsPath);
-			if (result == CrmResultSet.NOT_AUTHORITY) {
-				throw new ServiceException().errorCode(StatusCode.AUTHORITY_ERROR).errorMessage(StatusCode.AUTHORITY_ERROR_MESSAGE);
-			}
-			if ( result==CrmResultSet.TIME_OUT_ERROR){
-				throw new ServiceException().errorCode(StatusCode.TIME_OUT).errorMessage(StatusCode.TIME_OUT_MESSAGE);
-			}
-			if ( result==CrmResultSet.URL_NOT_EXISTS){
-				throw new ServiceException().errorCode(StatusCode.URL_NOT_EXISTS).errorMessage(StatusCode.URL_NOT_EXISTS_MESSAGE);
-			}else{
-				throw new ServiceException().errorCode(StatusCode.AUTHORITY_ERROR).errorMessage(StatusCode.AUTHORITY_ERROR_MESSAGE);
+			switch (result) {
+			case NOT_AUTHORITY:
+				throw new ServiceException().pos("配置信息文件鉴权").errorCode(StatusCode.AUTHORITY_ERROR).errorMessage(StatusCode.AUTHORITY_ERROR_MESSAGE);
+			case TIME_OUT_ERROR:
+				throw new ServiceException().pos("配置信息文件鉴权").errorCode(StatusCode.TIME_OUT).errorMessage(StatusCode.TIME_OUT_MESSAGE);
+
+			case URL_NOT_EXISTS:
+				throw new ServiceException().pos("配置信息文件鉴权").errorCode(StatusCode.URL_NOT_EXISTS).errorMessage(StatusCode.URL_NOT_EXISTS_MESSAGE);
+			case SUCCESS:
+				return;
+			default:
+				throw new ServiceException().pos("配置信息文件鉴权").errorCode(StatusCode.SYSTEM_UNKOWN_ERROR).errorMessage(StatusCode.SYSTEM_UNKOWN_ERROR_MESSAGE);
 			}
 		} else {
 			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage(StatusCode.PARAM_ERROR_MESSAGE);
@@ -60,7 +60,7 @@ public class CrmUtils {
 
 	private static CrmResultSet checkData(String ip, String serverId, String serverCode, String[] ipsPath) {
 		CrmResultSet crmResultSet = null;
-		
+
 		for (int i = 0; i < ipsPath.length; i++) {
 			String ipPath = ipsPath[i];
 			String path = ipPath + "/code?type=1&codeid=" + serverId + "&codestr=" + serverCode;
@@ -73,19 +73,21 @@ public class CrmUtils {
 				JSONObject jobj = JSONObject.parseObject(jsonData);
 				int result = jobj.getInteger("result");
 				int data = jobj.getInteger("data");
-				int SUCCESS_STATUS=1;
-		
-				if (result ==SUCCESS_STATUS  && data ==SUCCESS_STATUS) {
+				int SUCCESS_STATUS = 1;
+
+				if (result == SUCCESS_STATUS && data == SUCCESS_STATUS) {
 					return CrmResultSet.SUCCESS;
+				}else{
+					return CrmResultSet.NOT_AUTHORITY;
 				}
 			} catch (SocketTimeoutException e) {
-				crmResultSet=crmResultSet.TIME_OUT_ERROR;
+				crmResultSet = crmResultSet.TIME_OUT_ERROR;
 				logger.error(e);
 				continue;
-			}catch(IOException e){
-				crmResultSet=crmResultSet.URL_NOT_EXISTS;
+			} catch (IOException e) {
+				crmResultSet = crmResultSet.URL_NOT_EXISTS;
 				continue;
-			}catch (Exception e) {
+			} catch (Exception e) {
 				crmResultSet = crmResultSet.ERROR;
 				logger.error(e);
 				continue;

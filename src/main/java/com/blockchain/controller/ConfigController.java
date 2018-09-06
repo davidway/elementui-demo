@@ -69,6 +69,7 @@ public class ConfigController {
 			CrmUtils.checkAuth();
 			TrustSDKUtil.checkPariKeyMatch(configPropertiesFormDTO.getCreateUserPublicKey(), configPropertiesFormDTO.getCreateUserPrivateKey());
 		} catch (ServiceException e) {
+			logger.error("错误信息",e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -78,7 +79,7 @@ public class ConfigController {
 		try {
 			configPropertiesService.add(configPropertiesFormDTO);
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error("错误信息",e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);

@@ -43,7 +43,7 @@ public class PhpSystemJsonContentVO {
 
 	public PhpSystemJsonContentVO setKnownError(ServiceException e ) {
 		this.retcode=e.getErrorCode();
-		this.retmsg=e.getErrorMessage();
+		this.retmsg=e.consistsReturnString();
 		this.data = e.getData();
 		return this;
 	}

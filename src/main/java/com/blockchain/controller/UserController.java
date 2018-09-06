@@ -45,7 +45,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 
 @Controller("UserController")
 @RequestMapping(value = "/user")
-public class UserController {
+public class UserController implements BaseUserController{
 	private static Logger logger = Logger.getLogger(UserController.class);
 
 	@Resource
@@ -82,7 +82,7 @@ public class UserController {
 		try {
 			userKeyModel = userService.generatePairKey(userKeyModel);
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error("错误信息",e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setSDKError();
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -119,7 +119,7 @@ public class UserController {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 		} catch (ServiceException e) {
-			logger.error(e);
+		
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -136,7 +136,7 @@ public class UserController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error("错误信息",e);
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setSDKError();
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -146,7 +146,7 @@ public class UserController {
 		try {
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO, true);
 		} catch (JSONException e) {
-			logger.error(e);
+		
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setParseJsonError();
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -174,6 +174,7 @@ public class UserController {
 			ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 		} catch (ServiceException e) {
+			
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
@@ -187,13 +188,13 @@ public class UserController {
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-
+			
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error("错误信息",e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);

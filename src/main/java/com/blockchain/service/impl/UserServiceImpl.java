@@ -124,12 +124,12 @@ public class UserServiceImpl implements UserService {
 			if ( assetFormVO.getContent()!=null){
 				JSONObject content = o.getJSONObject("content");
 				 if (content .equals(assetFormVO.getContent())){
-						assetDTO.setAmount(o.getLong("amount"));
+				
 						assetDTO.setAssetAccount(o.getString("asset_account"));
 						assetDTO.setAssetId(o.getString("asset_id"));
-						assetDTO.setAssetType(o.getInteger("asset_type"));
+					
 						assetDTO.setState(o.getInteger("state"));
-						assetDTO.setContent(o.getJSONObject("content"));
+					
 						
 						assetList.add(assetDTO);
 				 }
@@ -137,10 +137,7 @@ public class UserServiceImpl implements UserService {
 				assetDTO.setAmount(o.getLong("amount"));
 				assetDTO.setAssetAccount(o.getString("asset_account"));
 				assetDTO.setAssetId(o.getString("asset_id"));
-				assetDTO.setAssetType(o.getInteger("asset_type"));
-				assetDTO.setState(o.getInteger("state"));
-				assetDTO.setContent(o.getJSONObject("content"));
-				assetDTO.setState(o.getInteger("state"));
+				
 				assetList.add(assetDTO);
 			}
 			

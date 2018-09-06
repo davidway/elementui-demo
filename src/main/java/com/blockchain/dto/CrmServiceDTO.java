@@ -102,13 +102,13 @@ public class CrmServiceDTO {
 
 	public void check() throws ServiceException {
 		if (StringUtils.isBlank(this.getCrmBaseUrls()) ) {
-			throw new ServiceException().errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
+			throw new ServiceException().pos("配置信息是否为空").errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
 		}
 		if (StringUtils.isBlank(this.getServerCode()) ) {
-			throw new ServiceException().errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
+			throw new ServiceException().pos("配置信息是否为空").errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
 		}
 		if (StringUtils.isBlank(this.getServerId()) ) {
-			throw new ServiceException().errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
+			throw new ServiceException().pos("配置信息是否为空").errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
 		}
 	}
 }

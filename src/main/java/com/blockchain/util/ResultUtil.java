@@ -24,7 +24,7 @@ public class ResultUtil {
 			throw new ServiceException().errorCode(errorCode).errorMessage(applyObject.getString("retmsg"));
 		} else if (retcode != 0 && retcode.equals(83590142) == false) {
 			Integer errorCode = StatusCode.SYSTEM_UNKOWN_ERROR;
-			throw new ServiceException().errorCode(errorCode).errorMessage(applyObject.getString("retmsg"));
+			throw new ServiceException().pos(pos).errorCode(errorCode).errorMessage(applyObject.getString("retmsg"));
 		} else {
 			log.debug(pos + "成功！结果为" + applyObject.toJSONString());
 		}
