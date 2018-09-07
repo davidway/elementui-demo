@@ -133,9 +133,12 @@ public class UserServiceImpl implements UserService {
 						assetList.add(assetDTO);
 				 }
 			}else{
-				assetDTO.setAmount(o.getLong("amount"));
-				assetDTO.setAssetAccount(o.getString("asset_account"));
-				assetDTO.setAssetId(o.getString("asset_id"));
+				 assetDTO.setAmount(o.getLong("amount"));
+					assetDTO.setAssetAccount(o.getString("asset_account"));
+					assetDTO.setAssetId(o.getString("asset_id"));
+					assetDTO.setAssetType(o.getInteger("asset_type"));
+					assetDTO.setState(o.getInteger("state"));
+					assetDTO.setContent(o.getJSONObject("content"));	
 				
 				assetList.add(assetDTO);
 			}
