@@ -7,7 +7,7 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 @ApiModel(description="资产查询描述",value="资产查询返回json")
 public class AssetDTO{
 	@ApiModelProperty( value = "金额")
-	private long amount;
+	private Long amount;
 	@ApiModelProperty( value = "资产账户地址")
 	private String assetAccount;
 	@ApiModelProperty( value = "资产id")
@@ -19,11 +19,11 @@ public class AssetDTO{
 	@ApiModelProperty( value = "资产的唯一标识内容")
 	private JSONObject content;
 
-
-	public long getAmount() {
+	
+	public Long getAmount() {
 		return amount;
 	}
-	public void setAmount(long amount) {
+	public void setAmount(Long amount) {
 		this.amount = amount;
 	}
 	public String getAssetAccount() {

@@ -25,7 +25,7 @@ import com.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.tencent.trustsql.sdk.util.SignStrUtil;
 
 public class AssetUtil {
-
+	
 	boolean isTest = false;
 
 

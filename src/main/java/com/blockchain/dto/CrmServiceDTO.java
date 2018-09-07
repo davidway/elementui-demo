@@ -53,6 +53,7 @@ public class CrmServiceDTO {
 				try {
 					output.close();
 				} catch (IOException e) {
+					logger.error("IO錯誤{}",e);
 					e.printStackTrace();
 				}
 			}
@@ -61,6 +62,7 @@ public class CrmServiceDTO {
 				try {
 					output.close();
 				} catch (IOException e) {
+					logger.error("IO錯誤{}",e);
 					e.printStackTrace();
 				}
 			}
@@ -80,6 +82,7 @@ public class CrmServiceDTO {
 				try {
 					in.close();
 				} catch (IOException e) {
+					logger.error("IO錯誤{}",e);
 					e.printStackTrace();
 				}
 			}
@@ -88,6 +91,7 @@ public class CrmServiceDTO {
 				try {
 					in.close();
 				} catch (IOException e) {
+					logger.error("IO錯誤{}",e);
 					e.printStackTrace();
 				}
 			}
@@ -119,4 +123,13 @@ public class CrmServiceDTO {
 			throw new ServiceException().pos("配置信息是否为空").errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
 		}
 	}
+
+
+
+	@Override
+	public String toString() {
+		return "CrmServiceDTO [crmBaseUrl=" + crmBaseUrl + ", serverCode=" + serverCode + ", serverId=" + serverId + "]";
+	}
+	
+	
 }

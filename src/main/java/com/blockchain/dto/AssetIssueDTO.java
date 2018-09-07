@@ -32,6 +32,10 @@ public class AssetIssueDTO {
 	public void setAssetId(String assetId) {
 		this.assetId = assetId;
 	}
+	@Override
+	public String toString() {
+		return "AssetIssueDTO [transactionId=" + transactionId + ", assetId=" + assetId + ", transHash=" + transHash + "]";
+	}
 	
 	
 	

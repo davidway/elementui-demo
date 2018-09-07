@@ -3,33 +3,31 @@ package com.blockchain.dto;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
-
-@ApiModel(description="交易信息",value="交易信息返回json")
+@ApiModel(description = "交易信息", value = "交易信息返回json")
 public class TransInfoDTO {
-	@ApiModelProperty(   value = "金额", dataType = "String")
-	private long amount;
-	@ApiModelProperty(   value = "转出账户", dataType = "String")
+	@ApiModelProperty(value = "金额", dataType = "String")
+	private Long amount;
+	@ApiModelProperty(value = "转出账户", dataType = "String")
 	private String dstAccount;
-	@ApiModelProperty(   value = "转出资产id", dataType = "String")
+	@ApiModelProperty(value = "转出资产id", dataType = "String")
 	private String dstAssetId;
-	@ApiModelProperty(   value = "转入账户", dataType = "String")
+	@ApiModelProperty(value = "转入账户", dataType = "String")
 	private String srcAccount;
-	@ApiModelProperty(   value = "转入账户资产id", dataType = "String")
+	@ApiModelProperty(value = "转入账户资产id", dataType = "String")
 	private String srcAssetId;
-	@ApiModelProperty(   value = "交易状态，1 申请中 2 已申请 3 提交中 4 已提交", dataType = "String")
+	@ApiModelProperty(value = "交易状态，1 申请中 2 已申请 3 提交中 4 已提交", dataType = "String")
 	private Integer transState;
-	@ApiModelProperty(   value = "交易时间，精确到秒", dataType = "String")
+	@ApiModelProperty(value = "交易时间，精确到秒", dataType = "String")
 	private String transTime;
-	@ApiModelProperty(   value = "交易类型，1 发行 2 转让 3 兑付", dataType = "String")
+	@ApiModelProperty(value = "交易类型，1 发行 2 转让 3 兑付", dataType = "String")
 	private Integer transType;
-	@ApiModelProperty(   value = "平台唯一标识一次交易的ID", dataType = "String")
+	@ApiModelProperty(value = "平台唯一标识一次交易的ID", dataType = "String")
 	private String transactionId;
-	@ApiModelProperty(   value = "待签名串列表", dataType = "String")
+	@ApiModelProperty(value = "待签名串列表", dataType = "String")
 	private String signList;
 
-	@ApiModelProperty(   value = "返回串hash", dataType = "String")
+	@ApiModelProperty(value = "返回串hash", dataType = "String")
 	private String hash;
-
 
 	public String getHash() {
 		return hash;
@@ -39,11 +37,11 @@ public class TransInfoDTO {
 		this.hash = hash;
 	}
 
-	public long getAmount() {
+	public Long getAmount() {
 		return amount;
 	}
 
-	public void setAmount(long amount) {
+	public void setAmount(Long amount) {
 		this.amount = amount;
 	}
 
@@ -124,9 +122,5 @@ public class TransInfoDTO {
 		return "TransInfo [amount=" + amount + ", dstAccount=" + dstAccount + ", dstAssetId=" + dstAssetId + ", srcAccount=" + srcAccount + ", srcAssetId=" + srcAssetId + ", transState=" + transState
 				+ ", transTime=" + transTime + ", transType=" + transType + ", transactionId=" + transactionId + ", signList=" + signList + "]";
 	}
-
-
-
-
 
 }

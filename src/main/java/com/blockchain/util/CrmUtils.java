@@ -1,6 +1,7 @@
 package com.blockchain.util;
 
 import java.io.BufferedReader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +25,7 @@ import com.blockchain.exception.StatusCode;
 
 public class CrmUtils {
 	static Logger logger = Logger.getLogger(CrmUtils.class);
+	static final int SUCCESS_STATUS = 1;
 
 	public static void checkAuth() throws ServiceException {
 		CrmServiceDTO crmServiceDto =new CrmServiceDTO();
@@ -52,7 +54,7 @@ public class CrmUtils {
 				throw new ServiceException().pos("配置信息文件鉴权").errorCode(StatusCode.SYSTEM_UNKOWN_ERROR).errorMessage(StatusCode.SYSTEM_UNKOWN_ERROR_MESSAGE);
 			}
 		} else {
-			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage(StatusCode.PARAM_ERROR_MESSAGE);
+			throw new ServiceException().pos("检查权限却走入else").errorCode(StatusCode.PARAM_ERROR).errorMessage(StatusCode.PARAM_ERROR_MESSAGE).data(ipsPath);
 		}
 
 	}
@@ -72,8 +74,7 @@ public class CrmUtils {
 				JSONObject jobj = JSONObject.parseObject(jsonData);
 				int result = jobj.getInteger("result");
 				int data = jobj.getInteger("data");
-				int SUCCESS_STATUS = 1;
-
+			
 				if (result == SUCCESS_STATUS && data == SUCCESS_STATUS) {
 					return CrmResultSet.SUCCESS;
 				}else{

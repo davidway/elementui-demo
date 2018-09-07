@@ -26,6 +26,10 @@ public class KeyInfoDTO {
 	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
 	}
+	@Override
+	public String toString() {
+		return "KeyInfoDTO [privateKey=" + privateKey + ", publicKey=" + publicKey + "]";
+	}
 	
 	
 }

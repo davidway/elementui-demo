@@ -59,11 +59,10 @@ public class AssetSettleFormDTO {
 	public void setSrcAsset(String srcAsset) {
 		this.srcAsset = srcAsset;
 	}
-	
+	@Override
+	public String toString() {
+		return "AssetSettleFormDTO [amount=" + amount + ", ownerAccount=" + ownerAccount + ", userPrivateKey=" + userPrivateKey + ", srcAsset=" + srcAsset + "]";
+	}
 
-	
-	
-
-	
 	
 }

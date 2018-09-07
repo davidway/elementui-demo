@@ -180,6 +180,7 @@ public class ConfigUtils {
 				try {
 					output.close();
 				} catch (IOException e) {
+					logger.error("IO錯誤{}",e);
 					e.printStackTrace();
 				}
 			}
@@ -188,6 +189,7 @@ public class ConfigUtils {
 				try {
 					output.close();
 				} catch (IOException e) {
+					logger.error("IO錯誤{}",e);
 					e.printStackTrace();
 				}
 			}
@@ -210,6 +212,7 @@ public class ConfigUtils {
 				try {
 					in.close();
 				} catch (IOException e) {
+					logger.error("IO錯誤{}",e);
 					e.printStackTrace();
 				}
 			}
@@ -218,6 +221,7 @@ public class ConfigUtils {
 				try {
 					in.close();
 				} catch (IOException e) {
+					logger.error("IO錯誤{}",e);
 					e.printStackTrace();
 				}
 			}
