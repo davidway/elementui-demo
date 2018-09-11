@@ -135,7 +135,7 @@ public class AssetServiceImpl implements AssetService {
 
 		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_issue_submit_v1.cgi";
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
-		ResultUtil.checkSubmitResultIfSuccess("资产提交接口", submitString,submitResultString);
+		ResultUtil.checkResultIfSuccess("资产提交接口",submitResultString);
 		issueLogger.debug("调用【资产只发行后】" + submitResultString);
 		issueLogger.debug("issue调试结束");
 
@@ -156,7 +156,7 @@ public class AssetServiceImpl implements AssetService {
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
 		transferLogger.info("调用【转账只提交后】" + submitResultString);
 
-		ResultUtil.checkSubmitResultIfSuccess("资产转让提交接口", submitString, submitResultString);
+		ResultUtil.checkResultIfSuccess("资产提交接口",submitResultString);
 		System.out.println(submitResultString);
 		transferLogger.info("issue调试结束");
 

@@ -1,7 +1,6 @@
 package com.blockchain.util;
 
 import java.io.BufferedReader;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,16 +12,14 @@ import java.net.URL;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson.JSONObject;
-import com.blockchain.dto.CrmResultSet;
 import com.blockchain.dto.CrmServiceDTO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
-
+ import com.blockchain.dto.CrmResultSet;
 public class CrmUtils {
 	static Logger logger = Logger.getLogger(CrmUtils.class);
 	static final int SUCCESS_STATUS = 1;
