@@ -42,7 +42,7 @@ public class CrmServiceDTO {
 	private void setProperties(String key, String name) {
 		OutputStream output = null;
 		try {
-			String path = new ClassPathResource("/crm_config.properties").getFile().getAbsolutePath();
+			String path = new ClassPathResource("../main-resources/crm_config.properties").getFile().getAbsolutePath();
 
 			output = new FileOutputStream(path);
 			prop.setProperty(key, name);
@@ -72,7 +72,7 @@ public class CrmServiceDTO {
 	private String getProperties(String name) {
 		InputStream in =null;
 		try {
-			String path = new ClassPathResource("/crm_config.properties").getFile().getAbsolutePath();
+			String path = new ClassPathResource("../main-resources/crm_config.properties").getFile().getAbsolutePath();
 			 in = new FileInputStream(path);
 			prop.load(in);
 			return getProperty(prop, name);

@@ -6,7 +6,7 @@
   </welcome-file-list>
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>classpath:application.xml</param-value>
+    <param-value>/WEB-INF/main-resources/application.xml</param-value>
   </context-param>
   <context-param>
     <param-name>webAppRootKey</param-name>
@@ -30,7 +30,7 @@
   </filter-mapping>
   <context-param>
     <param-name>log4jConfigLocation</param-name>
-    <param-value>classpath:log4j.properties</param-value>
+    <param-value>/WEB-INF/main-resources/log4j.properties</param-value>
   </context-param>
   <context-param>
     <param-name>log4jRefreshInterval</param-name>
@@ -47,7 +47,7 @@
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
     <init-param>
       <param-name>contextConfigLocation</param-name>
-      <param-value>classpath:spring-mvc.xml</param-value>
+      <param-value>/WEB-INF/main-resources/spring-mvc.xml</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>

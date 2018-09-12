@@ -1,6 +1,7 @@
 package com.blockchain.controller;
 
 import javax.annotation.Resource;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -24,7 +25,6 @@ import com.blockchain.dto.AssetSubmitFormDTO;
 import com.blockchain.dto.AssetTransferDTO;
 import com.blockchain.dto.AssetTransferFormDTO;
 import com.blockchain.dto.AssetTransferSubmitFormDTO;
-import com.blockchain.dto.CrmServiceDTO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.AssetService;
@@ -98,7 +98,7 @@ public class AssetController{
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (ServiceException e) {
-			logger.error("业务错误", e);
+	
 			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);

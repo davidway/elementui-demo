@@ -29,7 +29,7 @@ import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
 @Configuration
 @EnableSwagger
 @EnableWebMvc
-@ComponentScan({"com.blockchain.controller","com.blockchain.DTO"}) 
+@ComponentScan({"com.blockchain.controller","com.blockchain.dto"}) 
 public class ApiSwaggerConfig {	
 	private SpringSwaggerConfig springSwaggerConfig;
 
@@ -51,12 +51,12 @@ public class ApiSwaggerConfig {
 		
 		
 		    
-		if (SwaggerProperties.isOpen.equals(SwaggerProperties.OPEN)) {
+		/*if (SwaggerProperties.isOpen.equals(SwaggerProperties.OPEN)) {
 			return new SwaggerSpringMvcPlugin(this.springSwaggerConfig).apiInfo(apiInfo()).enable(true);
 		}else{
 			return new SwaggerSpringMvcPlugin(this.springSwaggerConfig).apiInfo(apiInfo()).enable(false);
-		}
-		
+		}*/
+		return new SwaggerSpringMvcPlugin(this.springSwaggerConfig).apiInfo(apiInfo()).enable(true);
 
 	}
 	

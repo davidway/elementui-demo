@@ -390,7 +390,7 @@
                     <outjar>${project.build.finalName}-pg.jar</outjar>
                     <!-- 添加依赖，这里你可以按你的需要修改，这里测试只需要一个JRE的Runtime包就行了 -->
                     <libs>
-                        <lib>${java.home}/lib/rt.jar</lib>
+                        <lib>${java.home}\lib\rt.jar</lib>
                     </libs>
                     <!-- 加载文件的过滤器，就是你的工程目录了-->
                     <inFilter>com/**</inFilter>

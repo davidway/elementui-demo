@@ -23,7 +23,7 @@ public class SwaggerProperties {
 	static {
 		try {
 			InputStream in = SwaggerProperties.class.getClassLoader()
-					.getResourceAsStream("swagger.properties");
+					.getResourceAsStream("../main-resources/swagger.properties");
 			prop.load(in);
 			isOpen = getProperty(prop, "is_open");
 
