@@ -30,7 +30,7 @@ public interface UserService {
 
 	List<TransInfoDTO> transQuery(AssetTransQueryFormDTO assetForm) throws ServiceException, TrustSDKException, Exception;
 
-	String getSrcAssetListBySrcAccount(String srcAccount, String content) throws TrustSDKException, Exception;
+
 
 	public UserInfoVO addUserHasBaseAccount(UserFormDTO userFormDTO) throws ServiceException, TrustSDKException, UnsupportedEncodingException, Exception;
 

@@ -195,39 +195,6 @@ public class UserServiceImpl implements UserService {
 		return transInfoList;
 	}
 	
-	@Override
-	public String getSrcAssetListBySrcAccount(String srcAccount, String content) throws TrustSDKException, Exception {
-		boolean first = true;
-		AccountQueryFormDTO accountQuery = new AccountQueryFormDTO();
-		accountQuery.setAssetAccount(srcAccount);
-		accountQuery.setPageLimit(20);
-		accountQuery.setPageNo(1);
-
-		accountQuery.setState(0);
-
-		JSONObject contentJson = JSON.parseObject(content);
-		logger.debug("调用【accountQuery前】的参数信息" + JSON.toJSONString(accountQuery));
-		List<AssetDTO> list = accountQuery(accountQuery);
-		StringBuffer assetIdList = new StringBuffer("");
-		logger.debug("调用【accountQuery】成功后返回的" + JSON.toJSONString(list));
-		for (AssetDTO assetDTO : list) {
-			if (assetDTO.getAssetType().equals(1) && assetDTO.getContent().equals(contentJson)) {
-				if (first) {
-					assetIdList.append(assetDTO.getAssetId());
-					first = false;
-				} else {
-					assetIdList.append("," + assetDTO.getAssetId());
-
-				}
-			}
-
-		}
-		if (StringUtils.isBlank(assetIdList)) {
-			//String s = new ErrorMessage(StatusCode.SERVICE_EXCEPTION, "资产查询", "该用户没有资产，可能都在待申请").toJsonString();
-			throw new ServiceException().errorCode(StatusCode.SERVICE_EXCEPTION).errorMessage("该用户没有资产，可能都在待申请");
-		}
-		return assetIdList.toString();
-	}
 
 	@Override
 	public UserInfoVO addUserHasBaseAccount(UserFormDTO userFormDTO) throws ServiceException,UnsupportedEncodingException, TrustSDKException, Exception {
