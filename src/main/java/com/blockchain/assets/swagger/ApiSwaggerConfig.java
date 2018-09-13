@@ -51,13 +51,12 @@ public class ApiSwaggerConfig {
 		
 		
 		    
-		/*if (SwaggerProperties.isOpen.equals(SwaggerProperties.OPEN)) {
+		if (SwaggerProperties.isOpen.equals(SwaggerProperties.OPEN)) {
 			return new SwaggerSpringMvcPlugin(this.springSwaggerConfig).apiInfo(apiInfo()).enable(true);
 		}else{
 			return new SwaggerSpringMvcPlugin(this.springSwaggerConfig).apiInfo(apiInfo()).enable(false);
-		}*/
-		return new SwaggerSpringMvcPlugin(this.springSwaggerConfig).apiInfo(apiInfo()).enable(true);
-
+		}
+		
 	}
 	
 

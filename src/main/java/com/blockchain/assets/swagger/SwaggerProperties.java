@@ -20,17 +20,23 @@ public class SwaggerProperties {
 
 	public static final String OPEN = "1";
 	public static final String CLOSE = "0";
+	static InputStream in=null;
 	static {
 		try {
-			InputStream in = SwaggerProperties.class.getClassLoader()
+			 in = SwaggerProperties.class.getClassLoader()
 					.getResourceAsStream("../main-resources/swagger.properties");
 			prop.load(in);
 			isOpen = getProperty(prop, "is_open");
-
 		}
-
 		catch (IOException e) {
 			logger.error(e);
+		}
+		finally{
+			try {
+				in.close();
+			} catch (IOException e) {
+				logger.error(e);
+			}
 		}
 	}
 
