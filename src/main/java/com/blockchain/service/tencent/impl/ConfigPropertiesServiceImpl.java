@@ -23,7 +23,7 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 		String nodeId = configPropertiesFormDto.getNodeId();
 		String createUserPrivateKey = configPropertiesFormDto.getCreateUserPrivateKey();
 		String createUserPublicKey = configPropertiesFormDto.getCreateUserPublicKey();
-		Integer choseType = configPropertiesFormDto.getChoseType();
+		Integer choseType = configPropertiesFormDto.getChainType();
 		ConfigUtils configUtils  = new ConfigUtils();
 	
 		if (StringUtils.isNotBlank(chainId)) {
@@ -64,6 +64,7 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 		String nodeId = configUtils.getNodeId();
 		String createUserPrivateKey = configUtils.getCreateUserPrivateKey();
 		String createUserPublicKey = configUtils.getCreateUserPublicKey();
+		Integer chainType = configUtils.getChainType();
 		
 		configPropertiesFormDto.setChainId(chainId);
 
@@ -76,6 +77,10 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 		configPropertiesFormDto.setCreateUserPrivateKey(createUserPrivateKey);
 
 		configPropertiesFormDto.setCreateUserPublicKey(createUserPublicKey);
+		
+		configPropertiesFormDto.setCreateUserPublicKey(createUserPublicKey);
+		
+		configPropertiesFormDto.setChainType(chainType);
 		return configPropertiesFormDto;
 		
 	}

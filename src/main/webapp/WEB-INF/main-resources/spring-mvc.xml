@@ -21,7 +21,7 @@
 	<!-- 设置Jackson在返回的时候过滤掉null的数据 -->
 	<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
       <property name="objectMapper">
-          <bean class="com.blockchain.util.CustomObjectMapperFactoryBean">
+          <bean class="com.blockchain.springjson.CustomObjectMapperFactoryBean">
               <constructor-arg>
                   <list>
                       <value>WriteNullListAsEmpty</value>

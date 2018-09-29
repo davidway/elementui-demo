@@ -8,7 +8,7 @@ import com.blockchain.service.tencent.dto.AssetIssueDto;
 import com.blockchain.service.tencent.dto.AssetSettleDto;
 import com.blockchain.service.tencent.dto.AssetSettleFormDto;
 import com.blockchain.service.tencent.dto.AssetSettleSubmitFormDto;
-import com.blockchain.service.tencent.dto.AssetSubmitFormDto;
+import com.blockchain.service.tencent.dto.AssetIssueSubmitFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferDto;
 import com.blockchain.service.tencent.dto.AssetTransferFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferSubmitFormDto;
@@ -16,16 +16,16 @@ import com.blockchain.service.tencent.dto.AssetTransferSubmitFormDto;
 @Component
 public class AssetPrepareUtil {
 
-	public AssetSubmitFormDto prepareAssetSubmitForm(String applyResultString) {
+	public AssetIssueSubmitFormDto prepareAssetSubmitForm(String applyResultString) {
 		JSONObject o = JSON.parseObject(applyResultString);
-		AssetSubmitFormDto assetSubmitFormDto = new AssetSubmitFormDto();
+		AssetIssueSubmitFormDto assetIssueSubmitFormDto = new AssetIssueSubmitFormDto();
 		String signStrList = o.getString("sign_str_list");
-		assetSubmitFormDto.setSignStr(signStrList);
+		assetIssueSubmitFormDto.setSignStr(signStrList);
 		String transactionId = o.getString("transaction_id");
-		assetSubmitFormDto.setTransactionId(transactionId);
+		assetIssueSubmitFormDto.setTransactionId(transactionId);
 		String assetId = o.getString("asset_id");
-		assetSubmitFormDto.setAssetId(assetId);
-		return assetSubmitFormDto;
+		assetIssueSubmitFormDto.setAssetId(assetId);
+		return assetIssueSubmitFormDto;
 		
 	}
 
@@ -99,10 +99,10 @@ public class AssetPrepareUtil {
 		 return assetSettleDto;
 	}
 
-	public AssetIssueDto generateAssetIssueDto(AssetSubmitFormDto assetSubmitFormDto, String submitResultString) {
+	public AssetIssueDto generateAssetIssueDto(AssetIssueSubmitFormDto assetIssueSubmitFormDto, String submitResultString) {
 		AssetIssueDto assetIssueDto = new AssetIssueDto();
 		
-		String transactionId = assetSubmitFormDto.getTransactionId();
+		String transactionId = assetIssueSubmitFormDto.getTransactionId();
 		String assetId = JSON.parseObject(submitResultString).getString("asset_id");
 		String transHash = JSON.parseObject(submitResultString).getString("trans_hash");
 		

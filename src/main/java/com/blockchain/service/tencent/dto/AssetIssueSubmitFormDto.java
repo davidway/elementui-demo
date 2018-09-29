@@ -6,7 +6,7 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value="资产发行表单")
-public class AssetSubmitFormDto {
+public class AssetIssueSubmitFormDto {
 	@ApiModelProperty(value="平台唯一标识一次交易的ID",required=true)
 	@NotEmpty(message="平台唯一标志id不能为空")
 	private String transactionId;

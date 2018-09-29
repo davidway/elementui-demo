@@ -28,7 +28,7 @@ public class ConfigPropertiesFormDto {
 	@ApiModelProperty( value = "类型选择器,0为腾讯，1为以太坊")
 	@Min(value=0,message="范围值在0~100")
 	@Max(value=100,message="范围值在0~100")
-	private Integer choseType;
+	private Integer chainType;
 	
 
 	public String getChainId() {
@@ -74,12 +74,13 @@ public class ConfigPropertiesFormDto {
 		return "ConfigPropertiesForm [createUserPrivateKey=" + createUserPrivateKey + ", createUserPublicKey=" + createUserPublicKey + ", chainId=" + chainId + ", ledgerId=" + ledgerId + ", mchId="
 				+ mchId + ", nodeId=" + nodeId + "]";
 	}
-	public Integer getChoseType() {
-		return choseType;
+	public Integer getChainType() {
+		return chainType;
 	}
-	public void setChoseType(Integer choseType) {
-		this.choseType = choseType;
+	public void setChainType(Integer chainType) {
+		this.chainType = chainType;
 	}
+
 	
 	
 	

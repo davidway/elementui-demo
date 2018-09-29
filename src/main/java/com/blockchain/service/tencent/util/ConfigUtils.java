@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 
+import com.blockchain.dto.BlockChainType;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.tencent.trustsql.sdk.TrustSDK;
@@ -32,7 +33,6 @@ public class ConfigUtils {
 	private String serverId;
 	private String serverCode;
 	private Integer chainType;
-	
 
 	public String getCreateUserPrivateKey() {
 		this.createUserPrivateKey = getProperties("createUserPrivateKey");
@@ -128,9 +128,14 @@ public class ConfigUtils {
 		String mchId = configUtils.getMchId();
 		Integer choseType = configUtils.getChainType();
 		StringBuffer lessName = new StringBuffer();
-		
-		
-		if ("0".equals(choseType)) {
+
+		// 类型选择必须要填写
+		if (choseType == null) {
+			throw new ServiceException().errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
+		}
+
+		// 腾讯的还要检查配置文件
+		if (choseType.equals(BlockChainType.TENCENT)) {
 			if (StringUtils.isBlank(chainId)) {
 				lessName.append("配置文件中的联盟链id不能为空，");
 			}
@@ -152,30 +157,18 @@ public class ConfigUtils {
 			if (StringUtils.isBlank(mchId)) {
 				lessName.append("配置文件中的机构id不能为空，");
 			}
-		}
-
-		if (choseType == null) {
-			lessName.append("类型选择不能为空");
-		}else{
-			configUtils.setChoseType(choseType);
+			try {
+				TrustSDK.checkPairKey(createUserPrivateKey, createUserPublicKey);
+			} catch (TrustSDKException e) {
+				throw new ServiceException().errorCode(StatusCode.PAIR_KEY_ERROR).errorMessage(StatusCode.PAIR_KEY_ERROR_MESSAGE);
+			}
 		}
 
 		if (StringUtils.isNotBlank(lessName.toString())) {
-			// String string = new
-			// ErrorMessage(Integer.valueOf(StatusCode.CONFIG_NOT_SET),
-			// StatusCode.CONFIG_NOT_SET_MESSAGE,
-			// lessName.toString()).toJsonString();
+
 			throw new ServiceException().errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
 		}
-		try {
-			TrustSDK.checkPairKey(createUserPrivateKey, createUserPublicKey);
-		} catch (TrustSDKException e) {
-			// String string = new
-			// ErrorMessage(Integer.valueOf(StatusCode.PAIR_KEY_ERROR),
-			// StatusCode.PAIR_KEY_ERROR_MESSAGE,
-			// lessName.toString()).toJsonString();
-			throw new ServiceException().errorCode(StatusCode.PAIR_KEY_ERROR).errorMessage(StatusCode.PAIR_KEY_ERROR_MESSAGE);
-		}
+
 	}
 
 	private void setProperties(String key, String name) {
@@ -285,18 +278,18 @@ public class ConfigUtils {
 
 	public Integer getChainType() {
 		String chainType = getProperties("chainType");
-		if ( StringUtils.isNotBlank(chainType)){
+		if (StringUtils.isNotBlank(chainType)) {
 			return Integer.valueOf(chainType);
-		}else{
+		} else {
 			return null;
 		}
-		
+
 	}
+
 	public void setChoseType(Integer chainType) {
 		this.chainType = chainType;
 		setProperties("chainType", String.valueOf(chainType));
 
 	}
-
 
 }

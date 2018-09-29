@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.blockchain.service.tencent.AssetService;
-import com.blockchain.service.tencent.dto.AssetFormDto;
+import com.blockchain.service.tencent.dto.AssetIssueFormDto;
 import com.blockchain.service.tencent.dto.AssetIssueDto;
 import com.blockchain.service.tencent.dto.AssetSettleDto;
 import com.blockchain.service.tencent.dto.AssetSettleFormDto;
 import com.blockchain.service.tencent.dto.AssetSettleSubmitFormDto;
-import com.blockchain.service.tencent.dto.AssetSubmitFormDto;
+import com.blockchain.service.tencent.dto.AssetIssueSubmitFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferDto;
 import com.blockchain.service.tencent.dto.AssetTransferFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferSubmitFormDto;
@@ -38,10 +38,10 @@ public class AssetServiceImpl implements AssetService {
 	AssetPrepareUtil assetPrepareUtil = new AssetPrepareUtil();
 	
 	@Override
-	public AssetIssueDto issue(AssetFormDto assetFormDto) throws Exception {
+	public AssetIssueDto issue(AssetIssueFormDto assetIssueFormDto) throws Exception {
 		issueLogger.info("issue调试");
-		issueLogger.info("传入的参数{}" , assetFormDto);
-		String applyString = assetUtil.generateIssueApplyParam(assetFormDto);
+		issueLogger.info("传入的参数{}" , assetIssueFormDto);
+		String applyString = assetUtil.generateIssueApplyParam(assetIssueFormDto);
 
 		issueLogger.info("调用【发行申请】前的参数:{}" , applyString);
 		String applyUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_issue_apply_v1.cgi";
@@ -49,18 +49,18 @@ public class AssetServiceImpl implements AssetService {
 		issueLogger.info("调用【发行申请】后的参数{}" , applyResultString);
 		ResultUtil.checkResultIfSuccess("资产申请接口", applyResultString);
 
-		AssetSubmitFormDto assetSubmitFormDto = assetPrepareUtil.prepareAssetSubmitForm(applyResultString);
-		String submitString = assetUtil.generateIssueSubmitParam(assetSubmitFormDto);
+		AssetIssueSubmitFormDto assetIssueSubmitFormDto = assetPrepareUtil.prepareAssetSubmitForm(applyResultString);
+		String submitString = assetUtil.generateIssueSubmitParam(assetIssueSubmitFormDto);
 
 		issueLogger.info("调用【发行提交】后的参数" + submitString);
 		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_issue_submit_v1.cgi";
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
 
-		ResultUtil.checkSubmitResultIfSuccess("资产提交接口", JSON.toJSONString(assetSubmitFormDto), submitResultString);
+		ResultUtil.checkSubmitResultIfSuccess("资产提交接口", JSON.toJSONString(assetIssueSubmitFormDto), submitResultString);
 		issueLogger.debug("issue调试结束");
 
 		AssetIssueDto assetIssueDto = new AssetIssueDto();
-		assetIssueDto = assetPrepareUtil.generateAssetIssueDto(assetSubmitFormDto, submitResultString);
+		assetIssueDto = assetPrepareUtil.generateAssetIssueDto(assetIssueSubmitFormDto, submitResultString);
 		return assetIssueDto;
 	}
 
@@ -128,9 +128,9 @@ public class AssetServiceImpl implements AssetService {
 
 
 	@Override
-	public AssetIssueDto issueSubmit(AssetSubmitFormDto assetSubmitFormDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
-		issueLogger.debug("传入的参数" + assetSubmitFormDto);
-		String submitString = assetUtil.generateIssueSubmitParam(assetSubmitFormDto);
+	public AssetIssueDto issueSubmit(AssetIssueSubmitFormDto assetIssueSubmitFormDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
+		issueLogger.debug("传入的参数" + assetIssueSubmitFormDto);
+		String submitString = assetUtil.generateIssueSubmitParam(assetIssueSubmitFormDto);
 		issueLogger.debug("调用【资产发行前】" + submitString);
 
 		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_issue_submit_v1.cgi";
@@ -141,7 +141,7 @@ public class AssetServiceImpl implements AssetService {
 
 	
 		AssetIssueDto assetIssueDto = new AssetIssueDto();
-		assetIssueDto = assetPrepareUtil.generateAssetIssueDto(assetSubmitFormDto, submitResultString);
+		assetIssueDto = assetPrepareUtil.generateAssetIssueDto(assetIssueSubmitFormDto, submitResultString);
 		return assetIssueDto;
 	}
 

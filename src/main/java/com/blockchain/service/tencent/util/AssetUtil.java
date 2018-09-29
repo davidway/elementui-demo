@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.blockchain.service.tencent.AssetService;
-import com.blockchain.service.tencent.dto.AssetFormDto;
+import com.blockchain.service.tencent.dto.AssetIssueFormDto;
 import com.blockchain.service.tencent.dto.AssetSettleFormDto;
 import com.blockchain.service.tencent.dto.AssetSettleSubmitFormDto;
-import com.blockchain.service.tencent.dto.AssetSubmitFormDto;
+import com.blockchain.service.tencent.dto.AssetIssueSubmitFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferSubmitFormDto;
 import com.blockchain.service.tencent.trustsql.sdk.TrustSDK;
@@ -32,7 +32,7 @@ public class AssetUtil {
 
 	private static Logger log = Logger.getLogger(AssetUtil.class);
 
-	public String generateIssueApplyParam(AssetFormDto assetFormDto) throws TrustSDKException, Exception {
+	public String generateIssueApplyParam(AssetIssueFormDto assetIssueFormDto) throws TrustSDKException, Exception {
 		ConfigUtils configUtils = new ConfigUtils();
 		String mchId =  configUtils.getMchId();
 		String prvKey =  configUtils.getCreateUserPrivateKey();
@@ -48,12 +48,12 @@ public class AssetUtil {
 
 		paramMap.put("chain_id", chainId);
 		paramMap.put("ledger_id", ledgerId);
-		paramMap.put("source_id", assetFormDto.getSourceId());
-		paramMap.put("owner_account", assetFormDto.getCreateUserAccountAddress());
+		paramMap.put("source_id", assetIssueFormDto.getSourceId());
+		paramMap.put("owner_account", assetIssueFormDto.getCreateUserAccountAddress());
 		paramMap.put("asset_type", "1");
-		paramMap.put("amount", assetFormDto.getAmount());
-		paramMap.put("unit", assetFormDto.getUnit());
-		JSONObject contentJsonObject = JSONObject.parseObject(assetFormDto.getContent());
+		paramMap.put("amount", assetIssueFormDto.getAmount());
+		paramMap.put("unit", assetIssueFormDto.getUnit());
+		JSONObject contentJsonObject = JSONObject.parseObject(assetIssueFormDto.getContent());
 		paramMap.put("content", contentJsonObject);
 		paramMap.put("timestamp", System.currentTimeMillis() / 1000L);
 		paramMap.put("mch_sign", TrustSDK.signString(prvKey, SignStrUtil.mapToKeyValueStr(paramMap).getBytes("UTF-8"), false));
@@ -65,7 +65,7 @@ public class AssetUtil {
 		return postJson.toJSONString();
 	}
 
-	public String generateIssueSubmitParam(AssetSubmitFormDto assetSubmitFormDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
+	public String generateIssueSubmitParam(AssetIssueSubmitFormDto assetIssueSubmitFormDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
 		ConfigUtils configUtils = new ConfigUtils();
 		String mchId =  configUtils.getMchId();
 		String prvKey =  configUtils.getCreateUserPrivateKey();
@@ -75,10 +75,10 @@ public class AssetUtil {
 		String ledgerId =  configUtils.getLedgerId();
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 
-		String transactionId = assetSubmitFormDto.getTransactionId();
+		String transactionId = assetIssueSubmitFormDto.getTransactionId();
 
-		String assetId = assetSubmitFormDto.getAssetId();
-		String tempString = assetSubmitFormDto.getSignStr();
+		String assetId = assetIssueSubmitFormDto.getAssetId();
+		String tempString = assetIssueSubmitFormDto.getSignStr();
 
 		paramMap.put("version", "1.0");
 		paramMap.put("sign_type", "ECDSA");

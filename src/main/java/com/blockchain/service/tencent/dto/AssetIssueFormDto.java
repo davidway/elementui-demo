@@ -3,25 +3,23 @@ package com.blockchain.service.tencent.dto;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.blockchain.service.tencent.util.ConfigUtils;
-import com.wordnik.swagger.annotations.ApiImplicitParam;
-import com.wordnik.swagger.annotations.ApiImplicitParams;
+import com.blockchain.validate.group.EthValidateGroup;
+import com.blockchain.validate.group.TencentValidateGroup;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 
 @ApiModel("资产发行列表")
-public class AssetFormDto {
-	@ApiModelProperty(value="原资产唯一ID，由业务系统自己维护",required=true)
-	@NotEmpty(message="资产id不能为空")
+public class AssetIssueFormDto {
+	@ApiModelProperty(value="腾讯：原资产唯一ID，由业务系统自己维护",required=true)
+	@NotEmpty(message="资产id不能为空",groups=TencentValidateGroup.class)
 	private String sourceId;
 	
-	@NotEmpty(message="内容不能为空")
-	@ApiModelProperty(value="区块链系统唯一标志内容，json格式",required=true)
+	@NotEmpty(message="内容不能为空",groups=TencentValidateGroup.class)
+	@ApiModelProperty(value="腾讯：区块链系统唯一标志内容，json格式",required=true)
 	private String content;
 	@NotEmpty(message = "金额不能为空")
 	@ApiModelProperty(value="金额",required=true)
@@ -35,8 +33,14 @@ public class AssetFormDto {
 	private String createUserAccountAddress;
 	
 	@ApiModelProperty(value="资产单位",required=true)
-	@NotEmpty(message="单位不能为空")
+	@NotEmpty(message="代币缩写单位")
 	private String unit;
+	
+
+
+	@ApiModelProperty(value="以太坊 代币全名称",required=true)
+	@NotEmpty(message="单位不能为空",groups=EthValidateGroup.class)
+	private String fullName;
 	
 	public String getSourceId() {
 		return sourceId;
@@ -79,10 +83,20 @@ public class AssetFormDto {
 		this.unit = unit;
 	}
 
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
 	@Override
 	public String toString() {
-		return "AssetForm [sourceId=" + sourceId + ", content=" + content + ", amount=" + amount + ", createUserAccountAddress=" + createUserAccountAddress + ", unit=" + unit + "]";
+		return "AssetIssueFormDto [sourceId=" + sourceId + ", content=" + content + ", amount=" + amount + ", createUserAccountAddress=" + createUserAccountAddress + ", unit=" + unit + ", fullName="
+				+ fullName + "]";
 	}
-	
+
+
 	
 }

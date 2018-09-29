@@ -40,11 +40,23 @@ public class AssetTransferFormDto {
 	private String userPrivateKey;
 
 	
-
-
+	@ApiModelProperty(value = "以太坊事务数字", required = true)
+	private String nonce;
+	@NotEmpty(message = "金额不能为空")
+	@ApiModelProperty(value = "份额", required = true)
+	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
 	
-
-
+	private String gasPrice;
+	@NotEmpty(message = "金额不能为空")
+	@ApiModelProperty(value = "份额", required = true)
+	
+	private String gasLimit ;
+	
+	@ApiModelProperty(value = "离线文件", required = true)
+	private String offlineFile;
+	@ApiModelProperty(value = "密码", required = true)
+	private String password;
+		
 
 	public String getAmount() {
 		return amount;
@@ -141,11 +153,87 @@ public class AssetTransferFormDto {
 
 
 
+	public String getNonce() {
+		return nonce;
+	}
+
+
+
+
+	public void setNonce(String nonce) {
+		this.nonce = nonce;
+	}
+
+
+
+
+	public String getGasPrice() {
+		return gasPrice;
+	}
+
+
+
+
+	public void setGasPrice(String gasPrice) {
+		this.gasPrice = gasPrice;
+	}
+
+
+
+
+	public String getGasLimit() {
+		return gasLimit;
+	}
+
+
+
+
+	public void setGasLimit(String gasLimit) {
+		this.gasLimit = gasLimit;
+	}
+
+
+
+
+	public String getOfflineFile() {
+		return offlineFile;
+	}
+
+
+
+
+	public void setOfflineFile(String offlineFile) {
+		this.offlineFile = offlineFile;
+	}
+
+
+
+
+	public String getPassword() {
+		return password;
+	}
+
+
+
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+
+
+
 	@Override
 	public String toString() {
-		return "AssetTransferForm [amount=" + amount + ", srcAccount=" + srcAccount + ", dstAccount=" + dstAccount + ", srcAsset=" + srcAsset + ", feeAccount=" + feeAccount + ", feeAmount="
-				+ feeAmount + ", userPrivateKey=" + userPrivateKey + "]";
+		return "AssetTransferFormDto [amount=" + amount + ", srcAccount=" + srcAccount + ", dstAccount=" + dstAccount + ", srcAsset=" + srcAsset + ", feeAccount=" + feeAccount + ", feeAmount="
+				+ feeAmount + ", userPrivateKey=" + userPrivateKey + ", nonce=" + nonce + ", gasPrice=" + gasPrice + ", gasLimit=" + gasLimit + ", offlineFile=" + offlineFile + ", password="
+				+ password + "]";
 	}
+
+
+
+
+	
 
 	
 

@@ -66,7 +66,7 @@ public class ChainUtil {
 
 	private static String getProperties(String name) {
 		try {
-			String path = new ClassPathResource("/ethereum-config.properties").getFile().getAbsolutePath();
+			String path = new ClassPathResource("../main-resources/ethereum-config.properties").getFile().getAbsolutePath();
 			InputStream in = new FileInputStream(path);
 			prop.load(in);
 			return getProperty(prop, name);

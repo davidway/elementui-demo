@@ -22,7 +22,6 @@ import com.blockchain.exception.StatusCode;
 import com.blockchain.service.tencent.ConfigPropertiesService;
 import com.blockchain.service.tencent.dto.ConfigPropertiesFormDto;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
-import com.blockchain.service.tencent.util.CrmUtils;
 import com.blockchain.service.tencent.util.TrustSDKUtil;
 import com.blockchain.service.tencent.vo.PhpSystemJsonContentVo;
 import com.blockchain.util.ResponseUtil;
@@ -66,7 +65,7 @@ public class ConfigController {
 
 		try {
 			ValidatorUtil.validate(bindingResult);
-			CrmUtils.checkAuth();
+			//CrmUtils.checkAuth();
 			TrustSDKUtil.checkPariKeyMatch(configPropertiesFormDto.getCreateUserPublicKey(), configPropertiesFormDto.getCreateUserPrivateKey());
 		} catch (ServiceException e) {
 			logger.error("错误信息",e);

@@ -32,6 +32,9 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import com.blockchain.service.tencent.util.ConfigUtils;
+import com.blockchain.util.BlockChainName;
+
 public class HttpClientUtil {
 
 	private static Log logger = LogFactory.getLog(HttpClientUtil.class);
@@ -56,6 +59,12 @@ public class HttpClientUtil {
 			HttpPost httpPost = new HttpPost(url.trim());
 
 			StringEntity strEntity = new StringEntity(reqBodyJson, "UTF-8");
+			ConfigUtils configUtils = new ConfigUtils();
+			Integer chainType = configUtils.getChainType();
+			if (chainType.equals(BlockChainName.ETH)){
+				strEntity.setContentType("application/json");
+			}
+			
 			httpPost.setEntity(strEntity);
 			CloseableHttpResponse response = getConnection().execute(httpPost);
 			int status = response.getStatusLine().getStatusCode();

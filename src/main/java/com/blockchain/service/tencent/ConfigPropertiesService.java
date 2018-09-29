@@ -8,6 +8,6 @@ public interface ConfigPropertiesService {
 
 	void add(ConfigPropertiesFormDto configPropertiesFormDto) throws TrustSDKException, ServiceException;
 
-	ConfigPropertiesFormDto get();
+	ConfigPropertiesFormDto get() ;
 
 }
