@@ -38,16 +38,16 @@ public class EthAssetIssueFormDto {
 
 	@ApiModelProperty(value="以太坊事务单位",required=true)
 	private String nonce;
-	@NotEmpty(message = "金额不能为空",groups=EthValidateGroup.class)
+	
+	@NotEmpty(message = "gasPrice不能为空",groups=EthValidateGroup.class)
 	@ApiModelProperty(value = "份额", required = true)
 	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
-	@Max(value=10,message="金额必须大于0,而且为整数，最大数字为10")
 	private String gasPrice;
-	@NotEmpty(message = "金额不能为空",groups=EthValidateGroup.class)
+	@NotEmpty(message = "gasLimit不能为空",groups=EthValidateGroup.class)
 	@ApiModelProperty(value = "份额", required = true)
 	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
-	@Max(value=10,message="金额必须大于0,而且为整数，最大数字为10")
 	private String gasLimit ;
+	
 	
 	@ApiModelProperty(value = "离线文件", required = true)
 	private String offlineFile;
@@ -55,7 +55,7 @@ public class EthAssetIssueFormDto {
 	private String password;
 	
 	@ApiModelProperty(value = "以太坊用户私钥", required = true)
-	private String privateKey;
+	private String userPrivateKey;
 
 	public String getAmount() {
 		return amount;
@@ -129,20 +129,21 @@ public class EthAssetIssueFormDto {
 		this.password = password;
 	}
 
-	public String getPrivateKey() {
-		return privateKey;
+	public String getUserPrivateKey() {
+		return userPrivateKey;
 	}
 
-	public void setPrivateKey(String privateKey) {
-		this.privateKey = privateKey;
+	public void setUserPrivateKey(String userPrivateKey) {
+		this.userPrivateKey = userPrivateKey;
 	}
 
 	@Override
 	public String toString() {
-		return "AssetIssueFormDTO [amount=" + amount + ", createUserAccountAddress=" + createUserAccountAddress + ", unit=" + unit + ", fullName=" + fullName + ", nonce=" + nonce + ", gasPrice="
-				+ gasPrice + ", gasLimit=" + gasLimit + ", offlineFile=" + offlineFile + ", password=" + password + ", privateKey=" + privateKey + "]";
+		return "EthAssetIssueFormDto [amount=" + amount + ", createUserAccountAddress=" + createUserAccountAddress + ", unit=" + unit + ", fullName=" + fullName + ", nonce=" + nonce + ", gasPrice="
+				+ gasPrice + ", gasLimit=" + gasLimit + ", offlineFile=" + offlineFile + ", password=" + password + ", userPrivateKey=" + userPrivateKey + "]";
 	}
-	
+
+
 	
 	
 

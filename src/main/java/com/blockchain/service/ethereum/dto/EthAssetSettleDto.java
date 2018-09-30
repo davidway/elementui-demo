@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.blockchain.validate.group.EthValidateGroup;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
@@ -25,11 +26,24 @@ public class EthAssetSettleDto {
 	private String userPrivateKey;
 	
 	
-	private String gasLimit;
+	@NotEmpty(message = "gasPrice不能为空",groups=EthValidateGroup.class)
+	@ApiModelProperty(value = "份额", required = true)
+	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
 	private String gasPrice;
-	private String nonce;
-	private String password;
+	@NotEmpty(message = "gasLimit不能为空",groups=EthValidateGroup.class)
+	@ApiModelProperty(value = "份额", required = true)
+	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
+	private String gasLimit ;
+	
+	
+	@ApiModelProperty(value = "离线文件", required = true)
 	private String offlineFile;
+	@ApiModelProperty(value = "密码", required = true)
+	private String password;
+	
+	@ApiModelProperty(value = "事务数字", required = true)
+	private String nonce;
+
 
 	
 	public String getAmount() {

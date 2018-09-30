@@ -74,15 +74,16 @@ public class EthAssetServiceImpl implements EthAssetService {
 		String submitUrl = serviceUrl + issueActionName;
 
 		// 校验他是否是离线文件模式或者是私钥模式；
-		String privateKey = assetIssueFormDto.getPrivateKey();
+		String privateKey = assetIssueFormDto.getUserPrivateKey();
 		String password = assetIssueFormDto.getPassword();
 
 		String offlineFile = assetIssueFormDto.getOfflineFile();
 
 		privateKey = getPrivateKey(privateKey, offlineFile, password);
 
-		BigInteger gasPrice = BigInteger.ZERO;
-		BigInteger gasLimit = BigInteger.ZERO;
+
+		BigInteger gasPrice =new BigInteger(assetIssueFormDto.getGasPrice());
+		BigInteger gasLimit = new BigInteger(assetIssueFormDto.getGasLimit());
 		if (StringUtils.isNotBlank(assetIssueFormDto.getGasPrice())) {
 			gasPrice = DefaultGasProvider.GAS_PRICE.multiply(new BigInteger(assetIssueFormDto.getGasPrice()));
 		} else {
@@ -153,9 +154,9 @@ public class EthAssetServiceImpl implements EthAssetService {
 		String srcAccout = assetTransferFormDto.getSrcAccount();
 		String dstAccount = assetTransferFormDto.getDstAccount();
 
-		BigInteger gasPrice = BigInteger.ZERO;
-		BigInteger gasLimit = BigInteger.ZERO;
-		if (StringUtils.isNotBlank(assetTransferFormDto.getGasPrice())) {
+		BigInteger gasPrice =new BigInteger(assetTransferFormDto.getGasPrice());
+		BigInteger gasLimit = new BigInteger(assetTransferFormDto.getGasLimit());
+	/*	if (StringUtils.isNotBlank(assetTransferFormDto.getGasPrice())) {
 			gasPrice =new BigInteger(assetTransferFormDto.getGasPrice() );
 		} else {
 			gasPrice = DefaultGasProvider.GAS_PRICE;
@@ -164,7 +165,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 			gasLimit =new BigInteger(assetTransferFormDto.getGasLimit() );
 		} else {
 			gasLimit = DefaultGasProvider.GAS_LIMIT;
-		}
+		}*/
 
 		String contractAddress = ethereumConfig.getContractAddress();
 		Long amount = Long.valueOf(assetTransferFormDto.getAmount());
@@ -270,19 +271,10 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 		String srcAccout = assetSettleFormDto.getOwnerAccount();
 
-		BigInteger gasPrice = BigInteger.ZERO;
-		BigInteger gasLimit = BigInteger.ZERO;
-		if (StringUtils.isNotBlank(assetSettleFormDto.getGasPrice())) {
-			gasPrice = DefaultGasProvider.GAS_PRICE.multiply(new BigInteger(assetSettleFormDto.getGasPrice()));
-		} else {
-			gasPrice = DefaultGasProvider.GAS_PRICE;
-		}
-		if (StringUtils.isNotBlank(assetSettleFormDto.getGasLimit())) {
-			gasLimit = DefaultGasProvider.GAS_LIMIT.multiply(new BigInteger(assetSettleFormDto.getGasLimit()));
-		} else {
-			gasLimit = DefaultGasProvider.GAS_LIMIT;
-		}
-
+		
+		BigInteger gasPrice =new BigInteger(assetSettleFormDto.getGasPrice());
+		BigInteger gasLimit = new BigInteger(assetSettleFormDto.getGasLimit());
+		
 		EthereumConfig ethereumConfig = new EthereumConfig();
 		String serviceUrl = ethereumConfig.getServiceSystemUrl();
 		String settleActionName = ethereumConfig.getSettleActionName();
