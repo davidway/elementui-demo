@@ -25,6 +25,7 @@ import com.blockchain.service.ethereum.dto.EthAssetSettleDto;
 import com.blockchain.service.ethereum.dto.EthAssetTransferFormDto;
 import com.blockchain.service.ethereum.dto.EthTransInfoDto;
 import com.blockchain.service.ethereum.dto.EthAssetIssueFormDto;
+import com.blockchain.service.ethereum.dto.GasInfo;
 import com.blockchain.service.tencent.AssetService;
 import com.blockchain.service.tencent.dto.AssetIssueFormDto;
 import com.blockchain.service.tencent.dto.AssetIssueDto;
@@ -88,18 +89,18 @@ public class AssetController {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 		ConfigUtils configUtils = new ConfigUtils();
-		Integer chainType=null;
+		Integer chainType = null;
 
 		try {
 			ConfigUtils.check();
-		
+
 			chainType = configUtils.getChainType();
 			switch (chainType) {
 			case BlockChainType.TENCENT:
 				new ValidatorUtil().validate(assetTransferFormDto, TencentValidateGroup.class);
 				ParamUtils.checkAssetNum(assetTransferFormDto.getSrcAsset());
 				TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetTransferFormDto.getUserPrivateKey(), assetTransferFormDto.getSrcAccount());
-			
+
 				break;
 
 			case BlockChainType.ETH:
@@ -180,7 +181,7 @@ public class AssetController {
 		try {
 
 			ConfigUtils.check();
-			
+
 			switch (chainType) {
 			case BlockChainType.TENCENT:
 				new ValidatorUtil().validate(assetSettleFormDto, TencentValidateGroup.class);
@@ -344,7 +345,7 @@ public class AssetController {
 		String jsonString = "";
 		try {
 			ConfigUtils.check();
-		
+
 			ValidatorUtil.validate(bindingResult);
 		} catch (ServiceException e) {
 			logger.error("业务错误", e);
@@ -472,6 +473,28 @@ public class AssetController {
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
+		return;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = { "/getGasInfo" }, method = RequestMethod.POST)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
+	public void getGasInfo() {
+		String jsonString = "";
+		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
+
+		GasInfo gasInfo = ethAssetService.getGasInfo();
+		phpSystemJsonContentVo.setData(gasInfo);
+		jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+		ResponseUtil.echo(response, jsonString);
 		return;
 	}
 }

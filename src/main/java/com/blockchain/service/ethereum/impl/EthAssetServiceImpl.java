@@ -33,6 +33,7 @@ import com.blockchain.service.ethereum.dto.EthAssetSettleDto;
 import com.blockchain.service.ethereum.dto.EthAssetTransferFormDto;
 import com.blockchain.service.ethereum.dto.EthAssetIssueFormDto;
 import com.blockchain.service.ethereum.dto.EthereumConfig;
+import com.blockchain.service.ethereum.dto.GasInfo;
 import com.blockchain.service.ethereum.ethjava.TokenERC20;
 import com.blockchain.service.ethereum.ethjava.utils.Environment;
 import com.blockchain.service.ethereum.util.ChainUtil;
@@ -484,4 +485,12 @@ public class EthAssetServiceImpl implements EthAssetService {
 		return hexValue;
 	}
 
+	@Override
+	public GasInfo getGasInfo() {
+		GasInfo gasInfo = new GasInfo();
+		gasInfo.setGasLimit(DefaultGasProvider.GAS_LIMIT);
+
+		gasInfo.setGasPrice(DefaultGasProvider.GAS_PRICE);
+		return gasInfo;
+	}
 }
