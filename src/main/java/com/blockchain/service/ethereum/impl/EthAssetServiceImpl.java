@@ -82,18 +82,9 @@ public class EthAssetServiceImpl implements EthAssetService {
 		privateKey = getPrivateKey(privateKey, offlineFile, password);
 
 
+
 		BigInteger gasPrice =new BigInteger(assetIssueFormDto.getGasPrice());
 		BigInteger gasLimit = new BigInteger(assetIssueFormDto.getGasLimit());
-		if (StringUtils.isNotBlank(assetIssueFormDto.getGasPrice())) {
-			gasPrice = DefaultGasProvider.GAS_PRICE.multiply(new BigInteger(assetIssueFormDto.getGasPrice()));
-		} else {
-			gasPrice = DefaultGasProvider.GAS_PRICE;
-		}
-		if (StringUtils.isNotBlank(assetIssueFormDto.getGasLimit())) {
-			gasLimit = DefaultGasProvider.GAS_LIMIT.multiply(new BigInteger(assetIssueFormDto.getGasLimit()));
-		} else {
-			gasLimit = DefaultGasProvider.GAS_LIMIT;
-		}
 
 		String name = assetIssueFormDto.getFullName();
 		BigInteger amount = new BigInteger(assetIssueFormDto.getAmount());
