@@ -42,6 +42,11 @@ public class AssetIssueFormDto {
 	@NotEmpty(message="单位不能为空",groups=EthValidateGroup.class)
 	private String fullName;
 	
+
+	@ApiModelProperty(value="以太坊 用户私钥",required=true)
+	@NotEmpty(message="用户私钥不能为空",groups=EthValidateGroup.class)
+	private String privateKey;
+	
 	public String getSourceId() {
 		return sourceId;
 	}
@@ -95,6 +100,14 @@ public class AssetIssueFormDto {
 	public String toString() {
 		return "AssetIssueFormDto [sourceId=" + sourceId + ", content=" + content + ", amount=" + amount + ", createUserAccountAddress=" + createUserAccountAddress + ", unit=" + unit + ", fullName="
 				+ fullName + "]";
+	}
+
+	public String getPrivateKey() {
+		return privateKey;
+	}
+
+	public void setPrivateKey(String privateKey) {
+		this.privateKey = privateKey;
 	}
 
 

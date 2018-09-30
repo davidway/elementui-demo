@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Controller;
@@ -40,6 +41,7 @@ import com.blockchain.service.tencent.dto.UserKeyDto;
 import com.blockchain.service.tencent.trustsql.sdk.TrustSDK;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.blockchain.service.tencent.util.ConfigUtils;
+import com.blockchain.service.tencent.util.CrmUtils;
 import com.blockchain.service.tencent.vo.PhpSystemJsonContentVo;
 import com.blockchain.service.tencent.vo.UserInfoVo;
 import com.blockchain.util.ResponseUtil;
@@ -55,7 +57,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 @RequestMapping(value = "/user")
 public class UserController {
 	private static Logger logger = Logger.getLogger(UserController.class);
-
+	public static final Logger getReturnLogger =  Logger.getLogger("getReturnLogger");
 	@Resource
 	HttpServletResponse response;
 
@@ -127,6 +129,7 @@ public class UserController {
 		String jsonString = "";
 		try {
 			ConfigUtils.check();
+			
 			ValidatorUtil.validate(bindingResult);
 		} catch (ServiceException e) {
 
@@ -215,6 +218,7 @@ public class UserController {
 				break;
 			case BlockChainType.ETH:
 				EthAccountQueryFormDto ethAccountQueryFormDto  = new EthAccountQueryFormDto();
+				BeanUtils.copyProperties(assetForm, ethAccountQueryFormDto);
 				EthAndTokenAssetDto tokenAndEth = ethUserService.ethereumAccountQuery(ethAccountQueryFormDto);
 				phpSystemJsonContentVO.setData(tokenAndEth);
 				jsonString = JSON.toJSONString(phpSystemJsonContentVO);
@@ -518,7 +522,8 @@ public class UserController {
 	@ResponseBody
 	@RequestMapping(value = { "/test" }, method = RequestMethod.POST, consumes = "application/json")
 	public void test( @RequestBody PhpSystemJsonContentVo phpSystemJsonContentVO, BindingResult bindingResult) {
-		logger.info(phpSystemJsonContentVO);
+		getReturnLogger.info(phpSystemJsonContentVO);
+		
 		return;
 	}
 }

@@ -9,12 +9,15 @@ import com.blockchain.exception.ServiceException;
 import com.blockchain.service.tencent.ConfigPropertiesService;
 import com.blockchain.service.tencent.dto.ConfigPropertiesFormDto;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
+import com.blockchain.service.tencent.util.BeanUtils;
 import com.blockchain.service.tencent.util.ConfigUtils;
+import com.blockchain.util.BlockChainName;
 
 @Service("ConfigPropertiesService")
 public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 
 	Logger logger = LoggerFactory.getLogger(ConfigPropertiesServiceImpl.class);
+
 	@Override
 	public void add(ConfigPropertiesFormDto configPropertiesFormDto) throws TrustSDKException, ServiceException {
 		String chainId = configPropertiesFormDto.getChainId();
@@ -23,33 +26,49 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 		String nodeId = configPropertiesFormDto.getNodeId();
 		String createUserPrivateKey = configPropertiesFormDto.getCreateUserPrivateKey();
 		String createUserPublicKey = configPropertiesFormDto.getCreateUserPublicKey();
-		Integer choseType = configPropertiesFormDto.getChainType();
-		ConfigUtils configUtils  = new ConfigUtils();
-	
-		if (StringUtils.isNotBlank(chainId)) {
-			configUtils.setChainId(chainId);
-		}
-		if (StringUtils.isNotBlank(ledgerId)) {
+		Integer chainType = configPropertiesFormDto.getChainType();
+		ConfigUtils configUtils = new ConfigUtils();
 
-			configUtils.setLedgerId(ledgerId);
-		}
-		if (StringUtils.isNotBlank(mchId)) {
-			configUtils.setMchId(mchId);
-		}
-		if (StringUtils.isNotBlank(nodeId)) {
-			configUtils.setNodeId(nodeId);
-		}
-		if (StringUtils.isNotBlank(createUserPrivateKey)) {
-			configUtils.setCreateUserPrivateKey(createUserPrivateKey);
-		}
-		if (StringUtils.isNotBlank(createUserPublicKey)) {
-			configUtils.setCreateUserPublicKey(createUserPublicKey);
-		}
-		if (StringUtils.isNotBlank(createUserPublicKey)) {
-			configUtils.setCreateUserPublicKey(createUserPublicKey);
-		}
-		if (choseType!=null) {
-			configUtils.setChoseType(choseType);
+		if (chainType != null) {
+			configUtils.setChainType(chainType);
+			switch (chainType) {
+			case BlockChainName.TENCENT:
+				if (StringUtils.isNotBlank(chainId)) {
+					configUtils.setChainId(chainId);
+				}
+				if (StringUtils.isNotBlank(ledgerId)) {
+
+					configUtils.setLedgerId(ledgerId);
+				}
+				if (StringUtils.isNotBlank(mchId)) {
+					configUtils.setMchId(mchId);
+				}
+				if (StringUtils.isNotBlank(nodeId)) {
+					configUtils.setNodeId(nodeId);
+				}
+				if (StringUtils.isNotBlank(createUserPrivateKey)) {
+					configUtils.setCreateUserPrivateKey(createUserPrivateKey);
+				}
+				if (StringUtils.isNotBlank(createUserPublicKey)) {
+					configUtils.setCreateUserPublicKey(createUserPublicKey);
+				}
+				if (StringUtils.isNotBlank(createUserPublicKey)) {
+					configUtils.setCreateUserPublicKey(createUserPublicKey);
+				}
+				break;
+			case BlockChainName.ETH:
+				//以太坊不作其余配置,清空腾讯的配置
+				configUtils.setChainId("");
+				configUtils.setCoin_privateKey("");
+				configUtils.setCreateUserPrivateKey("");
+				configUtils.setCreateUserPublicKey("");
+				configUtils.setLedgerId("");
+				configUtils.setMchId("");
+				configUtils.setNodeId("");
+				break;
+			default:
+				break;
+			}
 		}
 		return;
 	}
@@ -57,7 +76,7 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 	@Override
 	public ConfigPropertiesFormDto get() {
 		ConfigPropertiesFormDto configPropertiesFormDto = new ConfigPropertiesFormDto();
-		ConfigUtils configUtils  = new ConfigUtils();
+		ConfigUtils configUtils = new ConfigUtils();
 		String chainId = configUtils.getChainId();
 		String ledgerId = configUtils.getLedgerId();
 		String mchId = configUtils.getMchId();
@@ -65,7 +84,7 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 		String createUserPrivateKey = configUtils.getCreateUserPrivateKey();
 		String createUserPublicKey = configUtils.getCreateUserPublicKey();
 		Integer chainType = configUtils.getChainType();
-		
+
 		configPropertiesFormDto.setChainId(chainId);
 
 		configPropertiesFormDto.setLedgerId(ledgerId);
@@ -77,12 +96,12 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 		configPropertiesFormDto.setCreateUserPrivateKey(createUserPrivateKey);
 
 		configPropertiesFormDto.setCreateUserPublicKey(createUserPublicKey);
-		
+
 		configPropertiesFormDto.setCreateUserPublicKey(createUserPublicKey);
-		
+
 		configPropertiesFormDto.setChainType(chainType);
 		return configPropertiesFormDto;
-		
+
 	}
 
 }

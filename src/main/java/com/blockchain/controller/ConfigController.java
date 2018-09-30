@@ -17,15 +17,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.blockchain.dto.BlockChainType;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.tencent.ConfigPropertiesService;
 import com.blockchain.service.tencent.dto.ConfigPropertiesFormDto;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
+import com.blockchain.service.tencent.util.ConfigUtils;
+import com.blockchain.service.tencent.util.CrmUtils;
+import com.blockchain.service.tencent.util.ParamUtils;
 import com.blockchain.service.tencent.util.TrustSDKUtil;
 import com.blockchain.service.tencent.vo.PhpSystemJsonContentVo;
 import com.blockchain.util.ResponseUtil;
 import com.blockchain.util.ValidatorUtil;
+import com.blockchain.validate.group.EthValidateGroup;
+import com.blockchain.validate.group.TencentValidateGroup;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
@@ -63,13 +69,33 @@ public class ConfigController {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 
+		
 		try {
-			ValidatorUtil.validate(bindingResult);
-			//CrmUtils.checkAuth();
-			TrustSDKUtil.checkPariKeyMatch(configPropertiesFormDto.getCreateUserPublicKey(), configPropertiesFormDto.getCreateUserPrivateKey());
+			// CrmUtils.checkAuth();
+			Integer chainType = configPropertiesFormDto.getChainType();
+			check(chainType);
+		
+			switch (chainType) {
+			case BlockChainType.TENCENT:
+				new ValidatorUtil().validate(configPropertiesFormDto, TencentValidateGroup.class);
+				TrustSDKUtil.checkPariKeyMatch(configPropertiesFormDto.getCreateUserPublicKey(), configPropertiesFormDto.getCreateUserPrivateKey());
+				break;
+
+			case BlockChainType.ETH:
+				
+				new ValidatorUtil().validate(configPropertiesFormDto, EthValidateGroup.class);
+				break;
+			}
+
 		} catch (ServiceException e) {
-			logger.error("错误信息",e);
+
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+			ResponseUtil.echo(response, jsonString);
+			return;
+		} catch (Exception e) {
+			logger.error("错误信息", e);
+			phpSystemJsonContentVo = phpSystemJsonContentVo.setUnkownError(e.getMessage());
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
@@ -78,7 +104,7 @@ public class ConfigController {
 		try {
 			configPropertiesService.add(configPropertiesFormDto);
 		} catch (Exception e) {
-			logger.error("错误信息",e);
+			logger.error("错误信息", e);
 			phpSystemJsonContentVo.setRetmsg(e.getMessage());
 			phpSystemJsonContentVo.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
@@ -90,6 +116,15 @@ public class ConfigController {
 		jsonString = JSON.toJSONString(phpSystemJsonContentVo, SerializerFeature.WriteMapNullValue);
 		ResponseUtil.echo(response, jsonString);
 		return;
+	}
+
+	private void check(Integer chainType) throws ServiceException {
+		
+		if (chainType == null) {
+			throw new ServiceException().pos("设置chainType").errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
+		}
+
+		
 	}
 
 	@ResponseBody

@@ -17,28 +17,26 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 @ApiModel(value="兑换表单")
 public class AssetSettleFormDto {
 	@ApiModelProperty(value="转账金额",required=true)
-	@NotNull(message="金额不能为空",groups=TencentValidateGroup.class)
+	@NotNull(message="金额不能为空")
 	@Min(value=1,message="金额必须为正整数")
 	private String amount;
 	@ApiModelProperty(value="资产持有方帐户",required=true)
-	@NotEmpty(message="转出方帐号不能为空",groups=TencentValidateGroup.class)
+	@NotEmpty(message="转出方帐号不能为空")
 	private String ownerAccount;
 	@ApiModelProperty(value="转出方用户私钥",required=true)
-	@NotEmpty(message="私钥不能为空",groups=TencentValidateGroup.class)
+	@NotEmpty(message="私钥不能为空")
 	private String userPrivateKey;
 	@ApiModelProperty(value="转出方资产id，暂时不支持多个",required=true)
 	@NotEmpty(message="当前剩余资产id",groups=TencentValidateGroup.class)
 	private String srcAsset;
 	
-	
-
 	@ApiModelProperty(value = "以太坊事务数字")
 	private String nonce;
-	@NotEmpty(message = "金额不能为空",groups=EthValidateGroup.class)
+	
 	@ApiModelProperty(value = "份额")
 	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
 	private String gasPrice;
-	@NotEmpty(message = "金额不能为空",groups=EthValidateGroup.class)
+
 	@ApiModelProperty(value = "份额", required = true)
 	private String gasLimit ;
 	
@@ -47,7 +45,6 @@ public class AssetSettleFormDto {
 	@ApiModelProperty(value = "密码", required = true)
 	private String password;
 		
-	
 	
 	public String getAmount() {
 		return amount;

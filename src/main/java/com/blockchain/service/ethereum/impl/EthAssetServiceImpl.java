@@ -31,7 +31,7 @@ import com.blockchain.service.ethereum.EthAssetService;
 import com.blockchain.service.ethereum.EthUserService;
 import com.blockchain.service.ethereum.dto.EthAssetSettleDto;
 import com.blockchain.service.ethereum.dto.EthAssetTransferFormDto;
-import com.blockchain.service.ethereum.dto.EthereumAssetIssueFormDto;
+import com.blockchain.service.ethereum.dto.EthAssetIssueFormDto;
 import com.blockchain.service.ethereum.dto.EthereumConfig;
 import com.blockchain.service.ethereum.ethjava.TokenERC20;
 import com.blockchain.service.ethereum.ethjava.utils.Environment;
@@ -64,7 +64,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 	public static Web3j web3j = Web3j.build(new HttpService(Environment.getRpcUrl()));
 
 	@Override
-	public EthAssetIssueVo issueToken(EthereumAssetIssueFormDto assetIssueFormDto) throws Exception {
+	public EthAssetIssueVo issueToken(EthAssetIssueFormDto assetIssueFormDto) throws Exception {
 		Web3j web3j = Web3j.build(new HttpService(Environment.getRpcUrl()));
 
 		EthereumConfig ethereumConfig = new EthereumConfig();
@@ -155,12 +155,12 @@ public class EthAssetServiceImpl implements EthAssetService {
 		BigInteger gasPrice = BigInteger.ZERO;
 		BigInteger gasLimit = BigInteger.ZERO;
 		if (StringUtils.isNotBlank(assetTransferFormDto.getGasPrice())) {
-			gasPrice = DefaultGasProvider.GAS_PRICE.multiply(new BigInteger(assetTransferFormDto.getGasPrice()));
+			gasPrice =new BigInteger(assetTransferFormDto.getGasPrice() );
 		} else {
 			gasPrice = DefaultGasProvider.GAS_PRICE;
 		}
 		if (StringUtils.isNotBlank(assetTransferFormDto.getGasLimit())) {
-			gasLimit = DefaultGasProvider.GAS_LIMIT.multiply(new BigInteger(assetTransferFormDto.getGasLimit()));
+			gasLimit =new BigInteger(assetTransferFormDto.getGasLimit() );
 		} else {
 			gasLimit = DefaultGasProvider.GAS_LIMIT;
 		}

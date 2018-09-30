@@ -126,16 +126,16 @@ public class ConfigUtils {
 		String createUserPrivateKey = configUtils.getCreateUserPrivateKey();
 		String ledgerId = configUtils.getLedgerId();
 		String mchId = configUtils.getMchId();
-		Integer choseType = configUtils.getChainType();
+		Integer chainType = configUtils.getChainType();
 		StringBuffer lessName = new StringBuffer();
 
 		// 类型选择必须要填写
-		if (choseType == null) {
+		if (chainType == null) {
 			throw new ServiceException().errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
 		}
 
 		// 腾讯的还要检查配置文件
-		if (choseType.equals(BlockChainType.TENCENT)) {
+		if (chainType.equals(BlockChainType.TENCENT)) {
 			if (StringUtils.isBlank(chainId)) {
 				lessName.append("配置文件中的联盟链id不能为空，");
 			}
@@ -286,7 +286,7 @@ public class ConfigUtils {
 
 	}
 
-	public void setChoseType(Integer chainType) {
+	public void setChainType(Integer chainType) {
 		this.chainType = chainType;
 		setProperties("chainType", String.valueOf(chainType));
 

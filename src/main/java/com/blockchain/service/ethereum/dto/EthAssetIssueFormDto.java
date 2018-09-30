@@ -6,14 +6,16 @@ import javax.validation.constraints.Min;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.blockchain.validate.group.EthValidateGroup;
+import com.blockchain.validate.group.TencentValidateGroup;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 
 @ApiModel("资产发行列表")
-public class EthereumAssetIssueFormDto {
+public class EthAssetIssueFormDto {
 	
-	@NotEmpty(message = "金额不能为空")
+	@NotEmpty(message = "金额不能为空",groups=TencentValidateGroup.class)
 	@ApiModelProperty(value="金额",required=true)
 	
 	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为18个9")
@@ -28,17 +30,20 @@ public class EthereumAssetIssueFormDto {
 	@NotEmpty(message="单位不能为空")
 	private String unit;
 
+	@ApiModelProperty(value="以太坊资产全名",required=true)
+	@NotEmpty(message="单位不能为空",groups=EthValidateGroup.class)
 	private String fullName;
 	
+	@Min(value=1 ,message="事务数字必须大于0,而且为整数，最大数字为18个9",groups=EthValidateGroup.class)
 
-	
+	@ApiModelProperty(value="以太坊事务单位",required=true)
 	private String nonce;
-	@NotEmpty(message = "金额不能为空")
+	@NotEmpty(message = "金额不能为空",groups=EthValidateGroup.class)
 	@ApiModelProperty(value = "份额", required = true)
 	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
 	@Max(value=10,message="金额必须大于0,而且为整数，最大数字为10")
 	private String gasPrice;
-	@NotEmpty(message = "金额不能为空")
+	@NotEmpty(message = "金额不能为空",groups=EthValidateGroup.class)
 	@ApiModelProperty(value = "份额", required = true)
 	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
 	@Max(value=10,message="金额必须大于0,而且为整数，最大数字为10")
@@ -49,6 +54,7 @@ public class EthereumAssetIssueFormDto {
 	@ApiModelProperty(value = "密码", required = true)
 	private String password;
 	
+	@ApiModelProperty(value = "以太坊用户私钥", required = true)
 	private String privateKey;
 
 	public String getAmount() {

@@ -2,8 +2,11 @@ package com.blockchain.util;
 
 public class BlockChainName {
 
-	public static final Integer TECENT = 0;
+	public static final int TENCENT = 0;
 
 
-	public static final Integer ETH = 1;
+	public static final int ETH = 1;
+
+
+	
 }

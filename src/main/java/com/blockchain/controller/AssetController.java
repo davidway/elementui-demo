@@ -24,7 +24,7 @@ import com.blockchain.service.ethereum.EthAssetService;
 import com.blockchain.service.ethereum.dto.EthAssetSettleDto;
 import com.blockchain.service.ethereum.dto.EthAssetTransferFormDto;
 import com.blockchain.service.ethereum.dto.EthTransInfoDto;
-import com.blockchain.service.ethereum.dto.EthereumAssetIssueFormDto;
+import com.blockchain.service.ethereum.dto.EthAssetIssueFormDto;
 import com.blockchain.service.tencent.AssetService;
 import com.blockchain.service.tencent.dto.AssetIssueFormDto;
 import com.blockchain.service.tencent.dto.AssetIssueDto;
@@ -88,16 +88,18 @@ public class AssetController {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 		ConfigUtils configUtils = new ConfigUtils();
-		Integer chainType = configUtils.getChainType();
+		Integer chainType=null;
 
 		try {
 			ConfigUtils.check();
+		
+			chainType = configUtils.getChainType();
 			switch (chainType) {
 			case BlockChainType.TENCENT:
 				new ValidatorUtil().validate(assetTransferFormDto, TencentValidateGroup.class);
 				ParamUtils.checkAssetNum(assetTransferFormDto.getSrcAsset());
 				TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetTransferFormDto.getUserPrivateKey(), assetTransferFormDto.getSrcAccount());
-				ConfigUtils.check();
+			
 				break;
 
 			case BlockChainType.ETH:
@@ -124,14 +126,14 @@ public class AssetController {
 		}
 
 		try {
-
+			chainType = configUtils.getChainType();
 			switch (chainType) {
 			case BlockChainType.TENCENT:
 				AssetTransferDto assetTransferDto = assetService.transfer(assetTransferFormDto);
 				phpSystemJsonContentVo.setData(assetTransferDto);
 				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 				ResponseUtil.echo(response, jsonString);
-
+				break;
 			case BlockChainType.ETH:
 				EthAssetTransferFormDto ethAssetTransferFormDto = new EthAssetTransferFormDto();
 				BeanUtils.copyProperties(assetTransferFormDto, ethAssetTransferFormDto);
@@ -178,6 +180,7 @@ public class AssetController {
 		try {
 
 			ConfigUtils.check();
+			
 			switch (chainType) {
 			case BlockChainType.TENCENT:
 				new ValidatorUtil().validate(assetSettleFormDto, TencentValidateGroup.class);
@@ -264,6 +267,7 @@ public class AssetController {
 		try {
 			// 校验开始
 			ConfigUtils.check();
+			CrmUtils.checkAuth();
 			configUtils = new ConfigUtils();
 			chainType = configUtils.getChainType();
 			switch (chainType) {
@@ -293,7 +297,7 @@ public class AssetController {
 				ResponseUtil.echo(response, jsonString);
 				break;
 			case BlockChainType.ETH:
-				EthereumAssetIssueFormDto ethassetFormDTO = new EthereumAssetIssueFormDto();
+				EthAssetIssueFormDto ethassetFormDTO = new EthAssetIssueFormDto();
 				BeanUtils.copyProperties(assetIssueFormDto, ethassetFormDTO);
 				ethAssetService.issueToken(ethassetFormDTO);
 				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
@@ -340,7 +344,7 @@ public class AssetController {
 		String jsonString = "";
 		try {
 			ConfigUtils.check();
-			CrmUtils.checkAuth();
+		
 			ValidatorUtil.validate(bindingResult);
 		} catch (ServiceException e) {
 			logger.error("业务错误", e);

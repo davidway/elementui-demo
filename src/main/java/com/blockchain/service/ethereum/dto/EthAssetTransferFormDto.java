@@ -42,12 +42,12 @@ public class EthAssetTransferFormDto {
 	@NotEmpty(message = "金额不能为空")
 	@ApiModelProperty(value = "份额", required = true)
 	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
-	@Max(value=10,message="金额必须大于0,而且为整数，最大数字为10")
+	
 	private String gasPrice;
 	@NotEmpty(message = "金额不能为空")
 	@ApiModelProperty(value = "份额", required = true)
 	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
-	@Max(value=10,message="金额必须大于0,而且为整数，最大数字为10")
+	
 	private String gasLimit ;
 	
 	@ApiModelProperty(value = "离线文件", required = true)
