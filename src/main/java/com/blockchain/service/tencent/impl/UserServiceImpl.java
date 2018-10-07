@@ -255,4 +255,15 @@ public class UserServiceImpl implements TencentUserService {
 			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage("公私钥匹配错误");
 		}
 	}
+
+	@Override
+	public UserInfoVo getUserInfo(String privateKey) throws TrustSDKException {
+		UserInfoVo userInfoVo = new UserInfoVo();
+		String baseAccoutAddress = TrustSDK.generateAddrByPrvkey(privateKey);
+		String publicKey = TrustSDK.generatePubkeyByPrvkey(privateKey, true);
+		userInfoVo.setBaseAccountAddress(baseAccoutAddress);
+		userInfoVo.setBasePrivateKey(privateKey);
+		userInfoVo.setBasePublicKey(publicKey);
+		return userInfoVo;
+	}
 }

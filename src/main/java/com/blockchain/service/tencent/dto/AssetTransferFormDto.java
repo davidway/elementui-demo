@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.blockchain.validate.group.EthValidateGroup;
 import com.wordnik.swagger.annotations.ApiImplicitParam;
 import com.wordnik.swagger.annotations.ApiImplicitParams;
 import com.wordnik.swagger.annotations.ApiModel;
@@ -42,18 +43,17 @@ public class AssetTransferFormDto {
 	
 	@ApiModelProperty(value = "以太坊事务数字", required = true)
 	private String nonce;
-	@NotEmpty(message = "金额不能为空")
+	@NotEmpty(message = "gasPrice不能为空",groups = EthValidateGroup.class)
 	@ApiModelProperty(value = "份额", required = true)
 	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
 	
 	private String gasPrice;
-	@NotEmpty(message = "金额不能为空")
+	@NotEmpty(message = "gasLimit不能为空",groups = EthValidateGroup.class)
 	@ApiModelProperty(value = "份额", required = true)
-	
 	private String gasLimit ;
 	
 	@ApiModelProperty(value = "离线文件", required = true)
-	private String offlineFile;
+	private String keyStore;
 	@ApiModelProperty(value = "密码", required = true)
 	private String password;
 		
@@ -195,17 +195,6 @@ public class AssetTransferFormDto {
 
 
 
-	public String getOfflineFile() {
-		return offlineFile;
-	}
-
-
-
-
-	public void setOfflineFile(String offlineFile) {
-		this.offlineFile = offlineFile;
-	}
-
 
 
 
@@ -215,26 +204,9 @@ public class AssetTransferFormDto {
 
 
 
-
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
-
-
-
-	@Override
-	public String toString() {
-		return "AssetTransferFormDto [amount=" + amount + ", srcAccount=" + srcAccount + ", dstAccount=" + dstAccount + ", srcAsset=" + srcAsset + ", feeAccount=" + feeAccount + ", feeAmount="
-				+ feeAmount + ", userPrivateKey=" + userPrivateKey + ", nonce=" + nonce + ", gasPrice=" + gasPrice + ", gasLimit=" + gasLimit + ", offlineFile=" + offlineFile + ", password="
-				+ password + "]";
-	}
-
-
-
-
-	
-
-	
 
 }

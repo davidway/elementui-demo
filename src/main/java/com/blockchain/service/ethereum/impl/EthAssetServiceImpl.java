@@ -18,11 +18,14 @@ import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthEstimateGas;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.ChainId;
+import org.web3j.tx.FastRawTransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.tx.response.PollingTransactionReceiptProcessor;
 import org.web3j.utils.Numeric;
 
 import com.alibaba.fastjson.JSON;
@@ -78,7 +81,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 		String keyStore = assetIssueFormDto.getKeyStore();
 
-		privateKey = getPrivateKey(privateKey, keyStore, password);
+		//privateKey = getPrivateKey(privateKey, keyStore, password);
 
 		BigInteger gasPrice =new BigInteger(assetIssueFormDto.getGasPrice());
 		BigInteger gasLimit = new BigInteger(assetIssueFormDto.getGasLimit());
@@ -89,14 +92,15 @@ public class EthAssetServiceImpl implements EthAssetService {
 		
 		CompletableFuture<TokenERC20> contract = null;
 		try {
-
-			Credentials credentials = Credentials.create(privateKey);
+			
+			Credentials credentials = getCredentials(privateKey,keyStore,password);
 
 			contract = TokenERC20.deploy(web3j, credentials, gasPrice, gasLimit, amount, name, unit).sendAsync();
-
+				
+			
 			contract.thenAccept(transactionReceipt -> {
 				EthAssetIssueVo assetIssueVo = new EthAssetIssueVo();
-
+				
 				EthAssetIssueUtils ethAssetIssueUtils = new EthAssetIssueUtils();
 				assetIssueVo = ethAssetIssueUtils.generateAssetIssueVo(transactionReceipt, credentials, assetIssueVo, ethereumConfig);
 				PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
@@ -126,6 +130,17 @@ public class EthAssetServiceImpl implements EthAssetService {
 		return null;
 	}
 
+	private Credentials getCredentials(String privateKey, String keyStore, String password) throws IOException, CipherException, ServiceException {
+		if (StringUtils.isNotBlank(keyStore) && StringUtils.isNotBlank(password)) {	
+			return WalletUtils.loadCredentials(password, keyStore);
+		} else if (StringUtils.isNotBlank(privateKey)) {
+			return Credentials.create(privateKey);
+		}else{
+			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage(StatusCode.PARAM_ERROR_MESSAGE);
+		}
+		
+	}
+
 	@Override
 	public EthAssetTransferVo transferToken(EthAssetTransferFormDto assetTransferFormDto) throws TrustSDKException, Exception {
 
@@ -144,22 +159,13 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 		BigInteger gasPrice =new BigInteger(assetTransferFormDto.getGasPrice());
 		BigInteger gasLimit = new BigInteger(assetTransferFormDto.getGasLimit());
-	/*	if (StringUtils.isNotBlank(assetTransferFormDto.getGasPrice())) {
-			gasPrice =new BigInteger(assetTransferFormDto.getGasPrice() );
-		} else {
-			gasPrice = DefaultGasProvider.GAS_PRICE;
-		}
-		if (StringUtils.isNotBlank(assetTransferFormDto.getGasLimit())) {
-			gasLimit =new BigInteger(assetTransferFormDto.getGasLimit() );
-		} else {
-			gasLimit = DefaultGasProvider.GAS_LIMIT;
-		}*/
+
 
 		String contractAddress = ethereumConfig.getContractAddress();
 		Long amount = Long.valueOf(assetTransferFormDto.getAmount());
 
 		// 校验他是否是离线文件模式或者是私钥模式；
-		privateKey = getPrivateKey(privateKey, keyStore, password);
+		Credentials credentials = getCredentials(privateKey,keyStore,password);
 		EthGetTransactionCount ethGetTransactionCount = null;
 		try {
 			ethGetTransactionCount = web3j.ethGetTransactionCount(srcAccout, DefaultBlockParameterName.PENDING).send();
@@ -175,12 +181,14 @@ public class EthAssetServiceImpl implements EthAssetService {
 			String data = SmartContractUtils.genereateSignSmartContractMethodAndParam(dstAccount, amount, "transfer");
 			byte chainId = ChainUtil.getChainId();
 			String signedData = "";
-			signedData = signTransaction(nonce, gasPrice, gasLimit, contractAddress, value, data, chainId, privateKey);
+			signedData = signTransaction(nonce, gasPrice, gasLimit, contractAddress, value, data, chainId, credentials.getEcKeyPair().getPrivateKey().toString(16));
 
+			
+			
 			if (signedData != null) {
 				/****** 发送请求 ******/
 				CompletableFuture<EthSendTransaction> ethSendTransaction = web3j.ethSendRawTransaction(signedData).sendAsync();
-
+				
 				/************* SendAsync后的回调 **********************/
 				ethSendTransaction.thenAccept(transactionReceipt -> {
 					EthAssetTransferUtils ethAssetTransferUtils = new EthAssetTransferUtils();
@@ -223,17 +231,6 @@ public class EthAssetServiceImpl implements EthAssetService {
 		return null;
 	}
 
-	private String getPrivateKey(String privateKey, String offlineFile, String password) throws IOException, CipherException, ServiceException {
-		
-		if (StringUtils.isNotBlank(offlineFile) && StringUtils.isNotBlank(password)) {	
-			privateKey = exportPrivateKey(offlineFile, password);
-		} else if (StringUtils.isNotBlank(privateKey)) {
-			
-		}else{
-			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage(StatusCode.PARAM_ERROR_MESSAGE);
-		}
-		return privateKey;
-	}
 
 	/**
 	 * 导出私钥
@@ -291,7 +288,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 		Long amount = Long.valueOf(assetSettleFormDto.getAmount());
 
 		// 校验他是否是离线文件模式或者是私钥模式；
-		privateKey = getPrivateKey(privateKey, keyStore, password);
+		Credentials credentials = getCredentials(privateKey,keyStore,password);
 		EthGetTransactionCount ethGetTransactionCount = null;
 
 		try {
@@ -309,7 +306,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 			String data = SmartContractUtils.genereateSignSmartContractMethodAndParam(null, amount, "burn");
 			byte chainId = ChainUtil.getChainId();
 			String signedData = "";
-			signedData = signTransaction(nonce, gasPrice, gasLimit, contractAddress, value, data, chainId, privateKey);
+			signedData = signTransaction(nonce, gasPrice, gasLimit, contractAddress, value, data, chainId, credentials.getEcKeyPair().getPrivateKey().toString(16));
 
 			if (signedData != null) {
 				/****** 发送请求 ******/
@@ -364,7 +361,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 		String amount = assetTransferFormDto.getAmount();
 
 		// 校验他是否是离线文件模式或者是私钥模式；
-		String offlineFile = assetTransferFormDto.getKeyStore();
+		String keyStore = assetTransferFormDto.getKeyStore();
 		String password = assetTransferFormDto.getPassword();
 		String privateKey = assetTransferFormDto.getUserPrivateKey();
 
@@ -373,7 +370,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 		String settleActionName = ethereumConfig.getSettleActionName();
 		String submitUrl = serviceUrl + settleActionName;
 
-		privateKey = getPrivateKey(privateKey, offlineFile, password);
+		Credentials credentials = getCredentials(privateKey, keyStore, password);
 
 		byte chainId = ChainUtil.getChainId();
 		AssetTransferDto assetTransferDto = new AssetTransferDto();
@@ -391,36 +388,26 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 		nonce = getNonce(assetTransferFormDto.getNonce(), ethGetTransactionCount);
 
-		BigInteger gasPrice = BigInteger.ZERO;
-		BigInteger gasLimit = BigInteger.ZERO;
-		if (StringUtils.isNotBlank(assetTransferFormDto.getGasPrice())) {
-			gasPrice = DefaultGasProvider.GAS_PRICE.multiply(new BigInteger(assetTransferFormDto.getGasPrice()));
-		} else {
-			gasPrice = DefaultGasProvider.GAS_PRICE;
-		}
-		if (StringUtils.isNotBlank(assetTransferFormDto.getGasLimit())) {
-			gasLimit = DefaultGasProvider.GAS_LIMIT.multiply(new BigInteger(assetTransferFormDto.getGasLimit()));
-		} else {
-			gasLimit = DefaultGasProvider.GAS_LIMIT;
-		}
+		BigInteger gasPrice =new BigInteger(assetTransferFormDto.getGasPrice());
+		BigInteger gasLimit = new BigInteger(assetTransferFormDto.getGasLimit());
+		
 
-		// BigInteger value = Convert.toWei(BigDecimal.valueOf(0.5),
-		// Convert.Unit.ETHER).toBigInteger();
 		String data = "";
 		String signedData;
 		try {
 
-			signedData = signTransaction(nonce, gasPrice, gasLimit, dstAccount, new BigInteger(amount), data, chainId, privateKey);
+			signedData = signTransaction(nonce, gasPrice, gasLimit, dstAccount, new BigInteger(amount), data, chainId, credentials.getEcKeyPair().getPrivateKey().toString(16));
 
 			if (signedData != null) {
 				/****** 发送请求 ******/
 				CompletableFuture<EthSendTransaction> ethSendTransaction = web3j.ethSendRawTransaction(signedData).sendAsync();
 
 				/************* SendAsync后的回调 **********************/
-				ethSendTransaction.thenAccept(transactionReceipt -> {
+				ethSendTransaction.thenAcceptAsync(transactionReceipt -> {
 					EthAssetSettleUtils ethAssetSettleUtils = new EthAssetSettleUtils();
 					EthAssetSettleVo assetSettleDto = ethAssetSettleUtils.genereateTranferParam(nonce, transactionReceipt);
-
+					
+					
 					logger.debug(JSON.toJSONString(assetSettleDto));
 					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
 					org.web3j.protocol.core.Response.Error error = transactionReceipt.getError();

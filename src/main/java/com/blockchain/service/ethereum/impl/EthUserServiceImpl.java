@@ -1,5 +1,6 @@
 package com.blockchain.service.ethereum.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -9,6 +10,7 @@ import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.web3j.abi.FunctionEncoder;
@@ -41,41 +43,44 @@ import org.web3j.tx.ClientTransactionManager;
 import org.web3j.tx.Contract;
 
 import com.blockchain.exception.ServiceException;
+import com.blockchain.exception.StatusCode;
 import com.blockchain.service.ethereum.EthUserService;
 import com.blockchain.service.ethereum.dto.EthAccountQueryFormDto;
 import com.blockchain.service.ethereum.dto.EthUserFormDto;
 import com.blockchain.service.ethereum.dto.EthereumConfig;
 import com.blockchain.service.ethereum.ethjava.TokenERC20;
 import com.blockchain.service.ethereum.ethjava.utils.Environment;
+import com.blockchain.service.ethereum.util.MyFileUtil;
 import com.blockchain.service.ethereum.vo.EthAndTokenAssetVo;
 import com.blockchain.service.ethereum.vo.EthereumWalletInfo;
 import com.blockchain.service.tencent.dto.AssetTransQueryFormDto;
+import com.blockchain.service.tencent.dto.KeyInfoDto;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
+import com.blockchain.service.tencent.vo.UserInfoVo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service("EthUserServiceImpl")
 public class EthUserServiceImpl implements EthUserService {
-	
-	private static Admin 	admin = Admin.build(new HttpService(Environment.getRpcUrl()));
+
+	private static Admin admin = Admin.build(new HttpService(Environment.getRpcUrl()));
 
 	private static Logger logger = Logger.getLogger(EthUserServiceImpl.class);
 	public static Web3j web3j = Web3j.build(new HttpService(Environment.getRpcUrl()));
 
 	@Override
 	public BigInteger accountTokenQuery(EthAccountQueryFormDto assetFormVO) throws TrustSDKException, Exception {
-		String accoutAddress =assetFormVO.getAssetAccount();
-		//0xa944fee3cd9a479c94310c00dff27b16048f15f3
+		String accoutAddress = assetFormVO.getAssetAccount();
+		// 0xa944fee3cd9a479c94310c00dff27b16048f15f3
 		EthereumConfig etherumConfig = new EthereumConfig();
 		String contractAddress = etherumConfig.getContractAddress();
-		
+
 		getTokenBalance(accoutAddress);
 		web3j = Web3j.build(new HttpService(Environment.getRpcUrl()));
-	
+
 		BigInteger tokenBalance = getTokenBalance(web3j, accoutAddress, contractAddress);
 		return tokenBalance;
 	}
-
-	
 
 	@Override
 	public EthereumWalletInfo addUserHasBaseAccount(EthUserFormDto userFormDto) {
@@ -84,8 +89,8 @@ public class EthUserServiceImpl implements EthUserService {
 		String password = userFormDto.getPassword();
 
 		try {
-			userInfoVo = createAccount(password, WalletUtils.getTestnetKeyDirectory());
-			
+			userInfoVo = createAccount(password, MyFileUtil.genereateEthereumFilePath());
+
 		} catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchProviderException | CipherException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -119,7 +124,7 @@ public class EthUserServiceImpl implements EthUserService {
 			List<Type> results = FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters());
 			balanceValue = (BigInteger) results.get(0).getValue();
 			balanceValue = balanceValue.divide(new BigInteger("10").pow(18));
-			logger.debug(address+",余额为"+balanceValue);
+			logger.debug(address + ",余额为" + balanceValue);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -149,16 +154,16 @@ public class EthUserServiceImpl implements EthUserService {
 		String address = "";
 		try {
 
-		//	bip39Wallet = WalletUtils.generateBip39Wallet("", new File(directory));
+			// bip39Wallet = WalletUtils.generateBip39Wallet("", new
+			// File(directory));
 			WalletFile walletFile;
 			ECKeyPair ecKeyPair = Keys.createEcKeyPair();
 			walletFile = Wallet.createStandard(password, ecKeyPair);
-	
+
 			ObjectMapper objectMapper = ObjectMapperFactory.getObjectMapper();
 			String jsonStr = objectMapper.writeValueAsString(walletFile);
-			
-			
-			myAccountWallet.setAddress("0x"+walletFile.getAddress());
+
+			myAccountWallet.setAddress("0x" + walletFile.getAddress());
 
 			myAccountWallet.setKeyStore(jsonStr);
 			myAccountWallet.setPassword(password);
@@ -194,7 +199,6 @@ public class EthUserServiceImpl implements EthUserService {
 		}
 		return wallet;
 	}
-
 
 	/**
 	 * 获取余额
@@ -276,18 +280,19 @@ public class EthUserServiceImpl implements EthUserService {
 
 	@Override
 	public BigDecimal accountEthQuery(EthAccountQueryFormDto assetForm) throws TrustSDKException, Exception {
-		String account =assetForm.getAssetAccount();
+		String account = assetForm.getAssetAccount();
 		BigDecimal rest = getEthBalance(account);
 		return rest;
 	}
+
 	private static BigDecimal getEthBalance(String address) {
 		BigInteger balance = null;
 		BigDecimal eth = null;
 		try {
 			EthGetBalance ethGetBalance = web3j.ethGetBalance(address, DefaultBlockParameterName.LATEST).send();
 			balance = ethGetBalance.getBalance();
-			 eth = new BigDecimal(balance);
-			 eth = eth.divide(BigDecimal.TEN.pow(18));
+			eth = new BigDecimal(balance);
+			eth = eth.divide(BigDecimal.TEN.pow(18));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -295,20 +300,68 @@ public class EthUserServiceImpl implements EthUserService {
 		return eth;
 	}
 
-
-
 	@Override
 	public EthAndTokenAssetVo ethereumAccountQuery(EthAccountQueryFormDto accountQueryFormDto) throws TrustSDKException, Exception {
 		BigDecimal ethBalance = accountEthQuery(accountQueryFormDto);
 		BigInteger tokenBalance = accountTokenQuery(accountQueryFormDto);
-		
+
 		EthAndTokenAssetVo ethAndTokenAssetVo = new EthAndTokenAssetVo();
 		ethAndTokenAssetVo.setEthereumBalance(ethBalance.toString());
 		ethAndTokenAssetVo.setTokenBalance(tokenBalance.toString());
 		return ethAndTokenAssetVo;
 	}
 
-	
+	@Override
+	public void checkPairKey(KeyInfoDto keyInfo) throws ServiceException {
+		if ( StringUtils.isNotBlank(keyInfo.getPrivateKey())){
+			Credentials credentials = Credentials.create(keyInfo.getPrivateKey());
+			if (credentials != null) {
+
+			} else {
+				if (keyInfo.getPublicKey().equals(credentials.getEcKeyPair().getPublicKey()) == false) {
+					throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage("公私钥匹配错误");
+
+				}
+
+			}
+		}else if ( StringUtils.isNotBlank(keyInfo.getKeyStore())){
+			
+		}
+		
+		
+	}
+
+	@Override
+	public EthereumWalletInfo getUserInfo(String password,String privateKey) throws CipherException, JsonProcessingException {
+		EthereumWalletInfo userInfoVo = new EthereumWalletInfo();
+		// File(directory));
+		Credentials c = Credentials.create(privateKey);
+		//String keyStore = importPrivateKey(c.getEcKeyPair().getPrivateKey(), password, MyFileUtil.genereateEthereumFilePath());
 	
 
+		userInfoVo.setAddress("0x" + c.getAddress());
+		
+		userInfoVo.setKeyStore("");
+		userInfoVo.setPassword(password);
+		userInfoVo.setBasePrivateKey(privateKey);
+		
+		return userInfoVo;
+	}
+
+	private static String importPrivateKey(BigInteger privateKey, String password, String directory) {
+		ECKeyPair ecKeyPair = ECKeyPair.create(privateKey);
+		String keyStore="";
+		try {
+			 keyStore = WalletUtils.generateWalletFile(password,
+					ecKeyPair,
+					new File(directory),
+					true);
+			
+			return keyStore;
+			
+		} catch (CipherException | IOException e) {
+			e.printStackTrace();
+		}
+		return keyStore;
+	}
 }

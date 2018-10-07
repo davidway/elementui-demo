@@ -80,6 +80,14 @@ public class PhpSystemJsonContentVo {
 	}
 
 
+	public PhpSystemJsonContentVo setNoSupportError() {
+		this.retcode=StatusCode.METHOD_NO_SUPPORT;
+		this.retmsg=StatusCode.METHOD_NO_SUPPORT_MESSAGE;
+			
+		return this;
+	}
+
+
 	
 
 

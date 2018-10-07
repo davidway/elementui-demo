@@ -38,4 +38,6 @@ public interface TencentUserService {
 
 	public void checkPairKey(KeyInfoDto keyInfo) throws TrustSDKException, ServiceException;
 
+	public UserInfoVo getUserInfo(String privateKey) throws TrustSDKException;
+
 }

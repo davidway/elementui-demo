@@ -74,7 +74,7 @@ public class AssetController {
 	@ResponseBody
 	@RequestMapping(value = { "/transfer" }, method = RequestMethod.POST)
 	@ApiOperation(value = "转账申请且提交", httpMethod = "POST", response = AssetTransferDto.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
@@ -342,10 +342,27 @@ public class AssetController {
 	public void issueSubmit(@Valid @RequestBody AssetIssueSubmitFormDto assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
-		try {
-			ConfigUtils.check();
 
-			ValidatorUtil.validate(bindingResult);
+		
+		try {
+
+			ConfigUtils.check();
+			ConfigUtils configUtils = new ConfigUtils();
+			Integer chainType = configUtils.getChainType();
+			switch (chainType) {
+			case BlockChainType.TENCENT:
+				ConfigUtils.check();
+
+				ValidatorUtil.validate(bindingResult);
+				break;
+
+			case BlockChainType.ETH:
+				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
+				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+				ResponseUtil.echo(response, jsonString);
+				break;
+			}
+
 		} catch (ServiceException e) {
 			logger.error("业务错误", e);
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
@@ -392,10 +409,28 @@ public class AssetController {
 	public void transferSubmit(@Valid @RequestBody AssetTransferSubmitFormDto assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
+
+
 		try {
+
 			ConfigUtils.check();
-			ValidatorUtil.validate(bindingResult);
-		} catch (ServiceException e) {
+			ConfigUtils configUtils = new ConfigUtils();
+			Integer chainType = configUtils.getChainType();
+			switch (chainType) {
+			case BlockChainType.TENCENT:
+				ConfigUtils.check();
+				ValidatorUtil.validate(bindingResult);
+				break;
+
+			case BlockChainType.ETH:
+				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
+				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+				ResponseUtil.echo(response, jsonString);
+				break;
+			}
+		}
+
+		catch (ServiceException e) {
 
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
@@ -441,9 +476,26 @@ public class AssetController {
 	public void settleSubmit(@Valid @RequestBody AssetSettleSubmitFormDto assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
+
+	
 		try {
-			ValidatorUtil.validate(bindingResult);
+
 			ConfigUtils.check();
+			ConfigUtils configUtils = new ConfigUtils();
+			Integer chainType = configUtils.getChainType();
+			switch (chainType) {
+			case BlockChainType.TENCENT:
+				ValidatorUtil.validate(bindingResult);
+				ConfigUtils.check();
+				break;
+
+			case BlockChainType.ETH:
+				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
+				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+				ResponseUtil.echo(response, jsonString);
+				break;
+			}
+
 		} catch (ServiceException e) {
 
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
