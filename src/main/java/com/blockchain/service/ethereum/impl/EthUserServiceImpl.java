@@ -1,8 +1,6 @@
 package com.blockchain.service.ethereum.impl;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -23,7 +21,12 @@ import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.crypto.Bip39Wallet;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Keys;
+import org.web3j.crypto.Wallet;
+import org.web3j.crypto.WalletFile;
 import org.web3j.crypto.WalletUtils;
+import org.web3j.protocol.ObjectMapperFactory;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -38,19 +41,17 @@ import org.web3j.tx.ClientTransactionManager;
 import org.web3j.tx.Contract;
 
 import com.blockchain.exception.ServiceException;
-import com.blockchain.exception.StatusCode;
 import com.blockchain.service.ethereum.EthUserService;
 import com.blockchain.service.ethereum.dto.EthAccountQueryFormDto;
-import com.blockchain.service.ethereum.dto.EthAndTokenAssetDto;
-import com.blockchain.service.ethereum.dto.EthTransInfoDto;
 import com.blockchain.service.ethereum.dto.EthUserFormDto;
 import com.blockchain.service.ethereum.dto.EthereumConfig;
 import com.blockchain.service.ethereum.ethjava.TokenERC20;
 import com.blockchain.service.ethereum.ethjava.utils.Environment;
+import com.blockchain.service.ethereum.vo.EthAndTokenAssetVo;
 import com.blockchain.service.ethereum.vo.EthereumWalletInfo;
 import com.blockchain.service.tencent.dto.AssetTransQueryFormDto;
-import com.blockchain.service.tencent.trustsql.sdk.TrustSDK;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service("EthUserServiceImpl")
 public class EthUserServiceImpl implements EthUserService {
@@ -74,24 +75,7 @@ public class EthUserServiceImpl implements EthUserService {
 		return tokenBalance;
 	}
 
-	@Override
-	public List<EthTransInfoDto> transQuery(AssetTransQueryFormDto assetForm) throws ServiceException, TrustSDKException, Exception {
-		EthereumConfig etherumConfig = new EthereumConfig();
-		String contractAddress = etherumConfig.getContractAddress();
-		Web3j web3j = Web3j.build(new HttpService(Environment.getRpcUrl()));
-		ClientTransactionManager transactionManager = new ClientTransactionManager(web3j, contractAddress);
-		TokenERC20 token = TokenERC20.load(contractAddress, web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT);
-		token.transferEventObservable(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST).limit(10).subscribe(tx -> {
-			String toAddress = tx.to;
-			String fromAddress = tx.from;
-			BigInteger value = tx.value;
-			BigDecimal decimal = new BigDecimal(value).divide(BigDecimal.TEN.pow(18));
-			Log transLog = tx.log;
-			String transHash = transLog.getTransactionHash();
-			logger.debug("转账开始方"+fromAddress+"，转账给"+toAddress+",转账金额："+decimal+"transHash="+transHash);
-		});
-		return null;
-	}
+	
 
 	@Override
 	public EthereumWalletInfo addUserHasBaseAccount(EthUserFormDto userFormDto) {
@@ -161,24 +145,29 @@ public class EthUserServiceImpl implements EthUserService {
 	private static EthereumWalletInfo createAccount(String password, String directory) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, CipherException {
 
 		Bip39Wallet bip39Wallet = null;
-		EthereumWalletInfo wallet = new EthereumWalletInfo();
+		EthereumWalletInfo myAccountWallet = new EthereumWalletInfo();
 		String address = "";
 		try {
 
-			bip39Wallet = WalletUtils.generateBip39Wallet("", new File(directory));
-			String assistWord = bip39Wallet.getMnemonic();
-			String keyStoreName = bip39Wallet.getFilename();
-			Credentials credentials = WalletUtils.loadCredentials("", directory+"/"+keyStoreName);
-			wallet.setAddress(credentials.getAddress());
-			wallet.setAssitWords(assistWord);
-			wallet.setKeystore(keyStoreName);
-			wallet.setPassword(password);
-			wallet.setBasePrivateKey(credentials.getEcKeyPair().getPrivateKey().toString(16));
+		//	bip39Wallet = WalletUtils.generateBip39Wallet("", new File(directory));
+			WalletFile walletFile;
+			ECKeyPair ecKeyPair = Keys.createEcKeyPair();
+			walletFile = Wallet.createStandard(password, ecKeyPair);
+	
+			ObjectMapper objectMapper = ObjectMapperFactory.getObjectMapper();
+			String jsonStr = objectMapper.writeValueAsString(walletFile);
+			
+			
+			myAccountWallet.setAddress("0x"+walletFile.getAddress());
+
+			myAccountWallet.setKeyStore(jsonStr);
+			myAccountWallet.setPassword(password);
+			myAccountWallet.setBasePrivateKey(ecKeyPair.getPrivateKey().toString(16));
 		} catch (CipherException | IOException e) {
 			e.printStackTrace();
 		}
 
-		return wallet;
+		return myAccountWallet;
 	}
 
 	/**
@@ -309,14 +298,14 @@ public class EthUserServiceImpl implements EthUserService {
 
 
 	@Override
-	public EthAndTokenAssetDto ethereumAccountQuery(EthAccountQueryFormDto accountQueryFormDto) throws TrustSDKException, Exception {
+	public EthAndTokenAssetVo ethereumAccountQuery(EthAccountQueryFormDto accountQueryFormDto) throws TrustSDKException, Exception {
 		BigDecimal ethBalance = accountEthQuery(accountQueryFormDto);
 		BigInteger tokenBalance = accountTokenQuery(accountQueryFormDto);
 		
-		EthAndTokenAssetDto ethAndTokenAssetDto = new EthAndTokenAssetDto();
-		ethAndTokenAssetDto.setEthereumBalance(ethBalance.toString());
-		ethAndTokenAssetDto.setTokenBalance(tokenBalance.toString());
-		return ethAndTokenAssetDto;
+		EthAndTokenAssetVo ethAndTokenAssetVo = new EthAndTokenAssetVo();
+		ethAndTokenAssetVo.setEthereumBalance(ethBalance.toString());
+		ethAndTokenAssetVo.setTokenBalance(tokenBalance.toString());
+		return ethAndTokenAssetVo;
 	}
 
 	

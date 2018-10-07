@@ -27,8 +27,8 @@ import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.ethereum.EthUserService;
 import com.blockchain.service.ethereum.dto.EthAccountQueryFormDto;
-import com.blockchain.service.ethereum.dto.EthAndTokenAssetDto;
 import com.blockchain.service.ethereum.dto.EthUserFormDto;
+import com.blockchain.service.ethereum.vo.EthAndTokenAssetVo;
 import com.blockchain.service.ethereum.vo.EthereumWalletInfo;
 import com.blockchain.service.tencent.TencentUserService;
 import com.blockchain.service.tencent.dto.AccountQueryFormDto;
@@ -41,7 +41,6 @@ import com.blockchain.service.tencent.dto.UserKeyDto;
 import com.blockchain.service.tencent.trustsql.sdk.TrustSDK;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.blockchain.service.tencent.util.ConfigUtils;
-import com.blockchain.service.tencent.util.CrmUtils;
 import com.blockchain.service.tencent.vo.PhpSystemJsonContentVo;
 import com.blockchain.service.tencent.vo.UserInfoVo;
 import com.blockchain.util.ResponseUtil;
@@ -219,7 +218,7 @@ public class UserController {
 			case BlockChainType.ETH:
 				EthAccountQueryFormDto ethAccountQueryFormDto  = new EthAccountQueryFormDto();
 				BeanUtils.copyProperties(assetForm, ethAccountQueryFormDto);
-				EthAndTokenAssetDto tokenAndEth = ethUserService.ethereumAccountQuery(ethAccountQueryFormDto);
+				EthAndTokenAssetVo tokenAndEth = ethUserService.ethereumAccountQuery(ethAccountQueryFormDto);
 				phpSystemJsonContentVO.setData(tokenAndEth);
 				jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 				ResponseUtil.echo(response, jsonString);

@@ -50,7 +50,7 @@ public class EthAssetIssueFormDto {
 	
 	
 	@ApiModelProperty(value = "离线文件", required = true)
-	private String offlineFile;
+	private String keyStore;
 	@ApiModelProperty(value = "密码", required = true)
 	private String password;
 	
@@ -113,12 +113,14 @@ public class EthAssetIssueFormDto {
 		this.gasLimit = gasLimit;
 	}
 
-	public String getOfflineFile() {
-		return offlineFile;
+
+
+	public String getKeyStore() {
+		return keyStore;
 	}
 
-	public void setOfflineFile(String offlineFile) {
-		this.offlineFile = offlineFile;
+	public void setKeyStore(String keyStore) {
+		this.keyStore = keyStore;
 	}
 
 	public String getPassword() {
@@ -140,8 +142,9 @@ public class EthAssetIssueFormDto {
 	@Override
 	public String toString() {
 		return "EthAssetIssueFormDto [amount=" + amount + ", createUserAccountAddress=" + createUserAccountAddress + ", unit=" + unit + ", fullName=" + fullName + ", nonce=" + nonce + ", gasPrice="
-				+ gasPrice + ", gasLimit=" + gasLimit + ", offlineFile=" + offlineFile + ", password=" + password + ", userPrivateKey=" + userPrivateKey + "]";
+				+ gasPrice + ", gasLimit=" + gasLimit + ", keyStore=" + keyStore + ", password=" + password + ", userPrivateKey=" + userPrivateKey + "]";
 	}
+
 
 
 	

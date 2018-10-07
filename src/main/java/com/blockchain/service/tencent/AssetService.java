@@ -3,7 +3,6 @@ package com.blockchain.service.tencent;
 import java.io.UnsupportedEncodingException;
 
 import com.blockchain.exception.ServiceException;
-import com.blockchain.service.ethereum.dto.GasInfo;
 import com.blockchain.service.tencent.dto.AssetIssueDto;
 import com.blockchain.service.tencent.dto.AssetIssueFormDto;
 import com.blockchain.service.tencent.dto.AssetIssueSubmitFormDto;

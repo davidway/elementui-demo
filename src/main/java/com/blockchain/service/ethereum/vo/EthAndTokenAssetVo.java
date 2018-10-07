@@ -1,6 +1,6 @@
-package com.blockchain.service.ethereum.dto;
+package com.blockchain.service.ethereum.vo;
 
-public class EthAndTokenAssetDto {
+public class EthAndTokenAssetVo {
 	private String ethereumBalance;
 	private String tokenBalance;
 	public String getEthereumBalance() {

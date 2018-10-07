@@ -8,7 +8,6 @@ import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
@@ -27,24 +26,24 @@ import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.utils.Numeric;
 
 import com.alibaba.fastjson.JSON;
+import com.blockchain.exception.ServiceException;
+import com.blockchain.exception.StatusCode;
 import com.blockchain.service.ethereum.EthAssetService;
-import com.blockchain.service.ethereum.EthUserService;
+import com.blockchain.service.ethereum.dto.EthAssetIssueFormDto;
 import com.blockchain.service.ethereum.dto.EthAssetSettleDto;
 import com.blockchain.service.ethereum.dto.EthAssetTransferFormDto;
-import com.blockchain.service.ethereum.dto.EthAssetIssueFormDto;
 import com.blockchain.service.ethereum.dto.EthereumConfig;
-import com.blockchain.service.ethereum.dto.GasInfo;
 import com.blockchain.service.ethereum.ethjava.TokenERC20;
 import com.blockchain.service.ethereum.ethjava.utils.Environment;
 import com.blockchain.service.ethereum.util.ChainUtil;
 import com.blockchain.service.ethereum.util.EthAssetIssueUtils;
 import com.blockchain.service.ethereum.util.EthAssetSettleUtils;
 import com.blockchain.service.ethereum.util.EthAssetTransferUtils;
-import com.blockchain.service.ethereum.util.MyFileUtil;
 import com.blockchain.service.ethereum.util.SmartContractUtils;
 import com.blockchain.service.ethereum.vo.EthAssetIssueVo;
 import com.blockchain.service.ethereum.vo.EthAssetSettleVo;
 import com.blockchain.service.ethereum.vo.EthAssetTransferVo;
+import com.blockchain.service.ethereum.vo.GasInfoVo;
 import com.blockchain.service.tencent.dto.AssetTransferDto;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.blockchain.service.tencent.trustsql.sdk.util.HttpClientUtil;
@@ -77,11 +76,9 @@ public class EthAssetServiceImpl implements EthAssetService {
 		String privateKey = assetIssueFormDto.getUserPrivateKey();
 		String password = assetIssueFormDto.getPassword();
 
-		String offlineFile = assetIssueFormDto.getOfflineFile();
+		String keyStore = assetIssueFormDto.getKeyStore();
 
-		privateKey = getPrivateKey(privateKey, offlineFile, password);
-
-
+		privateKey = getPrivateKey(privateKey, keyStore, password);
 
 		BigInteger gasPrice =new BigInteger(assetIssueFormDto.getGasPrice());
 		BigInteger gasLimit = new BigInteger(assetIssueFormDto.getGasLimit());
@@ -89,7 +86,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 		String name = assetIssueFormDto.getFullName();
 		BigInteger amount = new BigInteger(assetIssueFormDto.getAmount());
 		String unit = assetIssueFormDto.getUnit();
-		BigInteger gasNumber = new BigInteger("1");
+		
 		CompletableFuture<TokenERC20> contract = null;
 		try {
 
@@ -138,7 +135,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 		String submitUrl = serviceUrl + transferActionName;
 
 		// 取值
-		String offlineFile = assetTransferFormDto.getOfflineFile();
+		String keyStore = assetTransferFormDto.getKeyStore();
 		String password = assetTransferFormDto.getPassword();
 		String privateKey = assetTransferFormDto.getUserPrivateKey();
 
@@ -162,7 +159,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 		Long amount = Long.valueOf(assetTransferFormDto.getAmount());
 
 		// 校验他是否是离线文件模式或者是私钥模式；
-		privateKey = getPrivateKey(privateKey, offlineFile, password);
+		privateKey = getPrivateKey(privateKey, keyStore, password);
 		EthGetTransactionCount ethGetTransactionCount = null;
 		try {
 			ethGetTransactionCount = web3j.ethGetTransactionCount(srcAccout, DefaultBlockParameterName.PENDING).send();
@@ -226,17 +223,36 @@ public class EthAssetServiceImpl implements EthAssetService {
 		return null;
 	}
 
-	private String getPrivateKey(String privateKey, String offlineFile, String password) throws IOException, CipherException {
-		Credentials credentials;
-
-		if (StringUtils.isNotBlank(offlineFile) && StringUtils.isNotBlank(password)) {
-			String keystorePath = MyFileUtil.genereateEthereumFilePath() + offlineFile;
-			credentials = WalletUtils.loadCredentials(password, keystorePath);
-			privateKey = credentials.getEcKeyPair().getPrivateKey().toString(PRIVATE_KEY_LENGTH);
+	private String getPrivateKey(String privateKey, String offlineFile, String password) throws IOException, CipherException, ServiceException {
+		
+		if (StringUtils.isNotBlank(offlineFile) && StringUtils.isNotBlank(password)) {	
+			privateKey = exportPrivateKey(offlineFile, password);
 		} else if (StringUtils.isNotBlank(privateKey)) {
-
+			
+		}else{
+			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage(StatusCode.PARAM_ERROR_MESSAGE);
 		}
 		return privateKey;
+	}
+
+	/**
+	 * 导出私钥
+	 *
+	 * @param keystorePath 账号的keystore路径
+	 * @param password     密码
+	 */
+	private static String exportPrivateKey(String keystorePath, String password) {
+		try {
+			Credentials credentials = WalletUtils.loadCredentials(
+					password,
+					keystorePath);
+			BigInteger privateKey = credentials.getEcKeyPair().getPrivateKey();
+			return privateKey.toString(16);
+		} catch (IOException | CipherException e) {
+			logger.error("导出私钥异常{}",e);
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private BigInteger getNonce(String nonceString, EthGetTransactionCount ethGetTransactionCount) {
@@ -256,7 +272,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 	public EthAssetSettleVo settleToken(EthAssetSettleDto assetSettleFormDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
 
 		// 取值
-		String offlineFile = assetSettleFormDto.getOfflineFile();
+		String keyStore = assetSettleFormDto.getKeyStore();
 		String password = assetSettleFormDto.getPassword();
 		String privateKey = assetSettleFormDto.getUserPrivateKey();
 
@@ -275,7 +291,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 		Long amount = Long.valueOf(assetSettleFormDto.getAmount());
 
 		// 校验他是否是离线文件模式或者是私钥模式；
-		privateKey = getPrivateKey(privateKey, offlineFile, password);
+		privateKey = getPrivateKey(privateKey, keyStore, password);
 		EthGetTransactionCount ethGetTransactionCount = null;
 
 		try {
@@ -348,7 +364,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 		String amount = assetTransferFormDto.getAmount();
 
 		// 校验他是否是离线文件模式或者是私钥模式；
-		String offlineFile = assetTransferFormDto.getOfflineFile();
+		String offlineFile = assetTransferFormDto.getKeyStore();
 		String password = assetTransferFormDto.getPassword();
 		String privateKey = assetTransferFormDto.getUserPrivateKey();
 
@@ -469,11 +485,11 @@ public class EthAssetServiceImpl implements EthAssetService {
 	}
 
 	@Override
-	public GasInfo getGasInfo() {
-		GasInfo gasInfo = new GasInfo();
-		gasInfo.setGasLimit(DefaultGasProvider.GAS_LIMIT);
+	public GasInfoVo getGasInfo() {
+		GasInfoVo gasInfoVo = new GasInfoVo();
+		gasInfoVo.setGasLimit(DefaultGasProvider.GAS_LIMIT);
 
-		gasInfo.setGasPrice(DefaultGasProvider.GAS_PRICE);
-		return gasInfo;
+		gasInfoVo.setGasPrice(DefaultGasProvider.GAS_PRICE);
+		return gasInfoVo;
 	}
 }

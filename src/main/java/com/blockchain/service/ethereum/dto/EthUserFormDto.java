@@ -1,13 +1,7 @@
 package com.blockchain.service.ethereum.dto;
 
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotEmpty;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-import com.wordnik.swagger.annotations.ApiParam;
 
 @ApiModel(value="EthUserFormDto的json")
 public class EthUserFormDto {

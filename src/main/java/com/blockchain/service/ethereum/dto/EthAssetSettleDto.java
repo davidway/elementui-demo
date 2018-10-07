@@ -37,7 +37,7 @@ public class EthAssetSettleDto {
 	
 	
 	@ApiModelProperty(value = "离线文件", required = true)
-	private String offlineFile;
+	private String keyStore;
 	@ApiModelProperty(value = "密码", required = true)
 	private String password;
 	
@@ -90,12 +90,18 @@ public class EthAssetSettleDto {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public String getOfflineFile() {
-		return offlineFile;
+	public String getKeyStore() {
+		return keyStore;
 	}
-	public void setOfflineFile(String offlineFile) {
-		this.offlineFile = offlineFile;
+	public void setKeyStore(String keyStore) {
+		this.keyStore = keyStore;
 	}
+	@Override
+	public String toString() {
+		return "EthAssetSettleDto [amount=" + amount + ", ownerAccount=" + ownerAccount + ", userPrivateKey=" + userPrivateKey + ", gasPrice=" + gasPrice + ", gasLimit=" + gasLimit + ", keyStore="
+				+ keyStore + ", password=" + password + ", nonce=" + nonce + "]";
+	}
+	
 
 
 

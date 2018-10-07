@@ -9,7 +9,7 @@ public class EthereumWalletInfo {
 	
 	
 	private String basePrivateKey;
-	private String keystore;
+	private String keyStore;
 	private String assitWords;
 	private String address;
 	private String password;
@@ -25,11 +25,12 @@ public class EthereumWalletInfo {
 	public void setBasePrivateKey(String basePrivateKey) {
 		this.basePrivateKey = basePrivateKey;
 	}
-	public String getKeystore() {
-		return keystore;
+	
+	public String getKeyStore() {
+		return keyStore;
 	}
-	public void setKeystore(String keystore) {
-		this.keystore = keystore;
+	public void setKeyStore(String keyStore) {
+		this.keyStore = keyStore;
 	}
 	public String getAddress() {
 		return address;

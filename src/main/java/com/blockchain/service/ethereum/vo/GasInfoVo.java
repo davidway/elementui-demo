@@ -1,8 +1,8 @@
-package com.blockchain.service.ethereum.dto;
+package com.blockchain.service.ethereum.vo;
 
 import java.math.BigInteger;
 
-public class GasInfo {
+public class GasInfoVo {
 	private BigInteger gasPrice;
 	
 	private BigInteger gasLimit;
