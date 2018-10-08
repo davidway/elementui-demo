@@ -654,7 +654,7 @@ public class UserController {
 	@ResponseBody
 	@RequestMapping(value = { "/test" }, method = RequestMethod.POST, consumes = "application/json")
 	public void test(@RequestBody PhpSystemJsonContentVo phpSystemJsonContentVO, BindingResult bindingResult) {
-		getReturnLogger.info(phpSystemJsonContentVO);
+		getReturnLogger.info(JSON.toJSONString(phpSystemJsonContentVO));
 
 		return;
 	}

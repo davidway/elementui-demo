@@ -9,7 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 public class DealJsonUtil {
-	private final   Logger log = Logger.getLogger(this.getClass());
+	
 	/***   
      * @param Json 
      * @return StringJson 将json对象中为null的值转换成""，并转换成json字符串返回

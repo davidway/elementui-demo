@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.blockchain.validate.group.EthValidateGroup;
+import com.blockchain.validate.group.TencentValidateGroup;
 import com.wordnik.swagger.annotations.ApiImplicitParam;
 import com.wordnik.swagger.annotations.ApiImplicitParams;
 import com.wordnik.swagger.annotations.ApiModel;
@@ -26,7 +27,7 @@ public class AssetTransferFormDto {
 	@NotEmpty(message = "资产转入帐户不能为空")
 	@ApiModelProperty(value = "资产转入帐户", required = true)
 	private String dstAccount;
-	@NotEmpty(message = "用户资产列表")
+	@NotEmpty(message = "用户资产列表",groups=TencentValidateGroup.class)
 	@ApiModelProperty(value = "转出账户持有的资产ID列表,逗号分割", required = true)
 	private String srcAsset;
 
