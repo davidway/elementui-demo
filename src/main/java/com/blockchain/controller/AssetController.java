@@ -105,6 +105,9 @@ public class AssetController {
 			case BlockChainType.ETH:
 				new ValidatorUtil().validate(assetTransferFormDto, EthValidateGroup.class);
 				break;
+			default:
+				throw new ServiceException().errorCode(StatusCode.MODEL_NO_SUPPORT).errorMessage(StatusCode.MODEL_NO_SUPPORT_MESSAGE);
+
 			}
 
 		} catch (TrustSDKException e) {
@@ -192,6 +195,9 @@ public class AssetController {
 			case BlockChainType.ETH:
 				new ValidatorUtil().validate(assetSettleFormDto, EthValidateGroup.class);
 				break;
+			default:
+				throw new ServiceException().errorCode(StatusCode.MODEL_NO_SUPPORT).errorMessage(StatusCode.MODEL_NO_SUPPORT_MESSAGE);
+			
 			}
 
 		} catch (ServiceException e) {
@@ -277,6 +283,8 @@ public class AssetController {
 			case BlockChainType.ETH:
 				new ValidatorUtil().validate(assetIssueFormDto, EthValidateGroup.class);
 				break;
+			default:
+				throw new ServiceException().errorCode(StatusCode.MODEL_NO_SUPPORT).errorMessage(StatusCode.MODEL_NO_SUPPORT_MESSAGE);
 			}
 			// 校验结束
 		} catch (ServiceException e) {

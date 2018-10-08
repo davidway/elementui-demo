@@ -45,7 +45,7 @@ public class AssetIssueFormDto {
 
 	@ApiModelProperty(value="以太坊 用户私钥",required=true)
 	
-	private String privateKey;
+	private String userPrivateKey;
 
 	@ApiModelProperty(value="以太坊 用户离线文件",required=true)
 	
@@ -54,6 +54,17 @@ public class AssetIssueFormDto {
 	@ApiModelProperty(value="以太坊 用户密码",required=true)
 	
 	private String password;
+	
+	@NotEmpty(message = "gasPrice不能为空",groups=EthValidateGroup.class)
+	@ApiModelProperty(value = "份额", required = true)
+	@Min(value=1 ,message="gasPrice必须大于0,而且为整数")
+	private String gasPrice;
+	@NotEmpty(message = "gasLimit不能为空",groups=EthValidateGroup.class)
+	@ApiModelProperty(value = "份额", required = true)
+	@Min(value=1 ,message="gasLimit必须大于0,而且为整数")
+	private String gasLimit ;
+	
+	
 	
 	public String getSourceId() {
 		return sourceId;
@@ -110,12 +121,14 @@ public class AssetIssueFormDto {
 				+ fullName + "]";
 	}
 
-	public String getPrivateKey() {
-		return privateKey;
+
+
+	public String getUserPrivateKey() {
+		return userPrivateKey;
 	}
 
-	public void setPrivateKey(String privateKey) {
-		this.privateKey = privateKey;
+	public void setUserPrivateKey(String userPrivateKey) {
+		this.userPrivateKey = userPrivateKey;
 	}
 
 	public String getKeyStore() {
@@ -132,6 +145,22 @@ public class AssetIssueFormDto {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getGasPrice() {
+		return gasPrice;
+	}
+
+	public void setGasPrice(String gasPrice) {
+		this.gasPrice = gasPrice;
+	}
+
+	public String getGasLimit() {
+		return gasLimit;
+	}
+
+	public void setGasLimit(String gasLimit) {
+		this.gasLimit = gasLimit;
 	}
 
 

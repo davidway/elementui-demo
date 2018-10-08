@@ -43,13 +43,14 @@ public class AssetTransferFormDto {
 	
 	@ApiModelProperty(value = "以太坊事务数字", required = true)
 	private String nonce;
-	@NotEmpty(message = "gasPrice不能为空",groups = EthValidateGroup.class)
-	@ApiModelProperty(value = "份额", required = true)
-	@Min(value=1 ,message="金额必须大于0,而且为整数，最大数字为10")
 	
-	private String gasPrice;
-	@NotEmpty(message = "gasLimit不能为空",groups = EthValidateGroup.class)
+	@NotEmpty(message = "gasPrice不能为空",groups=EthValidateGroup.class)
 	@ApiModelProperty(value = "份额", required = true)
+	@Min(value=1 ,message="gasPrice必须大于0,而且为整数")
+	private String gasPrice;
+	@NotEmpty(message = "gasLimit不能为空",groups=EthValidateGroup.class)
+	@ApiModelProperty(value = "份额", required = true)
+	@Min(value=1 ,message="gasLimit必须大于0,而且为整数")
 	private String gasLimit ;
 	
 	@ApiModelProperty(value = "离线文件", required = true)

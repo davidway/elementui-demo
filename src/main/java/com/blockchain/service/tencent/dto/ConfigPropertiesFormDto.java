@@ -3,15 +3,19 @@ package com.blockchain.service.tencent.dto;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+import org.springframework.validation.annotation.Validated;
+
+import com.blockchain.validate.group.EthValidateGroup;
+import com.blockchain.validate.group.TencentValidateGroup;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 @ApiModel(description="配置信息",value="配置信息返回json数据")
 public class ConfigPropertiesFormDto {
 	
 	@ApiModelProperty( value = "发行方私钥")
+	
 	private String createUserPrivateKey;
 	
 	@ApiModelProperty( value = "发行方公钥")
@@ -26,8 +30,9 @@ public class ConfigPropertiesFormDto {
 	private String nodeId;
 	
 	@ApiModelProperty( value = "类型选择器,0为腾讯，1为以太坊")
-	@Min(value=0,message="范围值在0~100")
-	@Max(value=100,message="范围值在0~100")
+	@Min(value=0,message="chainType范围值在0~1")
+	@Max(value=1,message="chainType范围值在0~1")
+	
 	private Integer chainType;
 	
 

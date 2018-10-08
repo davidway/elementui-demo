@@ -122,8 +122,16 @@ public class EthAssetServiceImpl implements EthAssetService {
 				}
 				return null;
 			});
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (ServiceException e) {
+			PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
+			phpSystemJsonContent = phpSystemJsonContent.setUnkownError(e.getErrorMessage());
+			logger.error("发行时发生错误异常", e);
+			try {
+				HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
+			} catch (Exception ex) {
+				logger.error("post时发生错误{}", ex);
+			}
+			return null;
 		}
 
 		// 因为结果给了回调进行，所以return null

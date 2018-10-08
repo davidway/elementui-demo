@@ -8,13 +8,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 public class ResponseUtil {
-	
+	static DealJsonUtil dealJsonUtil = new DealJsonUtil();
 
 	public static void echo(HttpServletResponse response, String obj) {
 		try {
 			response.setContentType("application/json;charset=UTF-8");  
 			response.setCharacterEncoding("utf-8");
-			response.getWriter().print((JSONObject.parseObject(obj)) );
+			response.getWriter().print(dealJsonUtil.nullToStringJson(JSONObject.parseObject(obj)) );
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -25,7 +25,7 @@ public class ResponseUtil {
 			response.setContentType("application/json;charset=UTF-8");  
 			response.setCharacterEncoding("utf-8");
 			// response.getWriter().print(obj.toString());//这种方式当参数的value为空时，会丢失对应的key值
-			response.getWriter().print(obj);
+			response.getWriter().print(dealJsonUtil.nullToStringJson(obj));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

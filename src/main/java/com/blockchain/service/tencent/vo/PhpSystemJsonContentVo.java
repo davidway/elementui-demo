@@ -68,7 +68,7 @@ public class PhpSystemJsonContentVo {
 
 	public PhpSystemJsonContentVo setUnkownError(String message) {
 		this.retcode=StatusCode.SYSTEM_UNKOWN_ERROR;
-		this.retmsg="未知错误";
+		this.retmsg=message;
 		
 		return this;
 	}

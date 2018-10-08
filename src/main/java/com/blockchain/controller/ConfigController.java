@@ -71,10 +71,10 @@ public class ConfigController {
 
 		
 		try {
-			// CrmUtils.checkAuth();
+			//CrmUtils.checkAuth();
 			Integer chainType = configPropertiesFormDto.getChainType();
 			check(chainType);
-		
+			new ValidatorUtil().validate(configPropertiesFormDto);
 			switch (chainType) {
 			case BlockChainType.TENCENT:
 				new ValidatorUtil().validate(configPropertiesFormDto, TencentValidateGroup.class);

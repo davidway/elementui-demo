@@ -91,5 +91,7 @@ public  class StatusCode {
 	/** 权限不足 */
 	public static final int AUTHORITY_ERROR = 201005;
 	public static final Integer METHOD_NO_SUPPORT = 201006;
-	public static final String METHOD_NO_SUPPORT_MESSAGE = "该方法不支持";	
+	public static final String METHOD_NO_SUPPORT_MESSAGE = "该方法不支持";
+	public static final String MODEL_NO_SUPPORT_MESSAGE = "该模式不支持，是否填错了模式的数字？";
+	public static final int MODEL_NO_SUPPORT = 201007;	
 }
