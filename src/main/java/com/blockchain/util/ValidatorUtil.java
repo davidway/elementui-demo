@@ -73,7 +73,7 @@ public class ValidatorUtil {
       Validator validator = factory.getValidator();
 
       Set<ConstraintViolation<T>> constraintViolations = validator.validate(t,validateGroupClass);
-      Set<ConstraintViolation<T>> globalValidate = validator.validate(t);
+      
 
       if (constraintViolations.size() > 0) {
           for (ConstraintViolation<T> violation : constraintViolations) {
@@ -81,11 +81,6 @@ public class ValidatorUtil {
           }
       } 
       
-      if (globalValidate.size() > 0) {
-          for (ConstraintViolation<T> violation : globalValidate) {
-             sb.append(violation.getMessage());
-          }
-      } 
       
       if ( StringUtils.isNotBlank(sb)){
 			
