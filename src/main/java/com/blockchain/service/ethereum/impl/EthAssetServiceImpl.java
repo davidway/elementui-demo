@@ -18,6 +18,7 @@ import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthEstimateGas;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
@@ -36,6 +37,7 @@ import com.blockchain.service.ethereum.dto.EthAssetIssueFormDto;
 import com.blockchain.service.ethereum.dto.EthAssetSettleDto;
 import com.blockchain.service.ethereum.dto.EthAssetTransferFormDto;
 import com.blockchain.service.ethereum.dto.EthereumConfig;
+import com.blockchain.service.ethereum.dto.GasInfoDto;
 import com.blockchain.service.ethereum.ethjava.TokenERC20;
 import com.blockchain.service.ethereum.ethjava.utils.Environment;
 import com.blockchain.service.ethereum.util.ChainUtil;
@@ -60,7 +62,6 @@ public class EthAssetServiceImpl implements EthAssetService {
 	public static final int DECIMALS = 18;// 默认token的精度是18，莫改
 	private static Admin admin = Admin.build(new HttpService(Environment.getRpcUrl()));
 
-
 	public static final Integer PRIVATE_KEY_LENGTH = 16;
 	CompletableFuture<EthSendTransaction> ethSendTransaction = null;
 	private static final Logger logger = LoggerFactory.getLogger(EthAssetServiceImpl.class);
@@ -81,26 +82,25 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 		String keyStore = assetIssueFormDto.getKeyStore();
 
-		//privateKey = getPrivateKey(privateKey, keyStore, password);
+		// privateKey = getPrivateKey(privateKey, keyStore, password);
 
-		BigInteger gasPrice =new BigInteger(assetIssueFormDto.getGasPrice());
+		BigInteger gasPrice = new BigInteger(assetIssueFormDto.getGasPrice());
 		BigInteger gasLimit = new BigInteger(assetIssueFormDto.getGasLimit());
 
 		String name = assetIssueFormDto.getFullName();
 		BigInteger amount = new BigInteger(assetIssueFormDto.getAmount());
 		String unit = assetIssueFormDto.getUnit();
-		
+
 		CompletableFuture<TokenERC20> contract = null;
 		try {
-			
-			Credentials credentials = getCredentials(privateKey,keyStore,password);
+
+			Credentials credentials = getCredentials(privateKey, keyStore, password);
 
 			contract = TokenERC20.deploy(web3j, credentials, gasPrice, gasLimit, amount, name, unit).sendAsync();
-				
-			
+
 			contract.thenAccept(transactionReceipt -> {
 				EthAssetIssueVo assetIssueVo = new EthAssetIssueVo();
-				
+
 				EthAssetIssueUtils ethAssetIssueUtils = new EthAssetIssueUtils();
 				assetIssueVo = ethAssetIssueUtils.generateAssetIssueVo(transactionReceipt, credentials, assetIssueVo, ethereumConfig);
 				PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
@@ -139,14 +139,14 @@ public class EthAssetServiceImpl implements EthAssetService {
 	}
 
 	private Credentials getCredentials(String privateKey, String keyStore, String password) throws IOException, CipherException, ServiceException {
-		if (StringUtils.isNotBlank(keyStore) && StringUtils.isNotBlank(password)) {	
+		if (StringUtils.isNotBlank(keyStore) && StringUtils.isNotBlank(password)) {
 			return WalletUtils.loadCredentials(password, keyStore);
 		} else if (StringUtils.isNotBlank(privateKey)) {
 			return Credentials.create(privateKey);
-		}else{
+		} else {
 			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage(StatusCode.PARAM_ERROR_MESSAGE);
 		}
-		
+
 	}
 
 	@Override
@@ -165,15 +165,14 @@ public class EthAssetServiceImpl implements EthAssetService {
 		String srcAccout = assetTransferFormDto.getSrcAccount();
 		String dstAccount = assetTransferFormDto.getDstAccount();
 
-		BigInteger gasPrice =new BigInteger(assetTransferFormDto.getGasPrice());
+		BigInteger gasPrice = new BigInteger(assetTransferFormDto.getGasPrice());
 		BigInteger gasLimit = new BigInteger(assetTransferFormDto.getGasLimit());
-
 
 		String contractAddress = ethereumConfig.getContractAddress();
 		Long amount = Long.valueOf(assetTransferFormDto.getAmount());
 
 		// 校验他是否是离线文件模式或者是私钥模式；
-		Credentials credentials = getCredentials(privateKey,keyStore,password);
+		Credentials credentials = getCredentials(privateKey, keyStore, password);
 		EthGetTransactionCount ethGetTransactionCount = null;
 		try {
 			ethGetTransactionCount = web3j.ethGetTransactionCount(srcAccout, DefaultBlockParameterName.PENDING).send();
@@ -191,12 +190,10 @@ public class EthAssetServiceImpl implements EthAssetService {
 			String signedData = "";
 			signedData = signTransaction(nonce, gasPrice, gasLimit, contractAddress, value, data, chainId, credentials.getEcKeyPair().getPrivateKey().toString(16));
 
-			
-			
 			if (signedData != null) {
 				/****** 发送请求 ******/
 				CompletableFuture<EthSendTransaction> ethSendTransaction = web3j.ethSendRawTransaction(signedData).sendAsync();
-				
+
 				/************* SendAsync后的回调 **********************/
 				ethSendTransaction.thenAccept(transactionReceipt -> {
 					EthAssetTransferUtils ethAssetTransferUtils = new EthAssetTransferUtils();
@@ -239,22 +236,21 @@ public class EthAssetServiceImpl implements EthAssetService {
 		return null;
 	}
 
-
 	/**
 	 * 导出私钥
 	 *
-	 * @param keystorePath 账号的keystore路径
-	 * @param password     密码
+	 * @param keystorePath
+	 *            账号的keystore路径
+	 * @param password
+	 *            密码
 	 */
 	private static String exportPrivateKey(String keystorePath, String password) {
 		try {
-			Credentials credentials = WalletUtils.loadCredentials(
-					password,
-					keystorePath);
+			Credentials credentials = WalletUtils.loadCredentials(password, keystorePath);
 			BigInteger privateKey = credentials.getEcKeyPair().getPrivateKey();
 			return privateKey.toString(16);
 		} catch (IOException | CipherException e) {
-			logger.error("导出私钥异常{}",e);
+			logger.error("导出私钥异常{}", e);
 			e.printStackTrace();
 		}
 		return null;
@@ -283,10 +279,9 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 		String srcAccout = assetSettleFormDto.getOwnerAccount();
 
-		
-		BigInteger gasPrice =new BigInteger(assetSettleFormDto.getGasPrice());
+		BigInteger gasPrice = new BigInteger(assetSettleFormDto.getGasPrice());
 		BigInteger gasLimit = new BigInteger(assetSettleFormDto.getGasLimit());
-		
+
 		EthereumConfig ethereumConfig = new EthereumConfig();
 		String serviceUrl = ethereumConfig.getServiceSystemUrl();
 		String settleActionName = ethereumConfig.getSettleActionName();
@@ -296,7 +291,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 		Long amount = Long.valueOf(assetSettleFormDto.getAmount());
 
 		// 校验他是否是离线文件模式或者是私钥模式；
-		Credentials credentials = getCredentials(privateKey,keyStore,password);
+		Credentials credentials = getCredentials(privateKey, keyStore, password);
 		EthGetTransactionCount ethGetTransactionCount = null;
 
 		try {
@@ -396,9 +391,8 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 		nonce = getNonce(assetTransferFormDto.getNonce(), ethGetTransactionCount);
 
-		BigInteger gasPrice =new BigInteger(assetTransferFormDto.getGasPrice());
+		BigInteger gasPrice = new BigInteger(assetTransferFormDto.getGasPrice());
 		BigInteger gasLimit = new BigInteger(assetTransferFormDto.getGasLimit());
-		
 
 		String data = "";
 		String signedData;
@@ -414,8 +408,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 				ethSendTransaction.thenAcceptAsync(transactionReceipt -> {
 					EthAssetSettleUtils ethAssetSettleUtils = new EthAssetSettleUtils();
 					EthAssetSettleVo assetSettleDto = ethAssetSettleUtils.genereateTranferParam(nonce, transactionReceipt);
-					
-					
+
 					logger.debug(JSON.toJSONString(assetSettleDto));
 					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
 					org.web3j.protocol.core.Response.Error error = transactionReceipt.getError();
@@ -480,11 +473,56 @@ public class EthAssetServiceImpl implements EthAssetService {
 	}
 
 	@Override
-	public GasInfoVo getGasInfo() {
+	public GasInfoVo getGasInfo(GasInfoDto gasInfoDto) throws IOException {
 		GasInfoVo gasInfoVo = new GasInfoVo();
 		gasInfoVo.setGasLimit(DefaultGasProvider.GAS_LIMIT);
+		BigInteger sum = new BigInteger("0");
+
+		sum = getAllGas(gasInfoDto);
 
 		gasInfoVo.setGasPrice(DefaultGasProvider.GAS_PRICE);
+		gasInfoVo.setEthEstimateGas(sum);
 		return gasInfoVo;
 	}
+
+	private BigInteger getAllGas(GasInfoDto gasInfoDto) throws IOException {
+		String fromAddress = gasInfoDto.getSrcAccount();
+		String dstAccount = gasInfoDto.getDstAccount();
+		Long amount = gasInfoDto.getAmount();
+		Integer[] methodType = gasInfoDto.getMethodType();
+		BigInteger sum = new BigInteger("0");
+		BigInteger estimateGas = new BigInteger("0");
+
+		for (Integer i : methodType) {
+			switch (i) {
+			
+			case SmartContractUtils.TRANSFER:
+				estimateGas = getTransferEstmateGas(fromAddress, dstAccount, amount, "transfer");
+				sum = sum.add(estimateGas);
+				break;
+			case SmartContractUtils.BURN:
+				estimateGas = getBurnEstmateGas(fromAddress, dstAccount, amount, "burn");
+				sum = sum.add(estimateGas);
+				break;
+			}
+		}
+		return sum;
+	}
+
+	private BigInteger getBurnEstmateGas(String fromAddress, String dstAccount, Long amount, String methodName) throws IOException {
+		String data = SmartContractUtils.genereateSignSmartContractMethodAndParam(null, amount, methodName);
+		Transaction t = Transaction.createEthCallTransaction(fromAddress, dstAccount, data);
+		EthEstimateGas ethEstimateGas = web3j.ethEstimateGas(t).send();
+		BigInteger estimateGas = ethEstimateGas.getAmountUsed();
+		return estimateGas;
+	}
+
+	private BigInteger getTransferEstmateGas(String fromAddress, String dstAccount, Long amount, String methodName) throws IOException {
+		String data = SmartContractUtils.genereateSignSmartContractMethodAndParam(dstAccount, amount, methodName);
+		Transaction t = Transaction.createEthCallTransaction(fromAddress, dstAccount, data);
+		EthEstimateGas ethEstimateGas = web3j.ethEstimateGas(t).send();
+		BigInteger estimateGas = ethEstimateGas.getAmountUsed();
+		return estimateGas;
+	}
+
 }

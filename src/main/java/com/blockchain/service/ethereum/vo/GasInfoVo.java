@@ -7,6 +7,9 @@ public class GasInfoVo {
 	
 	private BigInteger gasLimit;
 	
+	private BigInteger ethEstimateGas;
+	
+	
 	public BigInteger getGasPrice() {
 		return gasPrice;
 	}
@@ -18,6 +21,12 @@ public class GasInfoVo {
 	}
 	public void setGasLimit(BigInteger gasLimit) {
 		this.gasLimit = gasLimit;
+	}
+	public BigInteger getEthEstimateGas() {
+		return ethEstimateGas;
+	}
+	public void setEthEstimateGas(BigInteger ethEstimateGas) {
+		this.ethEstimateGas = ethEstimateGas;
 	}
 	
 	

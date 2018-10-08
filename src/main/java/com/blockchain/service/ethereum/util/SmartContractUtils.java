@@ -15,6 +15,10 @@ import org.web3j.abi.datatypes.generated.Uint256;
 
 public class SmartContractUtils {
 	public static final Integer DECIMALS = 18;
+	
+	public static final int BURN = 2;
+
+	public static final int TRANSFER = 1;
 
 	public static String genereateSignSmartContractMethodAndParam(String dstAccount, Long amount, String methodName) {
 		List<Type> inputParameters = new ArrayList<>();

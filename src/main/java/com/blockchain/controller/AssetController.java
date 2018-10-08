@@ -1,5 +1,7 @@
 package com.blockchain.controller;
 
+import java.io.IOException;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -24,6 +26,7 @@ import com.blockchain.service.ethereum.EthAssetService;
 import com.blockchain.service.ethereum.dto.EthAssetIssueFormDto;
 import com.blockchain.service.ethereum.dto.EthAssetSettleDto;
 import com.blockchain.service.ethereum.dto.EthAssetTransferFormDto;
+import com.blockchain.service.ethereum.dto.GasInfoDto;
 import com.blockchain.service.ethereum.vo.GasInfoVo;
 import com.blockchain.service.tencent.AssetService;
 import com.blockchain.service.tencent.dto.AssetIssueDto;
@@ -350,8 +353,6 @@ public class AssetController {
 	public void issueSubmit(@Valid @RequestBody AssetIssueSubmitFormDto assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
-
-		
 		try {
 
 			ConfigUtils.check();
@@ -503,16 +504,6 @@ public class AssetController {
 				ResponseUtil.echo(response, jsonString);
 				break;
 			}
-
-		} catch (ServiceException e) {
-
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-
-		try {
 			AssetSettleDto assetSettleDto = assetService.settleSubmit(assetForm);
 			phpSystemJsonContentVo.setData(assetSettleDto);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
@@ -524,7 +515,9 @@ public class AssetController {
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		} catch (Exception e) {
+		}
+
+		catch (Exception e) {
 			logger.error("未知错误{}", e);
 			phpSystemJsonContentVo.setRetmsg(e.getMessage());
 			phpSystemJsonContentVo.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
@@ -537,6 +530,7 @@ public class AssetController {
 
 	@ResponseBody
 	@RequestMapping(value = { "/getGasInfo" }, method = RequestMethod.POST)
+	@ApiOperation(value = "资产兑付只提交", httpMethod = "POST", response = AssetSettleDto.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
@@ -546,11 +540,43 @@ public class AssetController {
 			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	public void getGasInfo() {
+	public void getGasInfo(@Valid  @RequestBody GasInfoDto gasInfoDto,BindingResult bindingResult) {
 		String jsonString = "";
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 
-		GasInfoVo gasInfoVo = ethAssetService.getGasInfo();
+		GasInfoVo gasInfoVo = null;
+		try {
+
+			ConfigUtils.check();
+			ConfigUtils configUtils = new ConfigUtils();
+			Integer chainType = configUtils.getChainType();
+			switch (chainType) {
+			case BlockChainType.TENCENT:
+				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
+			
+				
+				break;
+
+			case BlockChainType.ETH:
+				ValidatorUtil.validate(bindingResult);
+				 gasInfoVo = ethAssetService.getGasInfo(gasInfoDto);
+				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+			
+				break;
+			}
+		}
+		catch (ServiceException e) {
+
+			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+			ResponseUtil.echo(response, jsonString);
+			return;
+		} catch (IOException e) {
+			phpSystemJsonContentVo = phpSystemJsonContentVo.setUnkownError(e.getMessage());
+			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+			ResponseUtil.echo(response, jsonString);
+			return;
+		}
 		phpSystemJsonContentVo.setData(gasInfoVo);
 		jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 		ResponseUtil.echo(response, jsonString);

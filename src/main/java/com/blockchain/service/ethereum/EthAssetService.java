@@ -1,10 +1,12 @@
 package com.blockchain.service.ethereum;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import com.blockchain.service.ethereum.dto.EthAssetIssueFormDto;
 import com.blockchain.service.ethereum.dto.EthAssetSettleDto;
 import com.blockchain.service.ethereum.dto.EthAssetTransferFormDto;
+import com.blockchain.service.ethereum.dto.GasInfoDto;
 import com.blockchain.service.ethereum.vo.EthAssetIssueVo;
 import com.blockchain.service.ethereum.vo.EthAssetSettleVo;
 import com.blockchain.service.ethereum.vo.EthAssetTransferVo;
@@ -21,6 +23,8 @@ public interface EthAssetService {
 
 	
 	EthAssetSettleVo settleToken(EthAssetSettleDto assetSettleFormDto) throws UnsupportedEncodingException, TrustSDKException, Exception;
-	GasInfoVo getGasInfo();
+	
+
+	GasInfoVo getGasInfo(GasInfoDto gasInfoDto) throws IOException;
 
 }
