@@ -146,12 +146,10 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 			// create a temp file
 			File temp = File.createTempFile("tempfile", ".tmp");
-
 			// write it
 			BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
 			bw.write(keyStore);
 			bw.close();
-
 			Credentials c = WalletUtils.loadCredentials(password, temp);
 
 			return c;
