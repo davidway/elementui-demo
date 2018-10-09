@@ -1,5 +1,8 @@
 package com.blockchain.service.ethereum.impl;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -139,8 +142,19 @@ public class EthAssetServiceImpl implements EthAssetService {
 	}
 
 	private Credentials getCredentials(String privateKey, String keyStore, String password) throws IOException, CipherException, ServiceException {
-		if (StringUtils.isNotBlank(keyStore) && StringUtils.isNotBlank(password)) {
-			return WalletUtils.loadCredentials(password, keyStore);
+		if (keyStore != null && StringUtils.isNotBlank(password)) {
+
+			// create a temp file
+			File temp = File.createTempFile("tempfile", ".tmp");
+
+			// write it
+			BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+			bw.write(keyStore);
+			bw.close();
+
+			Credentials c = WalletUtils.loadCredentials(password, temp);
+
+			return c;
 		} else if (StringUtils.isNotBlank(privateKey)) {
 			return Credentials.create(privateKey);
 		} else {
@@ -495,7 +509,7 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 		for (Integer i : methodType) {
 			switch (i) {
-			
+
 			case SmartContractUtils.TRANSFER:
 				estimateGas = getTransferEstmateGas(fromAddress, dstAccount, amount, "transfer");
 				sum = sum.add(estimateGas);

@@ -1,6 +1,8 @@
 package com.blockchain.service.ethereum.dto;
 
 
+import java.io.File;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 

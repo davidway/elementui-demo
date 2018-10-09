@@ -95,16 +95,19 @@ public class UserController {
 		String jsonString = "";
 
 		UserKeyDto userKeyModel = new UserKeyDto();
-	
+
 		try {
 
 			ConfigUtils.check();
 			ConfigUtils configUtils = new ConfigUtils();
 			Integer chainType = configUtils.getChainType();
-			
+
 			switch (chainType) {
 			case BlockChainType.TENCENT:
 				userKeyModel = tencentUserService.generatePairKey(userKeyModel);
+				phpSystemJsonContentVo.setData(userKeyModel);
+				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+				ResponseUtil.echo(response, jsonString);
 				break;
 			case BlockChainType.ETH:
 				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
@@ -112,8 +115,7 @@ public class UserController {
 				ResponseUtil.echo(response, jsonString);
 				break;
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.error("错误信息", e);
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setSDKError();
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
@@ -121,17 +123,6 @@ public class UserController {
 			return;
 		}
 
-		phpSystemJsonContentVo.setData(userKeyModel);
-
-		try {
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-		} catch (JSONException e) {
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setParseJsonError();
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-		ResponseUtil.echo(response, jsonString);
 		return;
 	}
 
@@ -148,7 +139,6 @@ public class UserController {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 
-	
 		try {
 
 			ConfigUtils.check();
@@ -158,6 +148,10 @@ public class UserController {
 			case BlockChainType.TENCENT:
 				ConfigUtils.check();
 				ValidatorUtil.validate(bindingResult);
+				UserInfoVo userInfoVO = tencentUserService.addUserHasBaseAndHostAccount(userFormDTO);
+				phpSystemJsonContentVo.setData(userInfoVO);
+				jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
+				ResponseUtil.echo(response, jsonString);
 				break;
 			case BlockChainType.ETH:
 				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
@@ -171,17 +165,6 @@ public class UserController {
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		}
-
-		try {
-			UserInfoVo userInfoVO = tencentUserService.addUserHasBaseAndHostAccount(userFormDTO);
-			phpSystemJsonContentVo.setData(userInfoVO);
-		} catch (ServiceException e) {
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
-
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
 		} catch (Exception e) {
 			logger.error("错误信息", e);
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setSDKError();
@@ -190,16 +173,6 @@ public class UserController {
 			return;
 		}
 
-		try {
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
-		} catch (JSONException e) {
-
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setParseJsonError();
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-		ResponseUtil.echo(response, jsonString);
 		return;
 	}
 
@@ -226,30 +199,14 @@ public class UserController {
 			switch (chainType) {
 			case BlockChainType.TENCENT:
 				new ValidatorUtil().validate(assetForm, TencentValidateGroup.class);
-				break;
-			case BlockChainType.ETH:
-				new ValidatorUtil().validate(assetForm, EthValidateGroup.class);
-				break;
-			}
-
-		} catch (ServiceException e) {
-
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-
-		try {
-
-			switch (chainType) {
-			case BlockChainType.TENCENT:
 				List<AssetDto> assetList = tencentUserService.accountQuery(assetForm);
 				phpSystemJsonContentVO.setData(assetList);
 				jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 				ResponseUtil.echo(response, jsonString);
+
 				break;
 			case BlockChainType.ETH:
+				new ValidatorUtil().validate(assetForm, EthValidateGroup.class);
 				EthAccountQueryFormDto ethAccountQueryFormDto = new EthAccountQueryFormDto();
 				BeanUtils.copyProperties(assetForm, ethAccountQueryFormDto);
 				EthAndTokenAssetVo tokenAndEth = ethUserService.ethereumAccountQuery(ethAccountQueryFormDto);
@@ -265,7 +222,9 @@ public class UserController {
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		} catch (Exception e) {
+		}
+
+		catch (Exception e) {
 			logger.error("错误信息", e);
 			phpSystemJsonContentVO.setRetmsg(e.getMessage());
 			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
@@ -290,7 +249,6 @@ public class UserController {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 
-	
 		try {
 
 			ConfigUtils.check();
@@ -301,6 +259,10 @@ public class UserController {
 			case BlockChainType.TENCENT:
 				ConfigUtils.check();
 				ValidatorUtil.validate(bindingResult);
+				List<TransInfoDto> assetList = tencentUserService.transQuery(assetForm);
+				phpSystemJsonContentVo.setData(assetList);
+				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+				ResponseUtil.echo(response, jsonString);
 				break;
 			case BlockChainType.ETH:
 				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
@@ -312,20 +274,6 @@ public class UserController {
 		}
 
 		catch (ServiceException e) {
-
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-
-		try {
-			List<TransInfoDto> assetList = tencentUserService.transQuery(assetForm);
-			phpSystemJsonContentVo.setData(assetList);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-
-		} catch (ServiceException e) {
 
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
@@ -449,32 +397,19 @@ public class UserController {
 			switch (chainType) {
 			case BlockChainType.TENCENT:
 				new ValidatorUtil().validate(userFormDTO, TencentValidateGroup.class);
+				UserInfoVo userInfoVO = tencentUserService.addUserHasBaseAccount(userFormDTO);
+				phpSystemJsonContentVO.setData(userInfoVO);
+
 				break;
 
 			case BlockChainType.ETH:
 				new ValidatorUtil().validate(userFormDTO, EthValidateGroup.class);
-				break;
-			}
-
-		} catch (ServiceException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-		try {
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				UserInfoVo userInfoVO = tencentUserService.addUserHasBaseAccount(userFormDTO);
-				phpSystemJsonContentVO.setData(userInfoVO);
-				break;
-
-			case BlockChainType.ETH:
 				EthUserFormDto ethUserFormDto = new EthUserFormDto();
 				String password = userFormDTO.getPassword();
 				ethUserFormDto.setPassword(password);
 				EthereumWalletInfo ethereumWalletInfo = ethUserService.addUserHasBaseAccount(ethUserFormDto);
 				phpSystemJsonContentVO.setData(ethereumWalletInfo);
+				
 				break;
 			}
 
@@ -518,7 +453,6 @@ public class UserController {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 
-	
 		try {
 
 			ConfigUtils.check();
@@ -528,6 +462,10 @@ public class UserController {
 			case BlockChainType.TENCENT:
 				ConfigUtils.check();
 				ValidatorUtil.validate(bindingResult);
+				UserInfoVo userInfoVO = tencentUserService.addUserHostAccount(userFormDTO);
+				phpSystemJsonContentVo.setData(userInfoVO);
+				jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
+				ResponseUtil.echo(response, jsonString);
 				break;
 			case BlockChainType.ETH:
 				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
@@ -544,17 +482,7 @@ public class UserController {
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		}
-
-		try {
-			UserInfoVo userInfoVO = tencentUserService.addUserHostAccount(userFormDTO);
-			phpSystemJsonContentVo.setData(userInfoVO);
-		} catch (ServiceException e) {
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		} catch (Exception e) {
+		}catch (Exception e) {
 
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setSDKError();
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
@@ -562,17 +490,7 @@ public class UserController {
 			return;
 		}
 
-		try {
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
-		} catch (JSONException e) {
-
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setParseJsonError();
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-		ResponseUtil.echo(response, jsonString);
-		return;
+		
 	}
 
 	@ResponseBody
@@ -589,18 +507,21 @@ public class UserController {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 
-		Integer chainType=null;
+		Integer chainType = null;
 		try {
 
 			ConfigUtils.check();
 			ConfigUtils configUtils = new ConfigUtils();
-			 chainType = configUtils.getChainType();
+			chainType = configUtils.getChainType();
 			switch (chainType) {
 			case BlockChainType.TENCENT:
 				ValidatorUtil.validate(bindingResult);
+				tencentUserService.checkPairKey(keyInfo);
+				jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
+				ResponseUtil.echo(response, jsonString);
 				break;
 			case BlockChainType.ETH:
-				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
+				ethUserService.checkPairKey(keyInfo);
 				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 				ResponseUtil.echo(response, jsonString);
 				break;
@@ -608,24 +529,6 @@ public class UserController {
 
 		} catch (ServiceException e) {
 
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-
-		try {
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				tencentUserService.checkPairKey(keyInfo);
-				break;
-
-			case BlockChainType.ETH:
-				ethUserService.checkPairKey(keyInfo);
-				break;
-			}
-
-		} catch (ServiceException e) {
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
@@ -638,16 +541,8 @@ public class UserController {
 			return;
 		}
 
-		try {
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
-		} catch (JSONException e) {
-			logger.error(e);
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setParseJsonError();
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-		ResponseUtil.echo(response, jsonString);
+		
+	
 		return;
 	}
 
