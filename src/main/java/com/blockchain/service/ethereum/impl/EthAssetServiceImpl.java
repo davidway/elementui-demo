@@ -8,6 +8,8 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.concurrent.CompletableFuture;
 
+import javax.mail.internet.HeaderTokenizer.Token;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +101,10 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 			Credentials credentials = getCredentials(privateKey, keyStore, password);
 
-			contract = TokenERC20.deploy(web3j, credentials, gasPrice, gasLimit, amount, name, unit).sendAsync();
+			Integer pollingInterval = 3000; // 3 seconds
+			FastRawTransactionManager fastRawTxMgr = new FastRawTransactionManager(web3j, credentials, new PollingTransactionReceiptProcessor(web3j, pollingInterval, 40));
+
+			contract = TokenERC20.deploy(web3j, fastRawTxMgr, gasPrice, gasLimit, amount, name, unit).sendAsync();
 
 			contract.thenAccept(transactionReceipt -> {
 				EthAssetIssueVo assetIssueVo = new EthAssetIssueVo();
@@ -194,58 +199,46 @@ public class EthAssetServiceImpl implements EthAssetService {
 		if (ethGetTransactionCount == null)
 			return null;
 		BigInteger nonce = getNonce(assetTransferFormDto.getNonce(), ethGetTransactionCount);
+
 		BigInteger value = BigInteger.ZERO; // value是发送交易的时候要不要带上一些以太币
-		try {
-			/*** 签名加密 ********/
-			String data = SmartContractUtils.genereateSignSmartContractMethodAndParam(dstAccount, amount, "transfer");
-			byte chainId = ChainUtil.getChainId();
-			String signedData = "";
-			signedData = signTransaction(nonce, gasPrice, gasLimit, contractAddress, value, data, chainId, credentials.getEcKeyPair().getPrivateKey().toString(16));
 
-			if (signedData != null) {
-				/****** 发送请求 ******/
-				CompletableFuture<EthSendTransaction> ethSendTransaction = web3j.ethSendRawTransaction(signedData).sendAsync();
+		/*** 签名加密 ********/
+		String data = SmartContractUtils.genereateSignSmartContractMethodAndParam(dstAccount, amount, "transfer");
+		byte chainId = ChainUtil.getChainId();
+		String signedData = "";
 
-				/************* SendAsync后的回调 **********************/
-				ethSendTransaction.thenAccept(transactionReceipt -> {
-					EthAssetTransferUtils ethAssetTransferUtils = new EthAssetTransferUtils();
-					EthAssetTransferVo assetIssueDTO = ethAssetTransferUtils.genereateTranferParam(nonce, transactionReceipt);
+		signedData = signTransaction(nonce, gasPrice, gasLimit, contractAddress, value, data, chainId, credentials.getEcKeyPair().getPrivateKey().toString(16));
 
-					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
-					org.web3j.protocol.core.Response.Error error = transactionReceipt.getError();
-					if (error != null) {
+		if (signedData != null) {
+			/****** 发送请求 ******/
 
-						phpSystemJsonContent.setRetcode(error.getCode());
-						phpSystemJsonContent.setRetmsg(error.getMessage());
-					} else {
-						phpSystemJsonContent.setData(assetIssueDTO);
-					}
+			Integer pollingInterval = 3000; // 3 seconds
+			FastRawTransactionManager fastRawTxMgr = new FastRawTransactionManager(web3j, credentials, new PollingTransactionReceiptProcessor(web3j, pollingInterval, 40));
+			EthSendTransaction transactionReceipt = fastRawTxMgr.sendTransaction(gasPrice, gasLimit, dstAccount, signedData, value);
+			// CompletableFuture<EthSendTransaction> ethSendTransaction =
+			// web3j.ethSendRawTransaction(signedData).sendAsync();
+			EthAssetTransferUtils ethAssetTransferUtils = new EthAssetTransferUtils();
+			EthAssetTransferVo assetIssueDTO = ethAssetTransferUtils.genereateTranferParam(nonce, transactionReceipt);
 
-					try {
-						HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
-					} catch (Exception e) {
-						logger.error("post时发生错误{}", e);
-					}
+			PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
+			org.web3j.protocol.core.Response.Error error = transactionReceipt.getError();
+			if (error != null) {
 
-				}).exceptionally(sendAsyncException -> {
-					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
-					phpSystemJsonContent.setUnkownError(sendAsyncException.getMessage());
-
-					logger.error("发送交易失败", sendAsyncException);
-					try {
-						HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
-					} catch (Exception e) {
-
-						logger.error("post时异常{}", e);
-					}
-					return null;
-				});
+				phpSystemJsonContent.setRetcode(error.getCode());
+				phpSystemJsonContent.setRetmsg(error.getMessage());
+			} else {
+				phpSystemJsonContent.setData(assetIssueDTO);
 			}
-		} catch (IOException e) {
-			logger.error("post时异常{}", e);
+
+			try {
+				HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
+			} catch (Exception e) {
+				logger.error("post时发生错误{}", e);
+			}
 		}
 
 		return null;
+
 	}
 
 	/**
@@ -316,57 +309,42 @@ public class EthAssetServiceImpl implements EthAssetService {
 		BigInteger nonce = getNonce(assetSettleFormDto.getNonce(), ethGetTransactionCount);
 		BigInteger value = BigInteger.ZERO;
 
-		try {
+	
 			/*** 签名加密 ********/
 			String data = SmartContractUtils.genereateSignSmartContractMethodAndParam(null, amount, "burn");
 			byte chainId = ChainUtil.getChainId();
 			String signedData = "";
 			signedData = signTransaction(nonce, gasPrice, gasLimit, contractAddress, value, data, chainId, credentials.getEcKeyPair().getPrivateKey().toString(16));
-
 			if (signedData != null) {
 				/****** 发送请求 ******/
-				CompletableFuture<EthSendTransaction> ethSendTransaction = web3j.ethSendRawTransaction(signedData).sendAsync();
 
-				/************* SendAsync后的回调 **********************/
-				ethSendTransaction.thenAccept(transactionReceipt -> {
-					EthAssetSettleUtils ethAssetSettleUtils = new EthAssetSettleUtils();
-					EthAssetSettleVo assetSettleDto = ethAssetSettleUtils.genereateTranferParam(nonce, transactionReceipt);
+				Integer pollingInterval = 3000; // 3 seconds
+				FastRawTransactionManager fastRawTxMgr = new FastRawTransactionManager(web3j, credentials, new PollingTransactionReceiptProcessor(web3j, pollingInterval, 40));
+				EthSendTransaction transactionReceipt = fastRawTxMgr.sendTransaction(gasPrice, gasLimit, null, signedData, value);
+				// CompletableFuture<EthSendTransaction> ethSendTransaction =
+				// web3j.ethSendRawTransaction(signedData).sendAsync();
+				EthAssetTransferUtils ethAssetTransferUtils = new EthAssetTransferUtils();
+				EthAssetTransferVo assetIssueDTO = ethAssetTransferUtils.genereateTranferParam(nonce, transactionReceipt);
 
-					logger.debug(JSON.toJSONString(assetSettleDto));
-					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
-					org.web3j.protocol.core.Response.Error error = transactionReceipt.getError();
-					if (error != null) {
+				PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
+				org.web3j.protocol.core.Response.Error error = transactionReceipt.getError();
+				if (error != null) {
 
-						phpSystemJsonContent.setRetcode(error.getCode());
-						phpSystemJsonContent.setRetmsg(error.getMessage());
-					} else {
-						phpSystemJsonContent.setData(assetSettleDto);
-					}
+					phpSystemJsonContent.setRetcode(error.getCode());
+					phpSystemJsonContent.setRetmsg(error.getMessage());
+				} else {
+					phpSystemJsonContent.setData(assetIssueDTO);
+				}
 
-					try {
-						HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
-					} catch (Exception e) {
-						logger.error("post时异常{}", e);
-					}
-
-				}).exceptionally(sendAsyncException -> {
-
-					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
-					phpSystemJsonContent.setUnkownError(sendAsyncException.getMessage());
-					logger.error("发送交易失败", sendAsyncException);
-
-					try {
-						HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
-					} catch (Exception e) {
-						logger.error("post时异常{}", e);
-					}
-					return null;
-				});
+				try {
+					HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
+				} catch (Exception e) {
+					logger.error("post时发生错误{}", e);
+				}
 			}
-		} catch (IOException e) {
-			logger.error("post时异常{}", e);
-		}
-		return null;
+
+			return null;
+			
 	}
 
 	@Override
