@@ -36,9 +36,3 @@ deploy:
     - my_runner_3
 
     
-    script:
-    - mkdir /zap/wrk/
-    - /zap/zap-baseline.py -J gl-dast-report.json -t http://xxx.com || true
-    - cp /zap/wrk/gl-dast-report.json .
-    
-    
