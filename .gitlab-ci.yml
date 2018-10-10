@@ -52,8 +52,7 @@ deploy:
       - mkdir /zap/wrk/ -p
       - /zap/zap-baseline.py -J gl-dast-report.json -t $website || true
       - cp /zap/wrk/gl-dast-report.json .
-    artifacts:
-      paths: [gl-dast-report.json]  
+   
        tags:
     - my_runner_4
       except:
