@@ -44,7 +44,7 @@ deploy:
     
   dast:
     stage: dast
- 
+    image: registry.gitlab.com/gitlab-org/security-products/zaproxy
     variables:
     website: "http://localhost:8080//blockchain"
     allow_failure: true
