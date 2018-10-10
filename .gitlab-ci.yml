@@ -1,14 +1,35 @@
-before_script:
-  - apt-get update -qq && apt-get install -y -qq sqlite3 libsqlite3-dev nodejs
-  - ruby -v
-  - which ruby
-  - gem install bundler --no-ri --no-rdoc
-  - bundle install --jobs $(nproc)  "${FLAGS[@]}"
+#定义持续集成流程模板,大小写敏感、使用缩进代表层级、不允许使用Tab缩进,只能使用空格
+#为了降低服务器的负载,dev分支不触发流水线
 
-rspec:
-  script:
-    - bundle exec rspec
+#stages表示不同阶段
+stages:
+    - install_deps
+    - build
+    - audit
+    - test
+    - deploy
 
-rubocop:
-  script:
-    - bundle exec rubocop
+
+
+#单元测试
+unit:
+    stage: test
+    script:
+    - echo "test unit..."
+    except:
+    - /_dev$/
+    tags:
+    - my_runner_2
+
+#自动部署
+deploy:
+    stage: deploy
+    script:
+    # export
+    - echo $CI_COMMIT_REF_NAME
+    - gitlab-ci-deploy $CI_PROJECT_NAMESPACE $CI_PROJECT_NAME $CI_COMMIT_REF_NAME
+    - echo $CI_PROJECT_NAMESPACE $CI_PROJECT_NAME $CI_COMMIT_REF_NAME
+    except:
+    - /_dev$/
+    tags:
+    - my_runner_3
