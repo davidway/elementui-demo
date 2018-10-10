@@ -8,6 +8,7 @@ stages:
     - audit
     - test
     - deploy
+    - dast
 
 
 
@@ -33,3 +34,24 @@ deploy:
     - /_dev$/
     tags:
     - my_runner_3
+
+    
+    script:
+    - mkdir /zap/wrk/
+    - /zap/zap-baseline.py -J gl-dast-report.json -t http://xxx.com || true
+    - cp /zap/wrk/gl-dast-report.json .
+    
+    
+  dast:
+    stage: dast
+ 
+    variables:
+    website: "http://localhost:8080//blockchain"
+    allow_failure: true
+    script:
+      - mkdir /zap/wrk/ -p
+      - /zap/zap-baseline.py -J gl-dast-report.json -t $website || true
+      - cp /zap/wrk/gl-dast-report.json .
+    artifacts:
+      paths: [gl-dast-report.json]  
+    
