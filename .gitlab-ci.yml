@@ -38,14 +38,15 @@ deploy:
     
 dast:
  stage: dast
-   except:
-    - /_dev$/
+ 
   script:
     - mkdir /zap/wrk/
     - /zap/zap-baseline.py -J gl-dast-report.json -t "http://823.st.wsy010.cn:8080/crm" || true
     - cp /zap/wrk/gl-dast-report.json .
   artifacts:
     paths: [gl-dast-report.json]
+      except:
+    - /_dev$/
    tags:
     - my_runner_4
     
