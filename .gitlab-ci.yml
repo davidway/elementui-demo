@@ -22,13 +22,13 @@ unit:
     tags:
     - my_runner_2
 
-#自动部署
+#自动部署测试
 deploy:
     stage: deploy
     script:
     # export
     - echo $CI_COMMIT_REF_NAME
-    - sudo gitlab-ci-deploy $CI_PROJECT_NAMESPACE $CI_PROJECT_NAME $CI_COMMIT_REF_NAME
+    -  gitlab-ci-deploy $CI_PROJECT_NAMESPACE $CI_PROJECT_NAME $CI_COMMIT_REF_NAME
     - echo $CI_PROJECT_NAMESPACE $CI_PROJECT_NAME $CI_COMMIT_REF_NAME
     except:
     - /_dev$/
