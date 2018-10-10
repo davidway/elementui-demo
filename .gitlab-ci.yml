@@ -54,4 +54,7 @@ deploy:
       - cp /zap/wrk/gl-dast-report.json .
     artifacts:
       paths: [gl-dast-report.json]  
-    
+       tags:
+    - my_runner_4
+      except:
+    - /_dev$/
