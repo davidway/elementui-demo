@@ -46,7 +46,7 @@ deploy:
     stage: dast
     image: registry.gitlab.com/gitlab-org/security-products/zaproxy
     variables:
-    website: "http://localhost:8080//blockchain"
+    website: "http://823.st.wsy010.cn:8080/crm/"
     allow_failure: true
     script:
       - mkdir /zap/wrk/ -p
