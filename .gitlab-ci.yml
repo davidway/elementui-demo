@@ -3,15 +3,9 @@
 
 #stages表示不同阶段
 stages:
-    - install_deps
-    - build
-    - audit
     - test
-    - deploy
     - dast
-
-
-
+    
 #测试CI
 unit:
     stage: test
@@ -21,32 +15,16 @@ unit:
     - /_dev$/
     tags:
     - my_runner_2
-
-#自动部署测试
-deploy:
-    stage: deploy
-    script:
-    # export
-    - echo $CI_COMMIT_REF_NAME
-    -  gitlab-ci-deploy $CI_PROJECT_NAMESPACE $CI_PROJECT_NAME $CI_COMMIT_REF_NAME
-    - echo $CI_PROJECT_NAMESPACE $CI_PROJECT_NAME $CI_COMMIT_REF_NAME
-    except:
-    - /_dev$/
-    tags:
-    - my_runner_3
-    
     
 dast:
  stage: dast
- 
+   except:
+    - /_dev$/
   script:
     - mkdir /zap/wrk/
     - /zap/zap-baseline.py -J gl-dast-report.json -t "http://823.st.wsy010.cn:8080/crm" || true
     - cp /zap/wrk/gl-dast-report.json .
   artifacts:
     paths: [gl-dast-report.json]
-      except:
-    - /_dev$/
    tags:
     - my_runner_4
-    
