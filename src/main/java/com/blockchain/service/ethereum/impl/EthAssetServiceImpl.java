@@ -6,9 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
-import javax.mail.internet.HeaderTokenizer.Token;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,10 +22,15 @@ import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.request.Transaction;
+import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.core.methods.response.EthEstimateGas;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
+import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
+import org.web3j.protocol.core.methods.response.EthTransaction;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.ChainId;
 import org.web3j.tx.FastRawTransactionManager;
@@ -37,6 +41,7 @@ import org.web3j.utils.Numeric;
 import com.alibaba.fastjson.JSON;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
+import com.blockchain.service.dto.EthTransInfoDto;
 import com.blockchain.service.ethereum.EthAssetService;
 import com.blockchain.service.ethereum.dto.EthAssetIssueFormDto;
 import com.blockchain.service.ethereum.dto.EthAssetSettleDto;
@@ -46,23 +51,25 @@ import com.blockchain.service.ethereum.dto.GasInfoDto;
 import com.blockchain.service.ethereum.ethjava.TokenERC20;
 import com.blockchain.service.ethereum.ethjava.utils.Environment;
 import com.blockchain.service.ethereum.util.ChainUtil;
+import com.blockchain.service.ethereum.util.EthAssetBurnUtils;
 import com.blockchain.service.ethereum.util.EthAssetIssueUtils;
-import com.blockchain.service.ethereum.util.EthAssetSettleUtils;
 import com.blockchain.service.ethereum.util.EthAssetTransferUtils;
 import com.blockchain.service.ethereum.util.SmartContractUtils;
+import com.blockchain.service.ethereum.vo.EthAssetBurnVo;
 import com.blockchain.service.ethereum.vo.EthAssetIssueVo;
-import com.blockchain.service.ethereum.vo.EthAssetSettleVo;
 import com.blockchain.service.ethereum.vo.EthAssetTransferVo;
+import com.blockchain.service.ethereum.vo.EthTransInfoVo;
 import com.blockchain.service.ethereum.vo.GasInfoVo;
 import com.blockchain.service.tencent.dto.AssetTransferDto;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.blockchain.service.tencent.trustsql.sdk.util.HttpClientUtil;
 import com.blockchain.service.tencent.vo.PhpSystemJsonContentVo;
 
-@Service("EthAssetServiceImpl")
 public class EthAssetServiceImpl implements EthAssetService {
 	public static final Logger issueLogger = LoggerFactory.getLogger("issueLogger");
 	public static final Logger transferLogger = LoggerFactory.getLogger("transferLogger");
+
+	public static final Logger transferInfo = LoggerFactory.getLogger(EthAssetServiceImpl.class);
 	public static final Logger settleLogger = LoggerFactory.getLogger("settleLogger");
 	public static final int DECIMALS = 18;// 默认token的精度是18，莫改
 	private static Admin admin = Admin.build(new HttpService(Environment.getRpcUrl()));
@@ -108,16 +115,20 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 			contract.thenAccept(transactionReceipt -> {
 				EthAssetIssueVo assetIssueVo = new EthAssetIssueVo();
+				TransactionReceipt s = transactionReceipt.getTransactionReceipt().get();
+				if (s.isStatusOK()) {
+					EthAssetIssueUtils ethAssetIssueUtils = new EthAssetIssueUtils();
+					assetIssueVo = ethAssetIssueUtils.generateAssetIssueVo(transactionReceipt, credentials, assetIssueVo, ethereumConfig);
+					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
+					phpSystemJsonContent.setData(assetIssueVo);
 
-				EthAssetIssueUtils ethAssetIssueUtils = new EthAssetIssueUtils();
-				assetIssueVo = ethAssetIssueUtils.generateAssetIssueVo(transactionReceipt, credentials, assetIssueVo, ethereumConfig);
-				PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
-				phpSystemJsonContent.setData(assetIssueVo);
-				try {
-					HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
-				} catch (Exception e) {
-					logger.error("post时发生错误{}", e);
+					try {
+						HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
+					} catch (Exception e) {
+						logger.error("post时发生错误{}", e);
+					}
 				}
+
 			}).exceptionally(sendAsyncException -> {
 
 				PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
@@ -202,39 +213,54 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 		BigInteger value = BigInteger.ZERO; // value是发送交易的时候要不要带上一些以太币
 
-		/*** 签名加密 ********/
-		String data = SmartContractUtils.genereateSignSmartContractMethodAndParam(dstAccount, amount, "transfer");
-		byte chainId = ChainUtil.getChainId();
-		String signedData = "";
+		try {
+			/*** 签名加密 ********/
+			String data = SmartContractUtils.genereateSignSmartContractMethodAndParam(dstAccount, amount, "transfer");
+			byte chainId = ChainUtil.getChainId();
+			String signedData = "";
+			signedData = signTransaction(nonce, gasPrice, gasLimit, contractAddress, value, data, chainId, credentials.getEcKeyPair().getPrivateKey().toString(16));
 
-		signedData = signTransaction(nonce, gasPrice, gasLimit, contractAddress, value, data, chainId, credentials.getEcKeyPair().getPrivateKey().toString(16));
+			if (signedData != null) {
+				/****** 发送请求 ******/
+				CompletableFuture<EthSendTransaction> ethSendTransaction = web3j.ethSendRawTransaction(signedData).sendAsync();
 
-		if (signedData != null) {
-			/****** 发送请求 ******/
+				/************* SendAsync后的回调 **********************/
+				ethSendTransaction.thenAccept(transactionReceipt -> {
+					EthAssetTransferUtils ethAssetTransferUtils = new EthAssetTransferUtils();
+					EthAssetTransferVo assetIssueDTO = ethAssetTransferUtils.genereateTranferParam(nonce, transactionReceipt);
 
-			Integer pollingInterval = 3000; // 3 seconds
-			FastRawTransactionManager fastRawTxMgr = new FastRawTransactionManager(web3j, credentials, new PollingTransactionReceiptProcessor(web3j, pollingInterval, 40));
-			EthSendTransaction transactionReceipt = fastRawTxMgr.sendTransaction(gasPrice, gasLimit, dstAccount, signedData, value);
-			// CompletableFuture<EthSendTransaction> ethSendTransaction =
-			// web3j.ethSendRawTransaction(signedData).sendAsync();
-			EthAssetTransferUtils ethAssetTransferUtils = new EthAssetTransferUtils();
-			EthAssetTransferVo assetIssueDTO = ethAssetTransferUtils.genereateTranferParam(nonce, transactionReceipt);
+					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
+					org.web3j.protocol.core.Response.Error error = transactionReceipt.getError();
+					if (error != null) {
 
-			PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
-			org.web3j.protocol.core.Response.Error error = transactionReceipt.getError();
-			if (error != null) {
+						phpSystemJsonContent.setRetcode(error.getCode());
+						phpSystemJsonContent.setRetmsg(error.getMessage());
+					} else {
+						phpSystemJsonContent.setData(assetIssueDTO);
+					}
 
-				phpSystemJsonContent.setRetcode(error.getCode());
-				phpSystemJsonContent.setRetmsg(error.getMessage());
-			} else {
-				phpSystemJsonContent.setData(assetIssueDTO);
+					try {
+						HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
+					} catch (Exception e) {
+						logger.error("post时发生错误{}", e);
+					}
+
+				}).exceptionally(sendAsyncException -> {
+					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
+					phpSystemJsonContent.setUnkownError(sendAsyncException.getMessage());
+
+					logger.error("发送交易失败", sendAsyncException);
+					try {
+						HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
+					} catch (Exception e) {
+
+						logger.error("post时异常{}", e);
+					}
+					return null;
+				});
 			}
-
-			try {
-				HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
-			} catch (Exception e) {
-				logger.error("post时发生错误{}", e);
-			}
+		} catch (IOException e) {
+			logger.error("post时异常{}", e);
 		}
 
 		return null;
@@ -267,15 +293,15 @@ public class EthAssetServiceImpl implements EthAssetService {
 		if (StringUtils.isNotBlank(nonceString)) {
 			nonce = new BigInteger(nonceString);
 		} else {
-			synchronized (this) {
+			
 				nonce = ethGetTransactionCount.getTransactionCount();
-			}
+	
 		}
-		return nonce;
+		return new BigInteger("97");
 	}
 
 	@Override
-	public EthAssetSettleVo settleToken(EthAssetSettleDto assetSettleFormDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
+	public EthAssetBurnVo settleToken(EthAssetSettleDto assetSettleFormDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
 
 		// 取值
 		String keyStore = assetSettleFormDto.getKeyStore();
@@ -309,42 +335,60 @@ public class EthAssetServiceImpl implements EthAssetService {
 		BigInteger nonce = getNonce(assetSettleFormDto.getNonce(), ethGetTransactionCount);
 		BigInteger value = BigInteger.ZERO;
 
-	
+		try {
 			/*** 签名加密 ********/
 			String data = SmartContractUtils.genereateSignSmartContractMethodAndParam(null, amount, "burn");
 			byte chainId = ChainUtil.getChainId();
 			String signedData = "";
 			signedData = signTransaction(nonce, gasPrice, gasLimit, contractAddress, value, data, chainId, credentials.getEcKeyPair().getPrivateKey().toString(16));
+
 			if (signedData != null) {
 				/****** 发送请求 ******/
+				CompletableFuture<EthSendTransaction> ethSendTransaction = web3j.ethSendRawTransaction(signedData).sendAsync();
 
-				Integer pollingInterval = 3000; // 3 seconds
-				FastRawTransactionManager fastRawTxMgr = new FastRawTransactionManager(web3j, credentials, new PollingTransactionReceiptProcessor(web3j, pollingInterval, 40));
-				EthSendTransaction transactionReceipt = fastRawTxMgr.sendTransaction(gasPrice, gasLimit, null, signedData, value);
-				// CompletableFuture<EthSendTransaction> ethSendTransaction =
-				// web3j.ethSendRawTransaction(signedData).sendAsync();
-				EthAssetTransferUtils ethAssetTransferUtils = new EthAssetTransferUtils();
-				EthAssetTransferVo assetIssueDTO = ethAssetTransferUtils.genereateTranferParam(nonce, transactionReceipt);
+				/************* SendAsync后的回调 **********************/
+				ethSendTransaction.thenAccept(transactionReceipt -> {
 
-				PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
-				org.web3j.protocol.core.Response.Error error = transactionReceipt.getError();
-				if (error != null) {
+					EthAssetBurnUtils ethAssetSettleUtils = new EthAssetBurnUtils();
+					EthAssetBurnVo assetSettleDto = ethAssetSettleUtils.genereateBurnParam(nonce, transactionReceipt);
 
-					phpSystemJsonContent.setRetcode(error.getCode());
-					phpSystemJsonContent.setRetmsg(error.getMessage());
-				} else {
-					phpSystemJsonContent.setData(assetIssueDTO);
-				}
+					logger.debug(JSON.toJSONString(assetSettleDto));
+					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
+					org.web3j.protocol.core.Response.Error error = transactionReceipt.getError();
+					if (error != null) {
 
-				try {
-					HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
-				} catch (Exception e) {
-					logger.error("post时发生错误{}", e);
-				}
+						phpSystemJsonContent.setRetcode(error.getCode());
+						phpSystemJsonContent.setRetmsg(error.getMessage());
+					} else {
+						phpSystemJsonContent.setData(assetSettleDto);
+					}
+
+					try {
+						HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
+					} catch (Exception e) {
+						logger.error("post时异常{}", e);
+					}
+
+				}).exceptionally(sendAsyncException -> {
+
+					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
+					phpSystemJsonContent.setUnkownError(sendAsyncException.getMessage());
+					logger.error("发送交易失败", sendAsyncException);
+
+					try {
+						HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
+					} catch (Exception e) {
+						logger.error("post时异常{}", e);
+					}
+					return null;
+				});
 			}
+		} catch (IOException e) {
+			logger.error("post时异常{}", e);
+		}
 
-			return null;
-			
+		return null;
+
 	}
 
 	@Override
@@ -396,8 +440,9 @@ public class EthAssetServiceImpl implements EthAssetService {
 
 				/************* SendAsync后的回调 **********************/
 				ethSendTransaction.thenAcceptAsync(transactionReceipt -> {
-					EthAssetSettleUtils ethAssetSettleUtils = new EthAssetSettleUtils();
-					EthAssetSettleVo assetSettleDto = ethAssetSettleUtils.genereateTranferParam(nonce, transactionReceipt);
+
+					EthAssetBurnUtils ethAssetSettleUtils = new EthAssetBurnUtils();
+					EthAssetBurnVo assetSettleDto = ethAssetSettleUtils.genereateBurnParam(nonce, transactionReceipt);
 
 					logger.debug(JSON.toJSONString(assetSettleDto));
 					PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
@@ -513,6 +558,49 @@ public class EthAssetServiceImpl implements EthAssetService {
 		EthEstimateGas ethEstimateGas = web3j.ethEstimateGas(t).send();
 		BigInteger estimateGas = ethEstimateGas.getAmountUsed();
 		return estimateGas;
+	}
+
+	@Override
+	public EthTransInfoVo getTransInfo(EthTransInfoDto ethTransInfo) {
+		EthereumConfig ethereumConfig = new EthereumConfig();
+		String serviceUrl = ethereumConfig.getServiceSystemUrl();
+		String transInfoActionName = ethereumConfig.getIssueActionName();
+		String submitUrl = serviceUrl + transInfoActionName;
+
+		String transactionHash = ethTransInfo.getTransHash();
+		CompletableFuture<EthGetTransactionReceipt> ethSendTransaction = web3j.ethGetTransactionReceipt(transactionHash ).sendAsync();
+
+		/************* SendAsync后的回调 **********************/
+		ethSendTransaction.thenAccept(transInfo -> {
+			Optional<TransactionReceipt> transData = transInfo.getTransactionReceipt();
+			if (transData.isPresent()) {
+				TransactionReceipt trans = transData.get();
+				// 大于12个区块确认数才能更新
+				Request<?, EthBlockNumber> s = web3j.ethBlockNumber();
+				trans.getBlockNumber();
+			
+
+				if ("0x1".equalsIgnoreCase(trans.getStatus())) {
+					logger.info("当前区块信息{}", s);
+					logger.info("交易确认区块信息{}", trans.getBlockNumber());
+					logger.info("交易成功");
+				}
+			}
+
+		}).exceptionally(sendAsyncException -> {
+			PhpSystemJsonContentVo phpSystemJsonContent = new PhpSystemJsonContentVo();
+			phpSystemJsonContent.setUnkownError(sendAsyncException.getMessage());
+
+			logger.error("发送交易失败", sendAsyncException);
+			try {
+				HttpClientUtil.post(submitUrl, JSON.toJSONString(phpSystemJsonContent));
+			} catch (Exception e) {
+
+				logger.error("post时异常{}", e);
+			}
+			return null;
+		});
+		return null;
 	}
 
 }

@@ -4,7 +4,7 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description="兑换使用实体类",value="兑换返回json")
-public class EthAssetSettleVo {
+public class EthAssetBurnVo {
 	@ApiModelProperty(   value = "交易号", dataType = "String")
 	private String transactionId;
 	@ApiModelProperty(   value = "兑换后的资产id列表", dataType = "String")

@@ -13,7 +13,6 @@ import com.blockchain.service.ethereum.vo.EthAndTokenAssetVo;
 import com.blockchain.service.ethereum.vo.EthereumWalletInfo;
 import com.blockchain.service.tencent.dto.KeyInfoDto;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
-import com.blockchain.service.tencent.vo.UserInfoVo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
@@ -39,12 +38,7 @@ public interface EthUserService {
 
 
 
-	void checkPairKey(KeyInfoDto keyInfo) throws ServiceException;
-
-
-
-
-
+	boolean checkPairKey(KeyInfoDto keyInfo) throws ServiceException;
 
 
 

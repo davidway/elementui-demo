@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
@@ -37,10 +36,7 @@ import org.web3j.protocol.core.methods.response.EthCall;
 import org.web3j.protocol.core.methods.response.EthEstimateGas;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
-import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.ClientTransactionManager;
-import org.web3j.tx.Contract;
 
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
@@ -48,19 +44,15 @@ import com.blockchain.service.ethereum.EthUserService;
 import com.blockchain.service.ethereum.dto.EthAccountQueryFormDto;
 import com.blockchain.service.ethereum.dto.EthUserFormDto;
 import com.blockchain.service.ethereum.dto.EthereumConfig;
-import com.blockchain.service.ethereum.ethjava.TokenERC20;
 import com.blockchain.service.ethereum.ethjava.utils.Environment;
 import com.blockchain.service.ethereum.util.MyFileUtil;
 import com.blockchain.service.ethereum.vo.EthAndTokenAssetVo;
 import com.blockchain.service.ethereum.vo.EthereumWalletInfo;
-import com.blockchain.service.tencent.dto.AssetTransQueryFormDto;
 import com.blockchain.service.tencent.dto.KeyInfoDto;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
-import com.blockchain.service.tencent.vo.UserInfoVo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Service("EthUserServiceImpl")
 public class EthUserServiceImpl implements EthUserService {
 
 	private static Admin admin = Admin.build(new HttpService(Environment.getRpcUrl()));
@@ -312,53 +304,49 @@ public class EthUserServiceImpl implements EthUserService {
 	}
 
 	@Override
-	public void checkPairKey(KeyInfoDto keyInfo) throws ServiceException {
-		if ( StringUtils.isNotBlank(keyInfo.getPrivateKey())){
+	public boolean checkPairKey(KeyInfoDto keyInfo) throws ServiceException {
+		boolean check = true;
+		if (StringUtils.isNotBlank(keyInfo.getPrivateKey())) {
 			Credentials credentials = Credentials.create(keyInfo.getPrivateKey());
 			if (credentials != null) {
 
 			} else {
 				if (keyInfo.getPublicKey().equals(credentials.getEcKeyPair().getPublicKey()) == false) {
-					throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage("公私钥匹配错误");
-
+					check = false;
 				}
-
 			}
-		}else if ( StringUtils.isNotBlank(keyInfo.getKeyStore())){
-			
+		} else if (StringUtils.isNotBlank(keyInfo.getKeyStore())) {
+			// TODO:
 		}
-		
-		
+		return check;
+
 	}
 
 	@Override
-	public EthereumWalletInfo getUserInfo(String password,String privateKey) throws CipherException, JsonProcessingException {
+	public EthereumWalletInfo getUserInfo(String password, String privateKey) throws CipherException, JsonProcessingException {
 		EthereumWalletInfo userInfoVo = new EthereumWalletInfo();
 		// File(directory));
 		Credentials c = Credentials.create(privateKey);
-		//String keyStore = importPrivateKey(c.getEcKeyPair().getPrivateKey(), password, MyFileUtil.genereateEthereumFilePath());
-	
+		// String keyStore = importPrivateKey(c.getEcKeyPair().getPrivateKey(),
+		// password, MyFileUtil.genereateEthereumFilePath());
 
 		userInfoVo.setAddress("0x" + c.getAddress());
-		
+
 		userInfoVo.setKeyStore("");
 		userInfoVo.setPassword(password);
 		userInfoVo.setBasePrivateKey(privateKey);
-		
+
 		return userInfoVo;
 	}
 
 	private static String importPrivateKey(BigInteger privateKey, String password, String directory) {
 		ECKeyPair ecKeyPair = ECKeyPair.create(privateKey);
-		String keyStore="";
+		String keyStore = "";
 		try {
-			 keyStore = WalletUtils.generateWalletFile(password,
-					ecKeyPair,
-					new File(directory),
-					true);
-			
+			keyStore = WalletUtils.generateWalletFile(password, ecKeyPair, new File(directory), true);
+
 			return keyStore;
-			
+
 		} catch (CipherException | IOException e) {
 			e.printStackTrace();
 		}

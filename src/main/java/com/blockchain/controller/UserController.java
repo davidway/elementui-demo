@@ -25,12 +25,16 @@ import org.web3j.crypto.CipherException;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
+import com.blockchain.controller.factory.CoinBaseFactory;
+import com.blockchain.controller.factory.CoinContextUtil;
 import com.blockchain.dto.BlockChainType;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.ethereum.EthUserService;
 import com.blockchain.service.ethereum.dto.EthAccountQueryFormDto;
 import com.blockchain.service.ethereum.dto.EthUserFormDto;
+import com.blockchain.service.ethereum.impl.EthUserServiceImpl;
 import com.blockchain.service.ethereum.vo.EthAndTokenAssetVo;
 import com.blockchain.service.ethereum.vo.EthereumWalletInfo;
 import com.blockchain.service.tencent.TencentUserService;
@@ -41,9 +45,11 @@ import com.blockchain.service.tencent.dto.KeyInfoDto;
 import com.blockchain.service.tencent.dto.TransInfoDto;
 import com.blockchain.service.tencent.dto.UserFormDto;
 import com.blockchain.service.tencent.dto.UserKeyDto;
+import com.blockchain.service.tencent.impl.TencentUserServiceImpl;
 import com.blockchain.service.tencent.trustsql.sdk.TrustSDK;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.blockchain.service.tencent.util.ConfigUtils;
+import com.blockchain.service.tencent.util.CrmUtils;
 import com.blockchain.service.tencent.vo.PhpSystemJsonContentVo;
 import com.blockchain.service.tencent.vo.UserInfoVo;
 import com.blockchain.util.BlockChainName;
@@ -65,10 +71,9 @@ public class UserController {
 	@Resource
 	HttpServletResponse response;
 
-	@Resource
-	TencentUserService tencentUserService;
-	@Resource
-	EthUserService ethUserService;
+	TencentUserService tencentUserService = new TencentUserServiceImpl();
+
+	EthUserService ethUserService = new EthUserServiceImpl();
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	@ResponseBody
@@ -126,7 +131,7 @@ public class UserController {
 		return;
 	}
 
-	@ResponseBody
+/*	@ResponseBody
 	@RequestMapping(value = { "/addUserHasBaseAndHostAccount" }, method = RequestMethod.POST, consumes = "application/json")
 	@ApiOperation(value = "创建用户时有基础和代理账户", httpMethod = "POST", response = UserInfoVo.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
@@ -146,10 +151,7 @@ public class UserController {
 			Integer chainType = configUtils.getChainType();
 			switch (chainType) {
 			case BlockChainType.TENCENT:
-				ConfigUtils.check();
-				ValidatorUtil.validate(bindingResult);
-				UserInfoVo userInfoVO = tencentUserService.addUserHasBaseAndHostAccount(userFormDTO);
-				phpSystemJsonContentVo.setData(userInfoVO);
+
 				jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
 				ResponseUtil.echo(response, jsonString);
 				break;
@@ -174,7 +176,7 @@ public class UserController {
 		}
 
 		return;
-	}
+	}*/
 
 	@ResponseBody
 	@RequestMapping(value = { "/accountQuery" }, method = RequestMethod.POST)
@@ -188,47 +190,32 @@ public class UserController {
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
 	public void accountQuery(@Valid @RequestBody AccountQueryFormDto assetForm, BindingResult bindingResult) {
-		PhpSystemJsonContentVo phpSystemJsonContentVO = new PhpSystemJsonContentVo();
+		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
-		ConfigUtils configUtils = new ConfigUtils();
-		Integer chainType = configUtils.getChainType();
+	
 
 		try {
 
 			ConfigUtils.check();
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				new ValidatorUtil().validate(assetForm, TencentValidateGroup.class);
-				List<AssetDto> assetList = tencentUserService.accountQuery(assetForm);
-				phpSystemJsonContentVO.setData(assetList);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-				ResponseUtil.echo(response, jsonString);
-
-				break;
-			case BlockChainType.ETH:
-				new ValidatorUtil().validate(assetForm, EthValidateGroup.class);
-				EthAccountQueryFormDto ethAccountQueryFormDto = new EthAccountQueryFormDto();
-				BeanUtils.copyProperties(assetForm, ethAccountQueryFormDto);
-				EthAndTokenAssetVo tokenAndEth = ethUserService.ethereumAccountQuery(ethAccountQueryFormDto);
-				phpSystemJsonContentVO.setData(tokenAndEth);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			}
-
+			CrmUtils.checkAuth();
+			ConfigUtils configUtils = new ConfigUtils();
+			Integer chainType = configUtils.getChainType();
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject jsonObject = coinBaseContext.accountQuery(assetForm);
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, jsonObject);
 		} catch (ServiceException e) {
 
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
+			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
 
 		catch (Exception e) {
 			logger.error("错误信息", e);
-			phpSystemJsonContentVO.setRetmsg(e.getMessage());
-			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
+			phpSystemJsonContentVo.setRetmsg(e.getMessage());
+			phpSystemJsonContentVo.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
@@ -374,6 +361,7 @@ public class UserController {
 		}
 	}
 
+
 	@ResponseBody
 	@RequestMapping(value = { "/addUserHasBaseAccount" }, method = RequestMethod.POST, consumes = "application/json")
 	@ApiOperation(value = "创建用户只有基础钱包账户", httpMethod = "POST", response = UserInfoVo.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -385,7 +373,7 @@ public class UserController {
 			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
 	public void addUserHasBaseAccount(@Valid @RequestBody UserFormDto userFormDTO, BindingResult bindingResult) {
-		PhpSystemJsonContentVo phpSystemJsonContentVO = new PhpSystemJsonContentVo();
+		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 		ConfigUtils configUtils = null;
 		Integer chainType = null;
@@ -394,103 +382,33 @@ public class UserController {
 			ConfigUtils.check();
 			configUtils = new ConfigUtils();
 			chainType = configUtils.getChainType();
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				new ValidatorUtil().validate(userFormDTO, TencentValidateGroup.class);
-				UserInfoVo userInfoVO = tencentUserService.addUserHasBaseAccount(userFormDTO);
-				phpSystemJsonContentVO.setData(userInfoVO);
-
-				break;
-
-			case BlockChainType.ETH:
-				new ValidatorUtil().validate(userFormDTO, EthValidateGroup.class);
-				EthUserFormDto ethUserFormDto = new EthUserFormDto();
-				String password = userFormDTO.getPassword();
-				ethUserFormDto.setPassword(password);
-				EthereumWalletInfo ethereumWalletInfo = ethUserService.addUserHasBaseAccount(ethUserFormDto);
-				phpSystemJsonContentVO.setData(ethereumWalletInfo);
-				
-				break;
-			}
-
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject s = coinBaseContext.addUserHasBaseAccount(userFormDTO);
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, s);
 		} catch (ServiceException e) {
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		} catch (Exception e) {
-			logger.error(e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setSDKError();
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-
-		try {
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO, true);
-		} catch (JSONException e) {
-			logger.error(e);
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setParseJsonError();
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-		ResponseUtil.echo(response, jsonString);
-		return;
-	}
-
-	@ResponseBody
-	@RequestMapping(value = { "/addUserHostAccount" }, method = RequestMethod.POST, consumes = "application/json")
-	@ApiOperation(value = "添加用户任意代理钱包账户", httpMethod = "POST", response = UserInfoVo.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	public void addUserHostAccount(@Valid @RequestBody UserFormDto userFormDTO, BindingResult bindingResult) {
-		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
-		String jsonString = "";
-
-		try {
-
-			ConfigUtils.check();
-			ConfigUtils configUtils = new ConfigUtils();
-			Integer chainType = configUtils.getChainType();
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				ConfigUtils.check();
-				ValidatorUtil.validate(bindingResult);
-				UserInfoVo userInfoVO = tencentUserService.addUserHostAccount(userFormDTO);
-				phpSystemJsonContentVo.setData(userInfoVO);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			case BlockChainType.ETH:
-				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			}
-
-		}
-
-		catch (ServiceException e) {
-
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
-		}catch (Exception e) {
-
+		} catch (Exception e) {
+			logger.error(e);
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setSDKError();
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
 
+		try {
 		
+		} catch (JSONException e) {
+			logger.error(e);
+			phpSystemJsonContentVo = phpSystemJsonContentVo.setParseJsonError();
+			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+			ResponseUtil.echo(response, jsonString);
+			return;
+		}
+		ResponseUtil.echo(response, jsonString);
+		return;
 	}
 
 	@ResponseBody
@@ -512,11 +430,14 @@ public class UserController {
 
 			ConfigUtils.check();
 			ConfigUtils configUtils = new ConfigUtils();
+			ValidatorUtil.validate(bindingResult);
+			
 			chainType = configUtils.getChainType();
 			switch (chainType) {
 			case BlockChainType.TENCENT:
-				ValidatorUtil.validate(bindingResult);
-				tencentUserService.checkPairKey(keyInfo);
+			
+				 boolean checkResult = tencentUserService.checkPairKey(keyInfo);
+				 
 				jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
 				ResponseUtil.echo(response, jsonString);
 				break;
@@ -541,8 +462,6 @@ public class UserController {
 			return;
 		}
 
-		
-	
 		return;
 	}
 

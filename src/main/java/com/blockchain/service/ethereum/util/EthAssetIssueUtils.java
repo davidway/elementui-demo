@@ -1,6 +1,7 @@
 package com.blockchain.service.ethereum.util;
 
 import org.web3j.crypto.Credentials;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import com.blockchain.service.ethereum.dto.EthereumConfig;
 import com.blockchain.service.ethereum.ethjava.TokenERC20;

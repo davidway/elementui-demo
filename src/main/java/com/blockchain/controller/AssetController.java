@@ -20,14 +20,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.blockchain.controller.factory.CoinBaseFactory;
+import com.blockchain.controller.factory.CoinContextUtil;
 import com.blockchain.dto.BlockChainType;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
+import com.blockchain.service.dto.EthTransInfoDto;
 import com.blockchain.service.ethereum.EthAssetService;
-import com.blockchain.service.ethereum.dto.EthAssetIssueFormDto;
 import com.blockchain.service.ethereum.dto.EthAssetSettleDto;
 import com.blockchain.service.ethereum.dto.EthAssetTransferFormDto;
 import com.blockchain.service.ethereum.dto.GasInfoDto;
+import com.blockchain.service.ethereum.impl.EthAssetServiceImpl;
+import com.blockchain.service.ethereum.vo.EthTransInfoVo;
 import com.blockchain.service.ethereum.vo.GasInfoVo;
 import com.blockchain.service.tencent.AssetService;
 import com.blockchain.service.tencent.dto.AssetIssueDto;
@@ -39,6 +44,7 @@ import com.blockchain.service.tencent.dto.AssetSettleSubmitFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferDto;
 import com.blockchain.service.tencent.dto.AssetTransferFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferSubmitFormDto;
+import com.blockchain.service.tencent.impl.TencentAssetServiceImpl;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.blockchain.service.tencent.util.BeanUtils;
 import com.blockchain.service.tencent.util.ConfigUtils;
@@ -60,10 +66,10 @@ public class AssetController {
 	Logger logger = LoggerFactory.getLogger(AssetController.class);
 	@Resource
 	HttpServletResponse response;
-	@Resource
-	AssetService assetService;
-	@Resource
-	EthAssetService ethAssetService;
+
+	AssetService assetService = new TencentAssetServiceImpl();
+
+	EthAssetService ethAssetService = new EthAssetServiceImpl();
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	@ResponseBody
@@ -97,30 +103,11 @@ public class AssetController {
 		try {
 			ConfigUtils.check();
 
+			configUtils = new ConfigUtils();
 			chainType = configUtils.getChainType();
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				new ValidatorUtil().validate(assetTransferFormDto, TencentValidateGroup.class);
-				ParamUtils.checkAssetNum(assetTransferFormDto.getSrcAsset());
-				TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetTransferFormDto.getUserPrivateKey(), assetTransferFormDto.getSrcAccount());
-				AssetTransferDto assetTransferDto = assetService.transfer(assetTransferFormDto);
-				phpSystemJsonContentVo.setData(assetTransferDto);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-
-			case BlockChainType.ETH:
-				new ValidatorUtil().validate(assetTransferFormDto, EthValidateGroup.class);
-				EthAssetTransferFormDto ethAssetTransferFormDto = new EthAssetTransferFormDto();
-				BeanUtils.copyProperties(assetTransferFormDto, ethAssetTransferFormDto);
-				ethAssetService.transferToken(ethAssetTransferFormDto);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			default:
-				throw new ServiceException().errorCode(StatusCode.MODEL_NO_SUPPORT).errorMessage(StatusCode.MODEL_NO_SUPPORT_MESSAGE);
-
-			}
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject jsonObject = coinBaseContext.transfer(assetTransferFormDto);
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, jsonObject);
 
 		} catch (TrustSDKException e) {
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(new ServiceException().errorCode(StatusCode.SYSTEM_UNKOWN_ERROR).errorMessage(StatusCode.SYSTEM_UNKOWN_ERROR_MESSAGE));
@@ -140,7 +127,6 @@ public class AssetController {
 			return;
 		}
 
-	
 		return;
 	}
 
@@ -163,34 +149,13 @@ public class AssetController {
 		ConfigUtils configUtils = new ConfigUtils();
 		Integer chainType = configUtils.getChainType();
 		try {
-
 			ConfigUtils.check();
 
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				new ValidatorUtil().validate(assetSettleFormDto, TencentValidateGroup.class);
-				ConfigUtils.check();
-				TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetSettleFormDto.getUserPrivateKey(), assetSettleFormDto.getOwnerAccount());
-				ParamUtils.checkAssetNum(assetSettleFormDto.getSrcAsset());
-				AssetSettleDto assetSettleDto = assetService.settle(assetSettleFormDto);
-				phpSystemJsonContentVo.setData(assetSettleDto);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-
-			case BlockChainType.ETH:
-				new ValidatorUtil().validate(assetSettleFormDto, EthValidateGroup.class);
-				EthAssetSettleDto ethAssetSettleDto = new EthAssetSettleDto();
-				BeanUtils.copyProperties(assetSettleFormDto, ethAssetSettleDto);
-				ethAssetService.settleToken(ethAssetSettleDto);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				
-				break;
-			default:
-				throw new ServiceException().errorCode(StatusCode.MODEL_NO_SUPPORT).errorMessage(StatusCode.MODEL_NO_SUPPORT_MESSAGE);
-			
-			}
+			configUtils = new ConfigUtils();
+			chainType = configUtils.getChainType();
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject jsonObject = coinBaseContext.settle(assetSettleFormDto);
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, jsonObject);
 
 		} catch (ServiceException e) {
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
@@ -205,7 +170,6 @@ public class AssetController {
 			return;
 		}
 
-	
 		return;
 	}
 
@@ -237,42 +201,10 @@ public class AssetController {
 			CrmUtils.checkAuth();
 			configUtils = new ConfigUtils();
 			chainType = configUtils.getChainType();
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				new ValidatorUtil().validate(assetIssueFormDto, TencentValidateGroup.class);
-				break;
-			case BlockChainType.ETH:
-				new ValidatorUtil().validate(assetIssueFormDto, EthValidateGroup.class);
-				break;
-			default:
-				throw new ServiceException().errorCode(StatusCode.MODEL_NO_SUPPORT).errorMessage(StatusCode.MODEL_NO_SUPPORT_MESSAGE);
-			}
-			// 校验结束
-		} catch (ServiceException e) {
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject jsonObject = coinBaseContext.issue(assetIssueFormDto);
 
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-
-		try {
-
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				AssetIssueDto assetIssueDto = assetService.issue(assetIssueFormDto);
-				phpSystemJsonContentVo.setData(assetIssueDto);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			case BlockChainType.ETH:
-				EthAssetIssueFormDto ethassetFormDTO = new EthAssetIssueFormDto();
-				BeanUtils.copyProperties(assetIssueFormDto, ethassetFormDTO);
-				ethAssetService.issueToken(ethassetFormDTO);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			}
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, jsonObject);
 
 		} catch (ServiceException e) {
 
@@ -314,27 +246,13 @@ public class AssetController {
 		try {
 
 			ConfigUtils.check();
+			CrmUtils.checkAuth();
 			ConfigUtils configUtils = new ConfigUtils();
 			Integer chainType = configUtils.getChainType();
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				ConfigUtils.check();
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject jsonObject = coinBaseContext.issueSubmit(assetForm);
 
-				ValidatorUtil.validate(bindingResult);
-				AssetIssueDto assetIssueDto = assetService.issueSubmit(assetForm);
-				phpSystemJsonContentVo.setData(assetIssueDto);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				
-				break;
-
-			case BlockChainType.ETH:
-				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			}
-
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, jsonObject);
 		} catch (ServiceException e) {
 			logger.error("业务错误", e);
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
@@ -362,7 +280,6 @@ public class AssetController {
 			return;
 		}
 
-		
 		return;
 	}
 
@@ -382,28 +299,16 @@ public class AssetController {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 
-
 		try {
 
 			ConfigUtils.check();
+			CrmUtils.checkAuth();
 			ConfigUtils configUtils = new ConfigUtils();
 			Integer chainType = configUtils.getChainType();
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				ConfigUtils.check();
-				ValidatorUtil.validate(bindingResult);
-				AssetTransferDto assetTransferDto = assetService.transSubmit(assetForm);
-				phpSystemJsonContentVo.setData(assetTransferDto);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject jsonObject = coinBaseContext.transSubmit(assetForm);
 
-			case BlockChainType.ETH:
-				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			}
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, jsonObject);
 		}
 
 		catch (ServiceException e) {
@@ -440,29 +345,17 @@ public class AssetController {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 
-	
 		try {
 
+			
 			ConfigUtils.check();
+			CrmUtils.checkAuth();
 			ConfigUtils configUtils = new ConfigUtils();
 			Integer chainType = configUtils.getChainType();
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				ValidatorUtil.validate(bindingResult);
-				ConfigUtils.check();
-				AssetSettleDto assetSettleDto = assetService.settleSubmit(assetForm);
-				phpSystemJsonContentVo.setData(assetSettleDto);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject jsonObject = coinBaseContext.settleSubmit(assetForm);
 
-			case BlockChainType.ETH:
-				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			}
-			
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, jsonObject);
 
 		} catch (ServiceException e) {
 
@@ -495,7 +388,7 @@ public class AssetController {
 			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	public void getGasInfo(@Valid  @RequestBody GasInfoDto gasInfoDto,BindingResult bindingResult) {
+	public void getGasInfo(@Valid @RequestBody GasInfoDto gasInfoDto, BindingResult bindingResult) {
 		String jsonString = "";
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 
@@ -508,19 +401,17 @@ public class AssetController {
 			switch (chainType) {
 			case BlockChainType.TENCENT:
 				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
-			
-				
+
 				break;
 
 			case BlockChainType.ETH:
 				ValidatorUtil.validate(bindingResult);
-				 gasInfoVo = ethAssetService.getGasInfo(gasInfoDto);
+				gasInfoVo = ethAssetService.getGasInfo(gasInfoDto);
 				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			
+
 				break;
 			}
-		}
-		catch (ServiceException e) {
+		} catch (ServiceException e) {
 
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
@@ -533,6 +424,54 @@ public class AssetController {
 			return;
 		}
 		phpSystemJsonContentVo.setData(gasInfoVo);
+		jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+		ResponseUtil.echo(response, jsonString);
+		return;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = { "/getTransInfo" }, method = RequestMethod.POST)
+	@ApiOperation(value = "资产兑付只提交", httpMethod = "POST", response = AssetSettleDto.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = StatusCode.SERVICE_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_ERROR, message = StatusCode.SUBMIT_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.APPLY_THREAD_ERROR, message = StatusCode.APPLY_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.SUBMIT_THREAD_ERROR, message = StatusCode.SUBMIT_THREAD_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
+			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
+	public void getTransInfo(@Valid @RequestBody EthTransInfoDto ethTransInfo, BindingResult bindingResult) {
+		String jsonString = "";
+		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
+
+		EthTransInfoVo ethTransInfoVo = null;
+		try {
+
+			ConfigUtils.check();
+			ConfigUtils configUtils = new ConfigUtils();
+			Integer chainType = configUtils.getChainType();
+			switch (chainType) {
+			case BlockChainType.TENCENT:
+				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
+
+				break;
+
+			case BlockChainType.ETH:
+				ValidatorUtil.validate(bindingResult);
+				ethTransInfoVo = ethAssetService.getTransInfo(ethTransInfo);
+				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+
+				break;
+			}
+		} catch (ServiceException e) {
+
+			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+			ResponseUtil.echo(response, jsonString);
+			return;
+		}
+		phpSystemJsonContentVo.setData(ethTransInfoVo);
 		jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 		ResponseUtil.echo(response, jsonString);
 		return;

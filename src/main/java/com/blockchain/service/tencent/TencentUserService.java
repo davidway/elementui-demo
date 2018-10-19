@@ -36,7 +36,7 @@ public interface TencentUserService {
 
 	public UserInfoVo addUserHostAccount(UserFormDto userFormDto)  throws ServiceException, TrustSDKException, UnsupportedEncodingException, Exception;
 
-	public void checkPairKey(KeyInfoDto keyInfo) throws TrustSDKException, ServiceException;
+	public boolean checkPairKey(KeyInfoDto keyInfo) throws TrustSDKException, ServiceException;
 
 	public UserInfoVo getUserInfo(String privateKey) throws TrustSDKException;
 

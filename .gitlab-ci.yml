@@ -18,7 +18,6 @@ unit:
     
 dast:
  stage: dast
-
   script:
     - mkdir /zap/wrk/
     - /zap/zap-baseline.py -J gl-dast-report.json -t "http://823.st.wsy010.cn:8080/crm" || true

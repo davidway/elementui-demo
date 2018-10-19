@@ -24,8 +24,7 @@ import com.blockchain.service.tencent.util.AssetPrepareUtil;
 import com.blockchain.service.tencent.util.AssetUtil;
 import com.blockchain.service.tencent.util.ResultUtil;
 
-@Service("AssetService")
-public class AssetServiceImpl implements AssetService {
+public class TencentAssetServiceImpl implements AssetService {
 	public static final Logger issueLogger = LoggerFactory.getLogger("issueLogger");
 	public static final Logger transferLogger = LoggerFactory.getLogger("transferLogger");
 	public static final Logger settleLogger = LoggerFactory.getLogger("settleLogger");

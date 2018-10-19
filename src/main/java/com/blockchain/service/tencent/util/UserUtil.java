@@ -26,7 +26,7 @@ public class UserUtil {
 	static boolean isTest = false;
 
 	public static String generateUserRequest(UserInfoVo userInfoVo, UserFormDto userFormDto) throws Exception {
-		String requestString = "";
+	
 		ConfigUtils configUtils = new ConfigUtils();
 		RequestData req = new RequestData();
 

@@ -13,7 +13,6 @@ import com.blockchain.service.tencent.util.BeanUtils;
 import com.blockchain.service.tencent.util.ConfigUtils;
 import com.blockchain.util.BlockChainName;
 
-@Service("ConfigPropertiesService")
 public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 
 	Logger logger = LoggerFactory.getLogger(ConfigPropertiesServiceImpl.class);
@@ -31,8 +30,7 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 
 		if (chainType != null) {
 			configUtils.setChainType(chainType);
-			switch (chainType) {
-			case BlockChainName.TENCENT:
+			
 				if (StringUtils.isNotBlank(chainId)) {
 					configUtils.setChainId(chainId);
 				}
@@ -55,20 +53,7 @@ public class ConfigPropertiesServiceImpl implements ConfigPropertiesService {
 				if (StringUtils.isNotBlank(createUserPublicKey)) {
 					configUtils.setCreateUserPublicKey(createUserPublicKey);
 				}
-				break;
-			case BlockChainName.ETH:
-				//以太坊不作其余配置,清空腾讯的配置
-				configUtils.setChainId("");
-				configUtils.setCoin_privateKey("");
-				configUtils.setCreateUserPrivateKey("");
-				configUtils.setCreateUserPublicKey("");
-				configUtils.setLedgerId("");
-				configUtils.setMchId("");
-				configUtils.setNodeId("");
-				break;
-			default:
-				break;
-			}
+			
 		}
 		return;
 	}
