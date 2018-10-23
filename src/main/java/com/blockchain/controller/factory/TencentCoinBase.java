@@ -1,5 +1,6 @@
 package com.blockchain.controller.factory;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
@@ -10,8 +11,11 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.blockchain.exception.ServiceException;
+import com.blockchain.exception.StatusCode;
+import com.blockchain.service.dto.EthTransInfoDto;
 import com.blockchain.service.ethereum.dto.EthAccountQueryFormDto;
 import com.blockchain.service.ethereum.dto.EthUserFormDto;
+import com.blockchain.service.ethereum.dto.GasInfoDto;
 import com.blockchain.service.tencent.AssetService;
 import com.blockchain.service.tencent.ConfigPropertiesService;
 import com.blockchain.service.tencent.TencentUserService;
@@ -23,11 +27,13 @@ import com.blockchain.service.tencent.dto.AssetIssueSubmitFormDto;
 import com.blockchain.service.tencent.dto.AssetSettleDto;
 import com.blockchain.service.tencent.dto.AssetSettleFormDto;
 import com.blockchain.service.tencent.dto.AssetSettleSubmitFormDto;
+import com.blockchain.service.tencent.dto.AssetTransQueryFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferDto;
 import com.blockchain.service.tencent.dto.AssetTransferFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferSubmitFormDto;
 import com.blockchain.service.tencent.dto.ConfigPropertiesFormDto;
 import com.blockchain.service.tencent.dto.KeyInfoDto;
+import com.blockchain.service.tencent.dto.TransInfoDto;
 import com.blockchain.service.tencent.dto.UserFormDto;
 import com.blockchain.service.tencent.impl.ConfigPropertiesServiceImpl;
 import com.blockchain.service.tencent.impl.TencentAssetServiceImpl;
@@ -133,6 +139,32 @@ public class TencentCoinBase implements CoinBase {
 	public JSONObject accountQuery(AccountQueryFormDto assetFormVO) throws TrustSDKException, Exception {
 		new ValidatorUtil().validate(assetFormVO, TencentValidateGroup.class);
 		List<AssetDto> assetList = tencentUserService.accountQuery(assetFormVO);
+
+		return (JSONObject) JSON.toJSON(assetList);
+	}
+
+	@Override
+	public JSONObject getGasInfo(GasInfoDto gasInfoDto) throws ServiceException, IOException {
+		throw new ServiceException().errorCode(StatusCode.METHOD_NO_SUPPORT).errorMessage(StatusCode.METHOD_NO_SUPPORT_MESSAGE);
+	}
+
+	@Override
+	public JSONObject getTransInfo(EthTransInfoDto ethTransInfo) throws ServiceException {
+		throw new ServiceException().errorCode(StatusCode.METHOD_NO_SUPPORT).errorMessage(StatusCode.METHOD_NO_SUPPORT_MESSAGE);
+	}
+
+	@Override
+	public JSONObject getUserInfo(String privateKey, String password) throws ServiceException, TrustSDKException {
+		UserInfoVo userInfoVO = new UserInfoVo();
+		userInfoVO = tencentUserService.getUserInfo(privateKey);
+
+		return (JSONObject) JSON.toJSON(userInfoVO);
+	}
+
+	@Override
+	public JSONObject transQuery(AssetTransQueryFormDto assetForm) throws ServiceException, TrustSDKException, Exception {
+		new ValidatorUtil().validate(assetForm, TencentValidateGroup.class);
+		List<TransInfoDto> assetList = tencentUserService.transQuery(assetForm);
 
 		return (JSONObject) JSON.toJSON(assetList);
 	}

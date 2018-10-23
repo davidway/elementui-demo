@@ -33,8 +33,11 @@ import com.blockchain.service.tencent.util.ResultUtil;
 import com.blockchain.service.tencent.util.UserUtil;
 import com.blockchain.service.tencent.vo.UserInfoVo;
 
+
 public class TencentUserServiceImpl implements TencentUserService {
 	private static Logger logger = Logger.getLogger(TencentUserServiceImpl.class);
+
+
 
 	@Override
 	public UserKeyDto generatePairKey(UserKeyDto userKeyModel) throws TrustSDKException, UnsupportedEncodingException {
@@ -57,37 +60,37 @@ public class TencentUserServiceImpl implements TencentUserService {
 	}
 
 	@Override
-	public UserInfoVo addUserHasBaseAndHostAccount(UserFormDto userFormDto) throws ServiceException, UnsupportedEncodingException, TrustSDKException, Exception {
-		// 申请原始帐号
+	public UserInfoVo addUserHasBaseAndHostAccount(UserFormDto userFormDto) throws ServiceException,UnsupportedEncodingException, TrustSDKException, Exception {
+		//申请原始帐号
 		UserInfoVo userInfoVo = generateUserInfo(userFormDto);
-		String userRegistRequestString = UserUtil.generateUserRequest(userInfoVo, userFormDto);
+		String userRegistRequestString = UserUtil.generateUserRequest(userInfoVo,userFormDto);
 		SimpleHttpClient httpClient = new SimpleHttpClient();
 		String userRegistResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/user_cert/register", userRegistRequestString);
 		ResultUtil.checkResultIfSuccess("申请用户", userRegistResult);
 		JSONObject userRegistRetData = JSON.parseObject(userRegistResult).getJSONObject("retdata");
-
-		// 注册原始帐号的账户
-		String userBaseAccoutForm = UserUtil.generateuserAccoutForm(userInfoVo, userRegistRetData, false);
+	
+		//注册原始帐号的账户
+		String userBaseAccoutForm = UserUtil.generateuserAccoutForm(userInfoVo,userRegistRetData, false);
 		String userBaseAccountRegistResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/account_cert/register", userBaseAccoutForm);
-		logger.debug("注册原始帐号的账户返回结果:" + userBaseAccountRegistResult);
-		ResultUtil.checkResultIfSuccess("申请账户", userBaseAccountRegistResult);
+		logger.debug("注册原始帐号的账户返回结果:"+userBaseAccountRegistResult);
+		ResultUtil.checkResultIfSuccess("申请账户",userBaseAccountRegistResult);
 		JSONObject userAccoutData = JSON.parseObject(userRegistResult).getJSONObject("retdata");
-
+		
 		String userBaseAccount = userAccoutData.getString("user_address");
-		if (StringUtils.isBlank(userBaseAccount)) {
+		if ( StringUtils.isBlank(userBaseAccount)){
 			userBaseAccount = userAccoutData.getString("account_address");
 		}
 		userInfoVo.setBaseAccountAddress(userBaseAccount);
-
-		// 再设置一个新的账号作为代理账号
-		String userHostAccoutForm = UserUtil.generateuserAccoutForm(userInfoVo, userRegistRetData, true);
+		
+		//再设置一个新的账号作为代理账号
+		 String userHostAccoutForm = UserUtil.generateuserAccoutForm(userInfoVo,userRegistRetData, true);
 		String userHostAccountFormResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/account_cert/register", userHostAccoutForm);
-		ResultUtil.checkResultIfSuccess("申请代理账户", userHostAccountFormResult);
-		logger.debug("注册申请代理账户返回结果:" + userHostAccountFormResult);
+		ResultUtil.checkResultIfSuccess("申请代理账户",userHostAccountFormResult);
+		logger.debug("注册申请代理账户返回结果:"+userHostAccountFormResult);
 		JSONObject userHostAccoutData = JSON.parseObject(userHostAccountFormResult).getJSONObject("retdata");
 		String userHostAccount = userHostAccoutData.getString("user_address");
-
-		if (StringUtils.isBlank(userHostAccount)) {
+	
+		if ( StringUtils.isBlank(userHostAccount)){
 			userHostAccount = userHostAccoutData.getString("account_address");
 		}
 		userInfoVo.setHostWalletAccountAddress(userHostAccount);
@@ -101,7 +104,6 @@ public class TencentUserServiceImpl implements TencentUserService {
 		userInfoVo.setName(userFormDto.getName());
 		return userInfoVo;
 	}
-
 	@Override
 	public List<AssetDto> accountQuery(AccountQueryFormDto assetFormVO) throws TrustSDKException, Exception {
 
@@ -118,28 +120,30 @@ public class TencentUserServiceImpl implements TencentUserService {
 		for (int i = 0; i < jsonArray.size(); i++) {
 			JSONObject o = jsonArray.getJSONObject(i);
 			AssetDto assetDto = new AssetDto();
-			if (assetFormVO.getContent() != null) {
+			if ( assetFormVO.getContent()!=null){
 				JSONObject content = o.getJSONObject("content");
-				if (content.equals(assetFormVO.getContent())) {
-					assetDto.setAmount(o.getLong("amount"));
+				 if (content .equals(assetFormVO.getContent())){
+					 assetDto.setAmount(o.getLong("amount"));
+						assetDto.setAssetAccount(o.getString("asset_account"));
+						assetDto.setAssetId(o.getString("asset_id"));
+						assetDto.setAssetType(o.getInteger("asset_type"));
+						assetDto.setState(o.getInteger("state"));
+						assetDto.setContent(o.getJSONObject("content"));	
+						assetList.add(assetDto);
+				 }
+			}else{
+				 assetDto.setAmount(o.getLong("amount"));
 					assetDto.setAssetAccount(o.getString("asset_account"));
 					assetDto.setAssetId(o.getString("asset_id"));
 					assetDto.setAssetType(o.getInteger("asset_type"));
 					assetDto.setState(o.getInteger("state"));
-					assetDto.setContent(o.getJSONObject("content"));
-					assetList.add(assetDto);
-				}
-			} else {
-				assetDto.setAmount(o.getLong("amount"));
-				assetDto.setAssetAccount(o.getString("asset_account"));
-				assetDto.setAssetId(o.getString("asset_id"));
-				assetDto.setAssetType(o.getInteger("asset_type"));
-				assetDto.setState(o.getInteger("state"));
-				assetDto.setContent(o.getJSONObject("content"));
-
+					assetDto.setContent(o.getJSONObject("content"));	
+				
 				assetList.add(assetDto);
 			}
-
+			
+			
+		
 		}
 		// 从大金额到小金额排序
 		Collections.sort(assetList, new Comparator<AssetDto>() {
@@ -189,50 +193,51 @@ public class TencentUserServiceImpl implements TencentUserService {
 		});
 		return transInfoList;
 	}
+	
 
 	@Override
-	public UserInfoVo addUserHasBaseAccount(UserFormDto userFormDto) throws ServiceException, UnsupportedEncodingException, TrustSDKException, Exception {
+	public UserInfoVo addUserHasBaseAccount(UserFormDto userFormDto) throws ServiceException,UnsupportedEncodingException, TrustSDKException, Exception {
 
-		// 申请原始帐号
+		//申请原始帐号
 		UserInfoVo userInfoVo = generateUserInfo(userFormDto);
-		String userRegistRequestString = UserUtil.generateUserRequest(userInfoVo, userFormDto);
+		String userRegistRequestString = UserUtil.generateUserRequest(userInfoVo,userFormDto);
 		SimpleHttpClient httpClient = new SimpleHttpClient();
 		String userRegistResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/user_cert/register", userRegistRequestString);
 		ResultUtil.checkResultIfSuccess("申请用户", userRegistResult);
 		JSONObject userRegistRetData = JSON.parseObject(userRegistResult).getJSONObject("retdata");
-
-		// 注册原始帐号的账户
-		String userBaseAccoutForm = UserUtil.generateuserAccoutForm(userInfoVo, userRegistRetData, false);
+	
+		//注册原始帐号的账户
+		String userBaseAccoutForm = UserUtil.generateuserAccoutForm(userInfoVo,userRegistRetData, false);
 		String userBaseAccountRegistResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/account_cert/register", userBaseAccoutForm);
-		logger.debug("注册原始帐号的账户返回结果:" + userBaseAccountRegistResult);
-		ResultUtil.checkResultIfSuccess("申请账户", userBaseAccountRegistResult);
+		logger.debug("注册原始帐号的账户返回结果:"+userBaseAccountRegistResult);
+		ResultUtil.checkResultIfSuccess("申请账户",userBaseAccountRegistResult);
 		JSONObject userAccoutData = JSON.parseObject(userRegistResult).getJSONObject("retdata");
-
+		
 		String userBaseAccount = userAccoutData.getString("user_address");
-		if (StringUtils.isBlank(userBaseAccount)) {
+		if ( StringUtils.isBlank(userBaseAccount)){
 			userBaseAccount = userAccoutData.getString("account_address");
 		}
 		userInfoVo.setBaseAccountAddress(userBaseAccount);
-
+		
 		return userInfoVo;
 	}
 
 	@Override
 	public UserInfoVo addUserHostAccount(UserFormDto userFormDto) throws ServiceException, TrustSDKException, UnsupportedEncodingException, Exception {
-		// 再设置一个新的账号作为代理账号
+		//再设置一个新的账号作为代理账号
 		UserInfoVo userInfoVo = new UserInfoVo();
 		userInfoVo.setId(userFormDto.getId());
 		userInfoVo.setName(userFormDto.getName());
-
+		
 		String userHostAccoutForm = UserUtil.generateuserAccoutFormOnlyHostAccount(userInfoVo, userFormDto);
 		SimpleHttpClient httpClient = new SimpleHttpClient();
 		String userHostAccountFormResult = httpClient.post("https://baas.trustsql.qq.com/idm_v1.1/api/account_cert/register", userHostAccoutForm);
-		ResultUtil.checkResultIfSuccess("申请代理账户", userHostAccountFormResult);
-		logger.debug("注册申请代理账户返回结果:" + userHostAccountFormResult);
+		ResultUtil.checkResultIfSuccess("申请代理账户",userHostAccountFormResult);
+		logger.debug("注册申请代理账户返回结果:"+userHostAccountFormResult);
 		JSONObject userHostAccoutData = JSON.parseObject(userHostAccountFormResult).getJSONObject("retdata");
 		String userHostAccount = userHostAccoutData.getString("user_address");
-
-		if (StringUtils.isBlank(userHostAccount)) {
+	
+		if ( StringUtils.isBlank(userHostAccount)){
 			userHostAccount = userHostAccoutData.getString("account_address");
 		}
 		userInfoVo.setHostWalletAccountAddress(userHostAccount);
@@ -241,12 +246,13 @@ public class TencentUserServiceImpl implements TencentUserService {
 	}
 
 	@Override
-	public boolean checkPairKey(KeyInfoDto keyInfo) throws TrustSDKException, ServiceException {
+	public void checkPairKey(KeyInfoDto keyInfo) throws TrustSDKException, ServiceException {
 		String privateKey = keyInfo.getPrivateKey().trim();
 		String publicKey = keyInfo.getPublicKey().trim();
 		boolean isPair = TrustSDK.checkPairKey(privateKey, publicKey);
-
-		return isPair;
+		if ( isPair==false){
+			throw new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage("公私钥匹配错误");
+		}
 	}
 
 	@Override

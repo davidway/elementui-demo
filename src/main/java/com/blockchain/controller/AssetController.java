@@ -347,7 +347,6 @@ public class AssetController {
 
 		try {
 
-			
 			ConfigUtils.check();
 			CrmUtils.checkAuth();
 			ConfigUtils configUtils = new ConfigUtils();
@@ -398,19 +397,9 @@ public class AssetController {
 			ConfigUtils.check();
 			ConfigUtils configUtils = new ConfigUtils();
 			Integer chainType = configUtils.getChainType();
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
-
-				break;
-
-			case BlockChainType.ETH:
-				ValidatorUtil.validate(bindingResult);
-				gasInfoVo = ethAssetService.getGasInfo(gasInfoDto);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-
-				break;
-			}
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject jsonObject = coinBaseContext.getGasInfo(gasInfoDto);
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, jsonObject);
 		} catch (ServiceException e) {
 
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
@@ -451,19 +440,10 @@ public class AssetController {
 			ConfigUtils.check();
 			ConfigUtils configUtils = new ConfigUtils();
 			Integer chainType = configUtils.getChainType();
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject jsonObject = coinBaseContext.getTransInfo(ethTransInfo);
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, jsonObject);
 
-				break;
-
-			case BlockChainType.ETH:
-				ValidatorUtil.validate(bindingResult);
-				ethTransInfoVo = ethAssetService.getTransInfo(ethTransInfo);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-
-				break;
-			}
 		} catch (ServiceException e) {
 
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);

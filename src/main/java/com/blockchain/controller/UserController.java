@@ -131,52 +131,61 @@ public class UserController {
 		return;
 	}
 
-/*	@ResponseBody
-	@RequestMapping(value = { "/addUserHasBaseAndHostAccount" }, method = RequestMethod.POST, consumes = "application/json")
-	@ApiOperation(value = "创建用户时有基础和代理账户", httpMethod = "POST", response = UserInfoVo.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message = StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
-			@ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = "公私钥匹配失败", response = StatusCode.class),
-			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	public void addUserHasBaseAndHostAccount(@Valid @RequestBody UserFormDto userFormDTO, BindingResult bindingResult) {
-		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
-		String jsonString = "";
-
-		try {
-
-			ConfigUtils.check();
-			ConfigUtils configUtils = new ConfigUtils();
-			Integer chainType = configUtils.getChainType();
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			case BlockChainType.ETH:
-				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			}
-		} catch (ServiceException e) {
-
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		} catch (Exception e) {
-			logger.error("错误信息", e);
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setSDKError();
-			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-
-		return;
-	}*/
+	/*
+	 * @ResponseBody
+	 * 
+	 * @RequestMapping(value = { "/addUserHasBaseAndHostAccount" }, method =
+	 * RequestMethod.POST, consumes = "application/json")
+	 * 
+	 * @ApiOperation(value = "创建用户时有基础和代理账户", httpMethod = "POST", response =
+	 * UserInfoVo.class, consumes = "application/json", produces =
+	 * MediaType.APPLICATION_JSON_VALUE)
+	 * 
+	 * @ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR,
+	 * message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
+	 * 
+	 * @ApiResponse(code = StatusCode.PARAM_ERROR, message =
+	 * StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
+	 * 
+	 * @ApiResponse(code = StatusCode.SUCCESS, message =
+	 * StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
+	 * 
+	 * @ApiResponse(code = StatusCode.PAIR_KEY_ERROR, message =
+	 * StatusCode.PAIR_KEY_ERROR_MESSAGE, response = StatusCode.class),
+	 * 
+	 * @ApiResponse(code = StatusCode.SERVICE_EXCEPTION, message = "公私钥匹配失败",
+	 * response = StatusCode.class),
+	 * 
+	 * @ApiResponse(code = StatusCode.CONFIG_NOT_SET, message =
+	 * StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) }) public
+	 * void addUserHasBaseAndHostAccount(@Valid @RequestBody UserFormDto
+	 * userFormDTO, BindingResult bindingResult) { PhpSystemJsonContentVo
+	 * phpSystemJsonContentVo = new PhpSystemJsonContentVo(); String jsonString
+	 * = "";
+	 * 
+	 * try {
+	 * 
+	 * ConfigUtils.check(); ConfigUtils configUtils = new ConfigUtils(); Integer
+	 * chainType = configUtils.getChainType(); switch (chainType) { case
+	 * BlockChainType.TENCENT:
+	 * 
+	 * jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
+	 * ResponseUtil.echo(response, jsonString); break; case BlockChainType.ETH:
+	 * phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
+	 * jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+	 * ResponseUtil.echo(response, jsonString); break; } } catch
+	 * (ServiceException e) {
+	 * 
+	 * phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
+	 * jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+	 * ResponseUtil.echo(response, jsonString); return; } catch (Exception e) {
+	 * logger.error("错误信息", e); phpSystemJsonContentVo =
+	 * phpSystemJsonContentVo.setSDKError(); jsonString =
+	 * JSON.toJSONString(phpSystemJsonContentVo); ResponseUtil.echo(response,
+	 * jsonString); return; }
+	 * 
+	 * return; }
+	 */
 
 	@ResponseBody
 	@RequestMapping(value = { "/accountQuery" }, method = RequestMethod.POST)
@@ -192,7 +201,6 @@ public class UserController {
 	public void accountQuery(@Valid @RequestBody AccountQueryFormDto assetForm, BindingResult bindingResult) {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
-	
 
 		try {
 
@@ -242,22 +250,9 @@ public class UserController {
 			ConfigUtils configUtils = new ConfigUtils();
 			Integer chainType = configUtils.getChainType();
 
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				ConfigUtils.check();
-				ValidatorUtil.validate(bindingResult);
-				List<TransInfoDto> assetList = tencentUserService.transQuery(assetForm);
-				phpSystemJsonContentVo.setData(assetList);
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			case BlockChainType.ETH:
-				phpSystemJsonContentVo = phpSystemJsonContentVo.setNoSupportError();
-				jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, jsonString);
-				break;
-			}
-
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject jsonObject = coinBaseContext.transQuery(assetForm);
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, jsonObject);
 		}
 
 		catch (ServiceException e) {
@@ -290,22 +285,18 @@ public class UserController {
 	public void getUserInfo(@Valid @RequestParam("privateKey") @ApiParam(value = "用户私钥", required = false, defaultValue = "{\"privateKey\":\"\"}") String privateKey,
 			@RequestParam("password") @ApiParam(value = "用户密码", required = false) String password) {
 		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
-
-		if (StringUtils.isBlank(privateKey)) {
-			ServiceException e = new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage("用户私钥不能为空");
-			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
-			String jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-			ResponseUtil.echo(response, jsonString);
-			return;
-		}
-
-		ConfigUtils configUtils = new ConfigUtils();
-		Integer chainType = configUtils.getChainType();
-
-		String returnString = "";
+		String returnString="";
 		try {
-
-			ConfigUtils.check();
+			if (StringUtils.isBlank(privateKey)) {
+				ServiceException e = new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage("用户私钥不能为空");
+				phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
+				String jsonString = JSON.toJSONString(phpSystemJsonContentVo);
+				ResponseUtil.echo(response, jsonString);
+				return;
+			}
+		
+			ConfigUtils configUtils = new ConfigUtils();
+			Integer chainType = configUtils.getChainType();
 			if (StringUtils.isBlank(password) && configUtils.getChainType().equals(BlockChainName.ETH)) {
 				ServiceException e = new ServiceException().errorCode(StatusCode.PARAM_ERROR).errorMessage("用户私钥不能为空");
 				phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
@@ -314,22 +305,11 @@ public class UserController {
 				return;
 			}
 
-			switch (chainType) {
-			case BlockChainType.TENCENT:
-				UserInfoVo userInfoVO = new UserInfoVo();
-				userInfoVO = tencentUserService.getUserInfo(privateKey);
-				phpSystemJsonContentVo.setData(userInfoVO);
-				returnString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, returnString);
-				break;
-			case BlockChainType.ETH:
-				EthereumWalletInfo walletInfo = new EthereumWalletInfo();
-				walletInfo = ethUserService.getUserInfo(password, privateKey);
-				phpSystemJsonContentVo.setData(walletInfo);
-				returnString = JSON.toJSONString(phpSystemJsonContentVo);
-				ResponseUtil.echo(response, returnString);
-				break;
-			}
+			ConfigUtils.check();
+
+			CoinBaseContext coinBaseContext = CoinContextUtil.getCoinContext(chainType);
+			JSONObject s = coinBaseContext.getUserInfo(privateKey, password);
+			ResponseUtil.successEcho(response, phpSystemJsonContentVo, s);
 
 		} catch (TrustSDKException e) {
 			logger.error(e);
@@ -360,7 +340,6 @@ public class UserController {
 			return;
 		}
 	}
-
 
 	@ResponseBody
 	@RequestMapping(value = { "/addUserHasBaseAccount" }, method = RequestMethod.POST, consumes = "application/json")
@@ -399,7 +378,7 @@ public class UserController {
 		}
 
 		try {
-		
+
 		} catch (JSONException e) {
 			logger.error(e);
 			phpSystemJsonContentVo = phpSystemJsonContentVo.setParseJsonError();
@@ -431,13 +410,13 @@ public class UserController {
 			ConfigUtils.check();
 			ConfigUtils configUtils = new ConfigUtils();
 			ValidatorUtil.validate(bindingResult);
-			
+
 			chainType = configUtils.getChainType();
 			switch (chainType) {
 			case BlockChainType.TENCENT:
-			
-				 boolean checkResult = tencentUserService.checkPairKey(keyInfo);
-				 
+
+				tencentUserService.checkPairKey(keyInfo);
+
 				jsonString = JSON.toJSONString(phpSystemJsonContentVo, true);
 				ResponseUtil.echo(response, jsonString);
 				break;
