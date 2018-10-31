@@ -6,8 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.blockchain.service.tencent.dto.ConfigPropertiesFormDto;
-import com.blockchain.service.tencent.vo.PhpSystemJsonContentVo;
 
 public class ResponseUtil {
 	static DealJsonUtil dealJsonUtil = new DealJsonUtil();
@@ -33,12 +31,4 @@ public class ResponseUtil {
 		}
 	}
 
-
-	public static void successEcho(HttpServletResponse response,PhpSystemJsonContentVo phpSystemJsonContentVo, Object  o) {
-		String jsonString="";
-		
-		phpSystemJsonContentVo.setData( o);
-		jsonString = JSON.toJSONString(phpSystemJsonContentVo);
-		ResponseUtil.echo(response, jsonString);
-	}
 }
