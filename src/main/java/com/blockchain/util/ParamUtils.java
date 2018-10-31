@@ -2,9 +2,9 @@ package com.blockchain.util;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blockchain.dto.AssetTransferFormDTO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
+import com.blockchain.service.tencent.dto.AssetTransferFormDto;
 
 public class ParamUtils {
 
@@ -15,7 +15,7 @@ public class ParamUtils {
 		}
 	}
 
-	public static void checkSumAmount(AssetTransferFormDTO assetTransferFormDTO) throws ServiceException {
+	public static void checkSumAmount(AssetTransferFormDto assetTransferFormDTO) throws ServiceException {
 		long sum =0;
 		if (StringUtils.isNotBlank(assetTransferFormDTO.getFeeAmount() )){
 			sum = Long.valueOf(assetTransferFormDTO.getAmount())+Long.valueOf(assetTransferFormDTO.getFeeAmount());

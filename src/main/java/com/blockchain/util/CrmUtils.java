@@ -16,16 +16,16 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson.JSONObject;
-import com.blockchain.dto.CrmServiceDTO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
- import com.blockchain.dto.CrmResultSet;
+import com.blockchain.service.tencent.dto.CrmResultSet;
+import com.blockchain.service.tencent.dto.CrmServiceDto;
 public class CrmUtils {
 	static Logger logger = Logger.getLogger(CrmUtils.class);
 	static final int SUCCESS_STATUS = 1;
 
 	public static void checkAuth() throws ServiceException {
-		CrmServiceDTO crmServiceDto =new CrmServiceDTO();
+		CrmServiceDto crmServiceDto =new CrmServiceDto();
 		crmServiceDto.check();
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 

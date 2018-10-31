@@ -19,11 +19,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.blockchain.dto.BlockChainBowerDto;
-import com.blockchain.dto.ConfigPropertiesFormDTO;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
-import com.blockchain.service.ConfigPropertiesService;
+import com.blockchain.service.tencent.ConfigPropertiesService;
+import com.blockchain.service.tencent.dto.BlockChainBowerDto;
+import com.blockchain.service.tencent.dto.ConfigPropertiesFormDto;
+import com.blockchain.service.tencent.vo.PhpSystemJsonContentVo;
 import com.blockchain.util.ConfigUtils;
 import com.blockchain.util.CrmUtils;
 import com.blockchain.util.ResponseUtil;
@@ -31,7 +32,6 @@ import com.blockchain.util.ResultUtil;
 import com.blockchain.util.TencentChainUtils;
 import com.blockchain.util.TrustSDKUtil;
 import com.blockchain.util.ValidatorUtil;
-import com.blockchain.vo.PhpSystemJsonContentVO;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.tencent.trustsql.sdk.util.HttpClientUtil;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -49,8 +49,8 @@ public class ConfigController {
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	@ResponseBody
-	public PhpSystemJsonContentVO handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-		PhpSystemJsonContentVO response = new PhpSystemJsonContentVO();
+	public PhpSystemJsonContentVo handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+		PhpSystemJsonContentVo response = new PhpSystemJsonContentVo();
 		response.setData("");
 		response.setRetcode(StatusCode.PARAM_ERROR);
 		response.setRetmsg("json格式错误，请检查是否为合法json");
@@ -65,46 +65,46 @@ public class ConfigController {
 			@ApiResponse(code = StatusCode.TIME_OUT, message = StatusCode.TIME_OUT_MESSAGE, response = StatusCode.class),
 
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	@ApiOperation(value = "生成/修改 公共配置信息", httpMethod = "POST", response = ConfigPropertiesFormDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
-	public void add(@Valid @RequestBody ConfigPropertiesFormDTO configPropertiesFormDTO, BindingResult bindingResult) throws TrustSDKException {
+	@ApiOperation(value = "生成/修改 公共配置信息", httpMethod = "POST", response = ConfigPropertiesFormDto.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	public void add(@Valid @RequestBody ConfigPropertiesFormDto configPropertiesFormDto, BindingResult bindingResult) throws TrustSDKException {
 
-		PhpSystemJsonContentVO PhpSystemJsonContentVO = new PhpSystemJsonContentVO();
+		PhpSystemJsonContentVo PhpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 
 		try {
 			ValidatorUtil.validate(bindingResult);
 			CrmUtils.checkAuth();
-			TrustSDKUtil.checkPariKeyMatch(configPropertiesFormDTO.getCreateUserPublicKey(), configPropertiesFormDTO.getCreateUserPrivateKey());
-			configPropertiesService.add(configPropertiesFormDTO);
+			TrustSDKUtil.checkPariKeyMatch(configPropertiesFormDto.getCreateUserPublicKey(), configPropertiesFormDto.getCreateUserPrivateKey());
+			configPropertiesService.add(configPropertiesFormDto);
 		} catch (ServiceException e) {
 			logger.error("错误信息", e);
-			PhpSystemJsonContentVO = PhpSystemJsonContentVO.setKnownError(e);
-			jsonString = JSON.toJSONString(PhpSystemJsonContentVO);
+			PhpSystemJsonContentVo = PhpSystemJsonContentVo.setKnownError(e);
+			jsonString = JSON.toJSONString(PhpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
 			logger.error("错误信息", e);
-			PhpSystemJsonContentVO.setRetmsg(e.getMessage());
-			PhpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
-			jsonString = JSON.toJSONString(PhpSystemJsonContentVO);
+			PhpSystemJsonContentVo.setRetmsg(e.getMessage());
+			PhpSystemJsonContentVo.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
+			jsonString = JSON.toJSONString(PhpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
-		configPropertiesFormDTO = configPropertiesService.get();
-		PhpSystemJsonContentVO.setData(configPropertiesFormDTO);
-		jsonString = JSON.toJSONString(PhpSystemJsonContentVO, SerializerFeature.WriteMapNullValue);
+		configPropertiesFormDto = configPropertiesService.get();
+		PhpSystemJsonContentVo.setData(configPropertiesFormDto);
+		jsonString = JSON.toJSONString(PhpSystemJsonContentVo, SerializerFeature.WriteMapNullValue);
 		ResponseUtil.echo(response, jsonString);
 		return;
 	}
 
 	@ResponseBody
 	@RequestMapping(value = { "/get" }, method = RequestMethod.POST)
-	@ApiOperation(value = "获取公共配置信息", httpMethod = "POST", response = ConfigPropertiesFormDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "获取公共配置信息", httpMethod = "POST", response = ConfigPropertiesFormDto.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	public void get() {
-		PhpSystemJsonContentVO PhpSystemJsonContentVO = new PhpSystemJsonContentVO();
-		ConfigPropertiesFormDTO configPropertiesFormDTO = configPropertiesService.get();
-		PhpSystemJsonContentVO.setData(configPropertiesFormDTO);
-		String jsonString = JSON.toJSONString(PhpSystemJsonContentVO, SerializerFeature.WriteMapNullValue);
+		PhpSystemJsonContentVo PhpSystemJsonContentVo = new PhpSystemJsonContentVo();
+		ConfigPropertiesFormDto configPropertiesFormDto = configPropertiesService.get();
+		PhpSystemJsonContentVo.setData(configPropertiesFormDto);
+		String jsonString = JSON.toJSONString(PhpSystemJsonContentVo, SerializerFeature.WriteMapNullValue);
 		ResponseUtil.echo(response, jsonString);
 		return;
 
@@ -112,9 +112,9 @@ public class ConfigController {
 
 	@ResponseBody
 	@RequestMapping(value = { "/getChainInfo" }, method = RequestMethod.POST)
-	@ApiOperation(value = "获取公共配置信息", httpMethod = "POST", response = ConfigPropertiesFormDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "获取公共配置信息", httpMethod = "POST", response = ConfigPropertiesFormDto.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	public void getBlockChainInfo() {
-		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
+		PhpSystemJsonContentVo phpSystemJsonContentVo = new PhpSystemJsonContentVo();
 		String jsonString = "";
 		String applyUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/trustsql_baas_getchainbynode.cgi";
 		try {
@@ -126,20 +126,20 @@ public class ConfigController {
 			// JSONUtils.prettyPrint(applyResultString);
 			LinkedList<BlockChainBowerDto> blockChainBowerDto = TencentChainUtils.genereateChainByNodeResult(applyResultString);
 
-			phpSystemJsonContentVO.setData(blockChainBowerDto);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
+			phpSystemJsonContentVo.setData(blockChainBowerDto);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 		} catch (ServiceException e) {
 		
-			phpSystemJsonContentVO = phpSystemJsonContentVO.setKnownError(e);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
+			phpSystemJsonContentVo = phpSystemJsonContentVo.setKnownError(e);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		} catch (Exception e) {
 			logger.error("错误信息", e);
-			phpSystemJsonContentVO.setRetmsg(e.getMessage());
-			phpSystemJsonContentVO.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
-			jsonString = JSON.toJSONString(phpSystemJsonContentVO);
+			phpSystemJsonContentVo.setRetmsg(e.getMessage());
+			phpSystemJsonContentVo.setRetcode(StatusCode.SYSTEM_UNKOWN_ERROR);
+			jsonString = JSON.toJSONString(phpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 			return;
 		}
@@ -148,7 +148,7 @@ public class ConfigController {
 
 	@ResponseBody
 	@RequestMapping(value = { "/getNodeInfo" }, method = RequestMethod.POST)
-	@ApiOperation(value = "获取节点信息", httpMethod = "POST", response = ConfigPropertiesFormDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "获取节点信息", httpMethod = "POST", response = ConfigPropertiesFormDto.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	public void getNodeInfo() {
 		String applyUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/nbaas_getchaininfo.cgi";
 		try {
@@ -156,9 +156,9 @@ public class ConfigController {
 
 			String applyResultString = HttpClientUtil.post(applyUrl, applyString);
 
-			PhpSystemJsonContentVO PhpSystemJsonContentVO = new PhpSystemJsonContentVO();
-			PhpSystemJsonContentVO.setData(applyResultString);
-			String jsonString = JSON.toJSONString(PhpSystemJsonContentVO);
+			PhpSystemJsonContentVo PhpSystemJsonContentVo = new PhpSystemJsonContentVo();
+			PhpSystemJsonContentVo.setData(applyResultString);
+			String jsonString = JSON.toJSONString(PhpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -168,16 +168,16 @@ public class ConfigController {
 
 	@ResponseBody
 	@RequestMapping(value = { "/getTransHeightInfo" }, method = RequestMethod.POST)
-	@ApiOperation(value = "获取交易高度信息", httpMethod = "POST", response = ConfigPropertiesFormDTO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "获取交易高度信息", httpMethod = "POST", response = ConfigPropertiesFormDto.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	public void getTransHeightInfo() {
 		String applyUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/nbaas_gettxbyheight.cgi";
 		try {
 			String applyString = TencentChainUtils.generateGetTxByHeight();
 
 			String applyResultString = HttpClientUtil.post(applyUrl, applyString);
-			PhpSystemJsonContentVO PhpSystemJsonContentVO = new PhpSystemJsonContentVO();
-			PhpSystemJsonContentVO.setData(applyResultString);
-			String jsonString = JSON.toJSONString(PhpSystemJsonContentVO);
+			PhpSystemJsonContentVo PhpSystemJsonContentVo = new PhpSystemJsonContentVo();
+			PhpSystemJsonContentVo.setData(applyResultString);
+			String jsonString = JSON.toJSONString(PhpSystemJsonContentVo);
 			ResponseUtil.echo(response, jsonString);
 
 		} catch (Exception e) {
