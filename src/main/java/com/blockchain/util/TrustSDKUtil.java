@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
+import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.tencent.trustsql.sdk.TrustSDK;
-import com.tencent.trustsql.sdk.exception.TrustSDKException;
 
 public class TrustSDKUtil {
 

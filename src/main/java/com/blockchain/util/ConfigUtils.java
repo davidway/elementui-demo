@@ -1,7 +1,6 @@
 package com.blockchain.util;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,8 +15,8 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
+import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.tencent.trustsql.sdk.TrustSDK;
-import com.tencent.trustsql.sdk.exception.TrustSDKException;
 
 public class ConfigUtils {
 	static Logger logger = Logger.getLogger(ConfigUtils.class);
