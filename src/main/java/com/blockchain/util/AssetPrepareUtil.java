@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.blockchain.service.tencent.dto.AssetIssueDto;
+import com.blockchain.service.tencent.dto.AssetIssueSubmitFormDto;
 import com.blockchain.service.tencent.dto.AssetSettleDto;
 import com.blockchain.service.tencent.dto.AssetSettleFormDto;
 import com.blockchain.service.tencent.dto.AssetSettleSubmitFormDto;
@@ -15,9 +16,9 @@ import com.blockchain.service.tencent.dto.AssetTransferSubmitFormDto;
 @Component
 public class AssetPrepareUtil {
 
-	public AssetSubmitFormDto prepareAssetSubmitForm(String applyResultString) {
+	public AssetIssueSubmitFormDto prepareAssetSubmitForm(String applyResultString) {
 		JSONObject o = JSON.parseObject(applyResultString);
-		AssetSubmitFormDto assetSubmitFormDto = new AssetSubmitFormDto();
+		AssetIssueSubmitFormDto assetSubmitFormDto = new AssetIssueSubmitFormDto();
 		String signStrList = o.getString("sign_str_list");
 		assetSubmitFormDto.setSignStr(signStrList);
 		String transactionId = o.getString("transaction_id");
@@ -100,7 +101,7 @@ public class AssetPrepareUtil {
 		 return assetSettleDto;
 	}
 
-	public AssetIssueDto generateAssetIssueDto(AssetSubmitFormDto assetSubmitFormDto, String submitResultString) {
+	public AssetIssueDto generateAssetIssueDto(AssetIssueSubmitFormDto assetSubmitFormDto, String submitResultString) {
 		AssetIssueDto assetIssueDto = new AssetIssueDto();
 		
 		String transactionId = assetSubmitFormDto.getTransactionId();

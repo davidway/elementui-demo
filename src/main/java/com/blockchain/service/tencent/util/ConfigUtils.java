@@ -1,6 +1,7 @@
-package com.blockchain.util;
+package com.blockchain.service.tencent.util;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,10 +14,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 
+import com.blockchain.dto.BlockChainType;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
+import com.blockchain.service.tencent.trustsql.sdk.TrustSDK;
 import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
-import com.tencent.trustsql.sdk.TrustSDK;
+import com.blockchain.validator.BlockChainValidatorContext;
+import com.blockchain.validator.factory.ValidatorFactory;
+
 
 public class ConfigUtils {
 	static Logger logger = Logger.getLogger(ConfigUtils.class);
@@ -30,7 +35,6 @@ public class ConfigUtils {
 	private String coin_privateKey;
 	private String serverId;
 	private String serverCode;
-	private String host;
 	private Integer chainType;
 
 	public String getCreateUserPrivateKey() {
@@ -117,50 +121,25 @@ public class ConfigUtils {
 		setProperties("coin_privateKey", this.coin_privateKey);
 	}
 
+	/**
+	 *  check方法使用了工厂模式 和 算是小策略模式
+	 * @throws ServiceException
+	 */
 	public static void check() throws ServiceException {
 		ConfigUtils configUtils = new ConfigUtils();
-		String chainId = configUtils.getChainId();
-		// String coin_privateKey = configUtils.getCoin_privateKey();
-		String createUserPublicKey = configUtils.getCreateUserPublicKey();
-		String createUserPrivateKey = configUtils.getCreateUserPrivateKey();
-		// String ledgerId = configUtils.getLedgerId();
-		String nodeId = configUtils.getNodeId();
-		String mchId = configUtils.getMchId();
-		StringBuffer lessName = new StringBuffer();
 
-		if (StringUtils.isBlank(chainId)) {
-			lessName.append("配置文件中的联盟链id不能为空，");
-		}
-		/*
-		 * if (StringUtils.isBlank(coin_privateKey)) {
-		 * lessName.append("配置文件中的账本id尚未被解析，"); }
-		 */
-		if (StringUtils.isBlank(createUserPrivateKey)) {
-			lessName.append("配置文件中的用户私钥不能为空，");
-		}
-		if (StringUtils.isBlank(createUserPublicKey)) {
-			lessName.append("配置文件中的用户公钥不能为空，");
-		}
-		/*
-		 * if (StringUtils.isBlank(ledgerId)) {
-		 * lessName.append("配置文件中的账本id不能为空，"); }
-		 */
-		if (StringUtils.isBlank(mchId)) {
-			lessName.append("配置文件中的机构id不能为空，");
-		}
-		if (StringUtils.isBlank(nodeId)) {
-			lessName.append("配置文件中的节点id不能为空，");
-		}
-		if (StringUtils.isNotBlank(lessName.toString())) {
+		Integer chainType = configUtils.getChainType();
 
+		// 类型选择必须要填写
+		if (chainType == null) {
 			throw new ServiceException().errorCode(StatusCode.CONFIG_NOT_SET).errorMessage(StatusCode.CONFIG_NOT_SET_MESSAGE);
 		}
-		try {
-			TrustSDK.checkPairKey(createUserPrivateKey, createUserPublicKey);
-		} catch (TrustSDKException e) {
+		BlockChainValidatorContext validateorContext = new BlockChainValidatorContext();
+		ValidatorFactory validatorFactory = new ValidatorFactory();
+		validatorFactory.setProductByType(chainType);
+		validateorContext.setFactory(validatorFactory);
+		validateorContext.check();
 
-			throw new ServiceException().errorCode(StatusCode.PAIR_KEY_ERROR).errorMessage(StatusCode.PAIR_KEY_ERROR_MESSAGE);
-		}
 	}
 
 	private void setProperties(String key, String name) {
@@ -268,26 +247,20 @@ public class ConfigUtils {
 		return this.serverId;
 	}
 
-	public void setHost(String host) {
-		this.host = host;
-
-		setProperties("host", host);
-
-	}
-
-	public String getHost() {
-		this.host = getProperties("host");
-
-		return this.host;
-	}
-
 	public Integer getChainType() {
-		return chainType;
+		String chainType = getProperties("chainType");
+		if (StringUtils.isNotBlank(chainType)) {
+			return Integer.valueOf(chainType);
+		} else {
+			return null;
+		}
+
 	}
 
 	public void setChainType(Integer chainType) {
 		this.chainType = chainType;
+		setProperties("chainType", String.valueOf(chainType));
+
 	}
 
-	
 }

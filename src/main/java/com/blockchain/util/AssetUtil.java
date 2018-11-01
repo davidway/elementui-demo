@@ -11,12 +11,13 @@ import org.apache.log4j.Logger;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.blockchain.service.tencent.dto.AssetIssueFormDto;
+import com.blockchain.service.tencent.dto.AssetIssueSubmitFormDto;
 import com.blockchain.service.tencent.dto.AssetSettleFormDto;
 import com.blockchain.service.tencent.dto.AssetSettleSubmitFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferFormDto;
 import com.blockchain.service.tencent.dto.AssetTransferSubmitFormDto;
+import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.tencent.trustsql.sdk.TrustSDK;
-import com.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.tencent.trustsql.sdk.util.SignStrUtil;
 
 public class AssetUtil {
@@ -66,7 +67,7 @@ public class AssetUtil {
 		return postJson.toJSONString();
 	}
 
-	public String generateIssueSubmitParam(AssetSubmitFormDto assetSubmitFormDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
+	public String generateIssueSubmitParam(AssetIssueSubmitFormDto assetSubmitFormDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
 		ConfigUtils configUtils = new ConfigUtils();
 		String mchId = configUtils.getMchId();
 		String prvKey = configUtils.getCreateUserPrivateKey();
