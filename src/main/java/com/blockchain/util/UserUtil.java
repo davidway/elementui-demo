@@ -148,7 +148,7 @@ public class UserUtil {
 		if (StringUtils.isNotBlank(assetForm.getAssetId())) {
 			paramMap.put("asset_id", assetForm.getAssetId());
 		}
-		int[] stateArray = assetForm.getState();
+		Integer[] stateArray = assetForm.getState();
 		ArrayList<Integer> array = new ArrayList<Integer>();
 		for (int i : stateArray) {
 

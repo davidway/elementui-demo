@@ -119,11 +119,6 @@ public class AssetIssueFormDto {
 		this.fullName = fullName;
 	}
 
-	@Override
-	public String toString() {
-		return "AssetIssueFormDto [sourceId=" + sourceId + ", content=" + content + ", amount=" + amount + ", createUserAccountAddress=" + createUserAccountAddress + ", unit=" + unit + ", fullName="
-				+ fullName + "]";
-	}
 
 
 
@@ -165,6 +160,34 @@ public class AssetIssueFormDto {
 
 	public void setGasLimit(String gasLimit) {
 		this.gasLimit = gasLimit;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getUserPublicKey() {
+		return userPublicKey;
+	}
+
+	public void setUserPublicKey(String userPublicKey) {
+		this.userPublicKey = userPublicKey;
+	}
+
+	@Override
+	public String toString() {
+		return "AssetIssueFormDto [sourceId=" + sourceId + ", content="
+				+ content + ", amount=" + amount
+				+ ", createUserAccountAddress=" + createUserAccountAddress
+				+ ", unit=" + unit + ", userId=" + userId + ", userPublicKey="
+				+ userPublicKey + ", userPrivateKey=" + userPrivateKey
+				+ ", keyStore=" + keyStore + ", password=" + password
+				+ ", fullName=" + fullName + ", gasPrice=" + gasPrice
+				+ ", gasLimit=" + gasLimit + "]";
 	}
 
 
