@@ -1,0 +1,13 @@
+package com.blockchain.service;
+
+import com.blockchain.VO.ConfigPropertiesForm;
+import com.blockchain.exception.BodyException;
+import com.tencent.trustsql.sdk.exception.TrustSDKException;
+
+public interface ConfigPropertiesService {
+
+	void add(ConfigPropertiesForm configPropertiesForm) throws TrustSDKException, BodyException;
+
+	ConfigPropertiesForm get();
+
+}

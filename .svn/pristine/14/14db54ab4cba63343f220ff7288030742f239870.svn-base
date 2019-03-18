@@ -1,0 +1,205 @@
+package com.blockchain.service.impl;
+
+import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import sun.util.logging.resources.logging;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.blockchain.DTO.Asset;
+import com.blockchain.DTO.AssetIssue;
+import com.blockchain.DTO.AssetSettle;
+import com.blockchain.DTO.AssetTransfer;
+import com.blockchain.DTO.TransInfo;
+import com.blockchain.VO.AccountQueryForm;
+import com.blockchain.VO.AssetForm;
+import com.blockchain.VO.AssetSettleForm;
+import com.blockchain.VO.AssetSettleSubmitForm;
+import com.blockchain.VO.AssetSubmitForm;
+import com.blockchain.VO.AssetTransQueryForm;
+import com.blockchain.VO.AssetTransferForm;
+import com.blockchain.VO.AssetTransferSubmitForm;
+import com.blockchain.exception.ServiceException;
+import com.blockchain.exception.ErrorMessage;
+import com.blockchain.exception.StatusCode;
+import com.blockchain.service.AssetService;
+import com.blockchain.util.AssetPrepareUtil;
+import com.blockchain.util.AssetUtil;
+import com.blockchain.util.ResultUtil;
+import com.tencent.trustsql.sdk.exception.TrustSDKException;
+import com.tencent.trustsql.sdk.util.HttpClientUtil;
+
+@Service
+public class AssetServiceImpl implements AssetService {
+	public static final Logger issueLogger = LoggerFactory.getLogger("issueLogger");
+	public static final Logger transferLogger = LoggerFactory.getLogger("transferLogger");
+	public static final Logger settleLogger = LoggerFactory.getLogger("settleLogger");
+	
+	@Resource
+	AssetUtil assetUtil;
+	@Resource
+	AssetPrepareUtil assetPrepareUtil;
+	
+	@Override
+	public AssetIssue issue(AssetForm assetForm) throws Exception {
+		issueLogger.info("issue调试");
+		issueLogger.info("传入的参数{}" , assetForm);
+		String applyString = assetUtil.generateIssueApplyParam(assetForm);
+
+		issueLogger.info("调用【发行申请】前的参数:{}" , applyString);
+		String applyUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_issue_apply_v1.cgi";
+		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
+		issueLogger.info("调用【发行申请】后的参数{}" , applyResultString);
+		ResultUtil.checkResultIfSuccess("资产申请接口", applyResultString);
+
+		AssetSubmitForm assetSubmitForm = assetPrepareUtil.prepareAssetSubmitForm(applyResultString);
+		String submitString = assetUtil.generateIssueSubmitParam(assetSubmitForm);
+
+		issueLogger.info("调用【发行提交】后的参数" + submitString);
+		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_issue_submit_v1.cgi";
+		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
+
+		ResultUtil.checkResultIfSuccessSubmit("资产提交接口", JSON.toJSONString(assetSubmitForm), submitResultString);
+		issueLogger.debug("issue调试结束");
+
+		AssetIssue assetIssue = new AssetIssue();
+		assetIssue = assetPrepareUtil.generateAssetIssueDto(assetSubmitForm, submitResultString);
+		return assetIssue;
+	}
+
+
+	@Override
+	public AssetTransfer transfer(AssetTransferForm assetTransferForm) throws TrustSDKException, Exception {
+
+		transferLogger.info("transfer调试开始");
+		String applyString = assetUtil.generateTransferApplyParam(assetTransferForm);
+		transferLogger.info("调用【转账申请前】的参数" + applyString);
+		String applyUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_transfer_apply_v1.cgi";
+		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
+		transferLogger.info("调用【转账申请后】的参数" + applyString);
+
+		ResultUtil.checkResultIfSuccess("资产转让申请接口", applyResultString);
+
+		AssetTransferSubmitForm asseTransfertSubmitForm = assetPrepareUtil.perpareTransferSubmitForm(assetTransferForm, applyResultString);
+		String submitString = assetUtil.generateTransferSubmitParam(asseTransfertSubmitForm);
+		transferLogger.info("调用【转账提交前】的参数" + submitString);
+		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_transfer_submit_v1.cgi";
+		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
+		transferLogger.info("调用【转账提交后】的参数" + submitResultString);
+
+		ResultUtil.checkResultIfSuccessSubmit("资产转让提交接口", JSONObject.toJSONString(asseTransfertSubmitForm), submitResultString);
+
+		transferLogger.info("issue调试结束");
+
+		AssetTransfer assetTransfer = new AssetTransfer();
+		assetTransfer = assetPrepareUtil.generateAssetTransferDTO(asseTransfertSubmitForm, submitResultString);
+		return assetTransfer;
+	}
+
+	@Override
+	public AssetSettle settle(AssetSettleForm assetSettleForm) throws UnsupportedEncodingException, TrustSDKException, Exception {
+		settleLogger.info("settle调试开始");
+		String applyString = assetUtil.generateSettleApplyParam(assetSettleForm);
+
+		settleLogger.info("调用【兑换申请前】" + applyString);
+		String applyUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_settle_apply_v1.cgi";
+		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
+		settleLogger.info("调用【兑换申请后】" + applyResultString);
+
+		ResultUtil.checkResultIfSuccess("资产兑换申请接口", applyResultString);
+
+		AssetSettleSubmitForm assetSettleSubmitForm = assetPrepareUtil.perpareTransferSubmitForm(assetSettleForm, applyResultString);
+		String submitString = assetUtil.generateSettleSubmitParam(assetSettleSubmitForm);
+
+		settleLogger.info("【兑换【调用提交前】" + submitString);
+		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_settle_submit_v1.cgi";
+		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
+		settleLogger.info("【兑换【调用提交】后" + submitResultString);
+
+		ResultUtil.checkResultIfSuccessSubmit("资产提交接口", JSON.toJSONString(assetSettleSubmitForm), submitResultString);
+		settleLogger.info("settle调试结束");
+
+		AssetSettle assetSettle = new AssetSettle();
+		assetSettle = assetPrepareUtil.generateAssetSettleDTO(assetSettleSubmitForm, submitResultString);
+		return assetSettle;
+	}
+
+	
+
+
+
+
+
+	@Override
+	public AssetIssue issueSubmit(AssetSubmitForm assetSubmitForm) throws UnsupportedEncodingException, TrustSDKException, Exception {
+		issueLogger.debug("传入的参数" + assetSubmitForm);
+		String submitString = assetUtil.generateIssueSubmitParam(assetSubmitForm);
+		issueLogger.debug("调用【资产发行前】" + submitString);
+
+		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_issue_submit_v1.cgi";
+		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
+		ResultUtil.checkResultIfSuccessSubmit("资产提交接口", submitString,submitResultString);
+		issueLogger.debug("调用【资产只发行后】" + submitResultString);
+		issueLogger.debug("issue调试结束");
+
+	
+		AssetIssue assetIssue = new AssetIssue();
+		assetIssue = assetPrepareUtil.generateAssetIssueDto(assetSubmitForm, submitResultString);
+		return assetIssue;
+	}
+
+	@Override
+	public AssetTransfer transSubmit(AssetTransferSubmitForm asseTransfertSubmitForm) throws TrustSDKException, Exception {
+
+	
+		String submitString = assetUtil.generateTransferSubmitParam(asseTransfertSubmitForm);
+
+		transferLogger.info("调用【转账只提交前】" + submitString);
+		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_transfer_submit_v1.cgi";
+		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
+		transferLogger.info("调用【转账只提交后】" + submitResultString);
+
+		ResultUtil.checkResultIfSuccessSubmit("资产转让提交接口", submitString, submitResultString);
+		System.out.println(submitResultString);
+		transferLogger.info("issue调试结束");
+
+		AssetTransfer assetTransfer = new AssetTransfer();
+		assetTransfer = assetPrepareUtil.generateAssetTransferDTO(asseTransfertSubmitForm, submitResultString);
+		return assetTransfer;
+	}
+
+
+
+	@Override
+	public AssetSettle settleSubmit(AssetSettleSubmitForm assetSettleSubmitForm) throws Exception {
+
+		String submitString = assetUtil.generateSettleSubmitParam(assetSettleSubmitForm);
+		settleLogger.info("调用【兑换只提交前】" + submitString);
+		String submitUrl = "https://baas.trustsql.qq.com/cgi-bin/v1.0/dam_asset_settle_submit_v1.cgi";
+
+		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
+		settleLogger.info("调用【兑换只提交后】" + submitResultString);
+		ResultUtil.checkResultIfSuccess("资产提交接口", submitResultString);
+
+		settleLogger.info("settle调试结束");
+
+		AssetSettle assetSettle = new AssetSettle();
+		assetSettle = assetPrepareUtil.generateAssetSettleDTO(assetSettleSubmitForm, submitResultString);
+		return assetSettle;
+	}
+
+}

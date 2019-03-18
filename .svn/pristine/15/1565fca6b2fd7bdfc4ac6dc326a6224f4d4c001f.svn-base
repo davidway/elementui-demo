@@ -1,0 +1,21 @@
+package com.blockchain.service;
+
+import java.io.UnsupportedEncodingException;
+
+import com.blockchain.DTO.UserInfo;
+import com.blockchain.DTO.UserKey;
+import com.blockchain.VO.UserForm;
+import com.tencent.trustsql.sdk.exception.TrustSDKException;
+
+/**
+ * 操作用户消息的service
+ * 
+ * @author lupf
+ * 
+ */
+public interface UserService {
+
+	public UserKey generatePairKey(UserKey userKeyModel) throws TrustSDKException, UnsupportedEncodingException;
+
+	public UserInfo add(UserForm userForm) throws UnsupportedEncodingException, TrustSDKException, Exception;
+}

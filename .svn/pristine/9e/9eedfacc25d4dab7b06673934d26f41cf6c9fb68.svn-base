@@ -1,0 +1,47 @@
+package com.blockchain.DTO;
+
+
+import org.apache.commons.codec.binary.Base64;
+
+import org.apache.commons.codec.digest.DigestUtils;
+
+
+
+
+public class BaseParam {
+	public static String mchId = "gb433b4b8de489629";
+	public static String seqNo = "QHtMEDMBVN0nnsSRuUY" + System.currentTimeMillis();
+	public static String create_user_publicKey = "Ami8PGxcSrCdbQDQj1v6Sw7T25r5Czf0LUb3vVDeFp3X";
+	public static String create_user_privateKey = "ZNshg6zyyRPEuGbEeXtvqka2ieN/paEwu1+R+YWAfDA=";
+	public static String afterTrustSql = "MEQCIHM6Pid9bqzPMuSxDSjCroZXiBQ7xXCVYD6I2nYDtgaFAiAVdwKbehilwpyJiKMxq0ZcYCRQbe2VZUkgfo5K9894RQ==";
+	public static String radomUserId = String.valueOf(Math.random());
+	
+	public static String user_public_key = "AyqX4w36oz750DHbzO1Cxldyt5tbW9G+xte+DmVa35Cg";
+	public static String user_private_key = "t3rLRIAGF85q/RMCz5HY6F5dOUq7rc+BZ69QEiLUVWw=";
+	public static String user_id="fly1";
+	public static String user_account_address="1LbJjxYAK2ceZksgKxepzCA9skyHuZ5BvE";
+	
+	public static String second_user_id="fly2";
+	public static String second_user_public_key = "AkDqGjjPNDEWiC2qV9IKL1YOJ2tlgmTqHXY70MOHQ8vq";
+	public static String second_user_private_key = "rIdTYTWC5WV98kY/HuianyrWmuYH4bqRiuzwnvek2fs=";
+	public static String second_user_account_address = "1GDfstzv3D4uiFcYkFWmfuAjrCo7MJN1zL";
+	
+	
+	public static String create_user_account_address="19gnKJ5WKxJ6ifbzsAX37gRtB4nxFa5sY5";
+	public static String version="1.0";
+	public static String signType="ECDSA";
+	public static String nodeId="ndqszcawe6aw2abkiv";
+	public static String chainId="ch1dcca23b3885045";
+	public static String leadgerId="ldbcd23db6782e342";
+	public static String  coin_privateKey = Base64.encodeBase64String(DigestUtils.sha256(leadgerId));
+	/**
+	 * 发行币种的银行的账户
+	 */
+	public static String coin_Account="12gRQNAefaADjQeEfw9gHhpqXJG47F9y1C";
+	/**
+	 * coinId
+	 * */
+	
+	public static String user_coin_assetId="27tJTnoxAjGRLrVh5U5gvZSHZDLTgPkidaSCneFuaDE2YMV";
+
+}

@@ -1,0 +1,9 @@
+package com.blockchain.exception;
+
+public class ThreadException extends Exception {
+
+	public ThreadException(String s) {
+		super(s);
+	}
+
+}

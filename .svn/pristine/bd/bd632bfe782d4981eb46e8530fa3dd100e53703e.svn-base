@@ -1,0 +1,55 @@
+package com.blockchain.util;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+
+
+
+
+import com.alibaba.fastjson.JSONObject;
+import com.blockchain.exception.BodyException;
+import com.blockchain.exception.ErrorMessage;
+import com.blockchain.exception.StatusCode;
+import com.blockchain.exception.SubmitException;
+
+public class ResultUtil {
+	
+
+	private static final Logger log = Logger.getLogger(ResultUtil.class);
+	public static void checkResultIfSuccess(String pos ,String resultString) throws BodyException {
+		if (StringUtils.isBlank(resultString)){
+			String s = new ErrorMessage(StatusCode.SYSTEM_UNKOWN_ERROR,pos,"调用SDK网络失败，请检查网络").toJsonString();
+			throw new BodyException(s) ;
+		}
+		JSONObject jsonObject  = JSONObject.parseObject(resultString);
+		Integer retcode =jsonObject.getInteger("retcode" ) ;
+		if ( retcode!=0){
+			String s = new ErrorMessage( jsonObject.getInteger("retcode" ),"BAAS系统的"+pos,jsonObject.getString("retmsg") ).toJsonString();
+			throw new BodyException(s) ;
+		}else{
+			log.debug(pos+"成功！结果为"+resultString);
+		}
+	}
+
+	
+
+	public static void checkResultIfSuccessSubmit(String pos, String submitParamString, String submitResultString) throws SubmitException, BodyException {
+		if (StringUtils.isBlank(submitResultString)){
+			String s = new ErrorMessage(StatusCode.SYSTEM_UNKOWN_ERROR,pos,"调用SDK网络失败，请检查网络").toJsonString();
+			throw new BodyException(s) ;
+		}
+		
+		JSONObject submitResultObject = JSONObject.parseObject(submitResultString);
+		
+		
+		Integer retcode =submitResultObject.getInteger("retcode" ) ;
+		if ( retcode!=0){
+			String s = new ErrorMessage( submitResultObject.getInteger("retcode" ),"BAAS系统的"+pos,submitResultObject.getString("retmsg")+"，请保存【返回参数】调用【只提交】接口" ).toJsonString();
+			
+			throw new SubmitException(s,JSONObject.parse(submitParamString)) ;
+		}else{
+			log.debug(pos+"成功！结果为"+submitParamString);
+		}
+	}
+
+}

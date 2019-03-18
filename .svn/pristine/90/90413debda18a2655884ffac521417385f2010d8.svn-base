@@ -1,0 +1,34 @@
+package com.blockchain.DTO;
+
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
+@ApiModel(value="发行返回json",description="发行提交实体")
+public class AssetIssue {
+	@ApiModelProperty( value = "交易流水号Id")
+	private String transactionId;
+	@ApiModelProperty( value = "发行资产后的账户资产id")
+	private String assetId;
+
+	
+	
+	public String getTransactionId() {
+		return transactionId;
+	}
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
+	}
+
+	public String getAssetId() {
+		return assetId;
+	}
+	public void setAssetId(String assetId) {
+		this.assetId = assetId;
+	}
+	@Override
+	public String toString() {
+		return "AssetIssue [transactionId=" + transactionId + ", assetId=" + assetId + "]";
+	}
+	
+	
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mappings PUBLIC "-//DOZER//DTD MAPPINGS//EN"
+"http://dozer.sourceforge.net/dtd/dozerbeanmapping.dtd">
+<mappings>
+
+	<mapping>
+		<class-a>com.blockchain.bean.Book</class-a>
+		<class-b>com.blockchain.bean.CookBook</class-b>
+		<field>
+			<a>name</a>
+			<b>bookName</b>
+		</field>
+		<field>
+			<a>author</a>
+			<b>author</b>
+		</field>
+	</mapping>
+
+	
+</mappings>

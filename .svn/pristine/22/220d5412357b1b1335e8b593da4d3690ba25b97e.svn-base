@@ -1,0 +1,29 @@
+package com.blockchain.DTO;
+
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description="兑换使用实体类",value="兑换返回json")
+public class AssetSettle {
+	@ApiModelProperty(   value = "交易号", dataType = "String")
+	private String transactionId;
+	@ApiModelProperty(   value = "兑换后的资产id列表", dataType = "String")
+	private String srcAssetId;
+	public String getTransactionId() {
+		return transactionId;
+	}
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
+	}
+	public String getSrcAssetId() {
+		return srcAssetId;
+	}
+	public void setSrcAssetId(String srcAssetId) {
+		this.srcAssetId = srcAssetId;
+	}
+	@Override
+	public String toString() {
+		return "AssetSettle [transactionId=" + transactionId + ", srcAssetId=" + srcAssetId + "]";
+	}
+	
+}

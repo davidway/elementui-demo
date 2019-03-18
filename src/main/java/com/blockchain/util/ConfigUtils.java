@@ -1,6 +1,7 @@
 package com.blockchain.util;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,8 +16,8 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
-import com.blockchain.service.tencent.trustsql.sdk.exception.TrustSDKException;
 import com.tencent.trustsql.sdk.TrustSDK;
+import com.tencent.trustsql.sdk.exception.TrustSDKException;
 
 public class ConfigUtils {
 	static Logger logger = Logger.getLogger(ConfigUtils.class);
@@ -31,7 +32,6 @@ public class ConfigUtils {
 	private String serverId;
 	private String serverCode;
 	private String host;
-	private Integer chainType;
 
 	public String getCreateUserPrivateKey() {
 		this.createUserPrivateKey = getProperties("createUserPrivateKey");
@@ -52,7 +52,7 @@ public class ConfigUtils {
 	}
 
 	public void setCreateUserPublicKey(String createUserPublicKey) {
-		this.createUserPrivateKey = this.createUserPrivateKey;
+		this.createUserPublicKey = createUserPublicKey;
 
 		setProperties("createUserPublicKey", createUserPublicKey);
 	}
@@ -236,38 +236,6 @@ public class ConfigUtils {
 		return value;
 	}
 
-	public String getServerCode() {
-		this.serverCode = getProperties("serverCode");
-
-		return this.serverCode;
-	}
-
-	public String getServerId() {
-		this.serverId = getProperties("serverId");
-
-		return this.serverId;
-	}
-
-	public void setServerCode(String serverCode) {
-		this.serverCode = serverCode;
-
-		setProperties("serverCode", serverCode);
-
-	}
-
-	public void setServerId(String serverId) {
-		this.serverId = serverId;
-
-		setProperties("serverId", serverId);
-
-	}
-
-	public String getCrmBaseUrls() {
-		this.serverId = getProperties("crmBaseUrls");
-
-		return this.serverId;
-	}
-
 	public void setHost(String host) {
 		this.host = host;
 
@@ -281,13 +249,4 @@ public class ConfigUtils {
 		return this.host;
 	}
 
-	public Integer getChainType() {
-		return chainType;
-	}
-
-	public void setChainType(Integer chainType) {
-		this.chainType = chainType;
-	}
-
-	
 }
