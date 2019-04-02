@@ -1,7 +1,9 @@
 package com.blockchain.dto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -12,7 +14,7 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 
 
 @ApiModel(value="交易查询表单")
-public class AssetTransQueryFormDTO {
+public class AssetTransQueryFormDTO  extends BaseDto{
 	@ApiModelProperty(value="转入账户",required=false)
 	private String dstAccount;
 	@ApiModelProperty(value="转出账户",required=false)
@@ -33,14 +35,13 @@ public class AssetTransQueryFormDTO {
 	private Integer pageNo;
 	@ApiModelProperty(value="区块高度范围",required=true)
 	
-	private ArrayList<Integer> blockHeightRange;
+	private ArrayList<Long> blockHeightRange;
 	@ApiModelProperty(value="状态交易状态【当前支持：2，本地已申请，4，已提交；（转让签收场景下：6，已签收；7，已拒签；8，已撤销）】",required=true)
-	
-	private Integer state;
-	
+	private Integer[] state;
+	@ApiModelProperty(value="交易类型【当前支持: 1，发行；2，转让；3，兑付；4，签收】",required=false)
+	private Integer[] transType ;
 	
 
-	
 	public String getSrcAccount() {
 		return srcAccount;
 	}
@@ -83,23 +84,30 @@ public class AssetTransQueryFormDTO {
 
 	
 	
-	public Integer getState() {
-		return state;
-	}
-	public void setState(Integer state) {
-		this.state = state;
-	}
-	public ArrayList<Integer> getBlockHeightRange() {
+	public ArrayList<Long> getBlockHeightRange() {
 		return blockHeightRange;
 	}
-	public void setBlockHeightRange(ArrayList<Integer> blockHeightRange) {
+	public void setBlockHeightRange(ArrayList<Long> blockHeightRange) {
 		this.blockHeightRange = blockHeightRange;
+	}
+	public Integer[] getState() {
+		return state;
+	}
+	public void setState(Integer[] state) {
+		this.state = state;
+	}
+	public Integer[] getTransType() {
+		return transType;
+	}
+	public void setTransType(Integer[] transType) {
+		this.transType = transType;
 	}
 	@Override
 	public String toString() {
 		return "AssetTransQueryFormDTO [dstAccount=" + dstAccount + ", srcAccount=" + srcAccount + ", transactionId=" + transactionId + ", transHash=" + transHash + ", pageLimit=" + pageLimit
-				+ ", pageNo=" + pageNo + ", blockHeightRange=" + blockHeightRange + ", state=" + state + "]";
+				+ ", pageNo=" + pageNo + ", blockHeightRange=" + blockHeightRange + ", state=" + Arrays.toString(state) + ", transType=" + Arrays.toString(transType) + "]";
 	}
+	
 	
 	
 

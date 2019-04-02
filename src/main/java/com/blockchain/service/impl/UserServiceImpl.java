@@ -18,6 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.blockchain.dto.AccountQueryFormDTO;
 import com.blockchain.dto.AssetDTO;
 import com.blockchain.dto.AssetTransQueryFormDTO;
+import com.blockchain.dto.ConfigDto;
 import com.blockchain.dto.KeyInfoDTO;
 import com.blockchain.dto.TransInfoDto;
 import com.blockchain.dto.UserFormDTO;
@@ -71,8 +72,8 @@ public class UserServiceImpl implements UserService {
 
 		String accountQueryString = UserUtil.generateAccountQueryParam(assetFormVO);
 		logger.debug("调用【资产查询前{}", accountQueryString);
-		ConfigUtils configUtils = new ConfigUtils();
-		String url = configUtils.getHost() + "/asset_account_query";
+		ConfigDto configDto = assetFormVO.getConfigDto();
+		String url = configDto.getHost() + "/asset_account_query";
 		String accountQueryResult = HttpClientUtil.post(url, accountQueryString);
 		logger.debug("调用的IP接口是{}",url);
 		logger.debug("调用【资产查询后】{}" , accountQueryResult);

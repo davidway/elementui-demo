@@ -1,5 +1,7 @@
 package com.blockchain.dto;
 
+import javax.validation.Valid;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -8,7 +10,7 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "transHeightDto", value = "transHeightDto")
-public class TransHeightDto {
+public class TransHeightDto extends BaseDto{
 	@Min(value = -1, message = " beginHeight最小值不能小于0")
 	@NotNull(message = "beginHeight不能为空")
 	@ApiModelProperty(value = "开始高度", required = true)
@@ -19,10 +21,11 @@ public class TransHeightDto {
 	
 	@NotNull(message = "endHeight不能为空")
 	private Long endHeight;
-
 	
 
 
+
+	
 
 	public Long getBeginHeight() {
 		return beginHeight;

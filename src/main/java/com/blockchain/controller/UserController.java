@@ -121,7 +121,7 @@ public class UserController {
 		String jsonString = "";
 		
 		try {
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 			List<AssetDTO> assetList = userService.accountQuery(assetForm);
 			phpSystemJsonContentVO.setData(assetList);
@@ -158,8 +158,9 @@ public class UserController {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
+			
 			List<TransInfoDto> assetList = TencentChainUtils.transQuery(assetForm);
 			phpSystemJsonContentVO.setData(assetList);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO, SerializerFeature.WriteMapNullValue);
@@ -240,8 +241,9 @@ public class UserController {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
+			
 			UserInfoVO userInfoVO = userService.addUserHasBaseAccount(userFormDTO);
 			phpSystemJsonContentVO.setData(userInfoVO);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO, true);

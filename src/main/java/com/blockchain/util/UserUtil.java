@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.blockchain.dto.AccountQueryFormDTO;
 import com.blockchain.dto.AssetTransQueryFormDTO;
+import com.blockchain.dto.ConfigDto;
 import com.blockchain.dto.UserFormDTO;
 import com.blockchain.vo.UserInfoVO;
 import com.tencent.trustsql.sdk.TrustSDK;
@@ -29,12 +30,12 @@ public class UserUtil {
 	static boolean isTest = false;
 
 	public static String generateUserRequest(UserInfoVO userInfoVO, UserFormDTO userFormDTO) throws Exception {
-		ConfigUtils configUtils = new ConfigUtils();
-		String mchId = configUtils.getMchId();
-		String prvKey = configUtils.getCreateUserPrivateKey();
-		String createUserPublicKey = configUtils.getCreateUserPublicKey();
+		ConfigDto configDto = userFormDTO.getConfigDto();
+		String mchId = configDto.getMchId();
+		String prvKey = configDto.getCreateUserPrivateKey();
+		String createUserPublicKey = configDto.getCreateUserPublicKey();
 
-		String chainId = configUtils.getChainId();
+		String chainId = configDto.getChainId();
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 
 		PairKey pairKey = TrustSDK.generatePairKey(true);
@@ -48,7 +49,6 @@ public class UserUtil {
 		paramMap.put("mch_id", mchId);
 		paramMap.put("version", "1.0");
 
-	
 		paramMap.put("user_id", userInfoVO.getId());
 		paramMap.put("user_pub_key", publicKey);
 		paramMap.put("full_name", userInfoVO.getName());
@@ -89,10 +89,10 @@ public class UserUtil {
 		String prvKey = configUtils.getCreateUserPrivateKey();
 		// String prvKey = "gaxUIUD76vmEaJwxUZEcqoM0LDESKtpc3M4FDSlPSV0";
 		String signSrc = SignUtil.genSignSrc(req);
-	
+
 		String sign = TrustSDK.signString(prvKey, signSrc.getBytes("UTF-8"), false);
 		req.setSign(sign);
-	
+
 		return JSONObject.toJSONString(req);
 	}
 
@@ -130,11 +130,11 @@ public class UserUtil {
 	}
 
 	public static String generateAccountQueryParam(AccountQueryFormDTO assetForm) throws TrustSDKException, Exception {
-		ConfigUtils configUtils = new ConfigUtils();
-		String mchId = configUtils.getMchId();
-		String prvKey = configUtils.getCreateUserPrivateKey();
-		String mchPublicKehy = configUtils.getCreateUserPublicKey();
-		String chainId = configUtils.getChainId();
+		ConfigDto configDto = assetForm.getConfigDto();
+		String mchId = configDto.getMchId();
+		String prvKey = configDto.getCreateUserPrivateKey();
+		String mchPublicKehy = configDto.getCreateUserPublicKey();
+		String chainId = configDto.getChainId();
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 		paramMap.put("version", "2.0");
 		paramMap.put("sign_type", "ECDSA");
@@ -171,15 +171,15 @@ public class UserUtil {
 	}
 
 	public static String generateTransQueryParam(AssetTransQueryFormDTO assetForm) throws TrustSDKException, Exception {
-		ConfigUtils configUtils = new ConfigUtils();
-		
-
-		String mchId = configUtils.getMchId();
-		String prvKey = configUtils.getCreateUserPrivateKey();
-
-		
-		String chainId = configUtils.getChainId();
-		String mchPublicKey = configUtils.getCreateUserPublicKey();
+		ConfigDto configDto = assetForm.getConfigDto();
+		String mchId = "";
+		String prvKey = "";
+		String chainId ="";	
+		String mchPublicKey = "";
+		mchPublicKey = configDto.getCreateUserPublicKey();
+		chainId = configDto.getChainId();
+		prvKey = configDto.getCreateUserPrivateKey();
+		mchId = configDto.getMchId();
 		
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 		paramMap.put("version", "2.0");
@@ -187,15 +187,16 @@ public class UserUtil {
 		paramMap.put("mch_id", mchId);
 		paramMap.put("mch_pubkey", mchPublicKey);
 
-		if (null!=assetForm.getBlockHeightRange()) {
+		if (null != assetForm.getBlockHeightRange()) {
+			
 			paramMap.put("b_height", assetForm.getBlockHeightRange());
 		}
-		
+
 		paramMap.put("chain_id", chainId);
 		if (StringUtils.isNotBlank(assetForm.getSrcAccount())) {
 			paramMap.put("src_account", assetForm.getSrcAccount());
 		}
-	
+
 		if (StringUtils.isNotBlank(assetForm.getDstAccount())) {
 			paramMap.put("dst_account", assetForm.getDstAccount());
 		}
@@ -205,12 +206,25 @@ public class UserUtil {
 		if (StringUtils.isNotBlank(assetForm.getTransHash())) {
 			paramMap.put("trans_hash", assetForm.getTransHash());
 		}
-		if ( assetForm.getState()!=null){
+		if (assetForm.getState() != null) {
 			ArrayList<Integer> statusArray = new ArrayList();
-			statusArray.add(assetForm.getState());
-			paramMap.put("state",statusArray );
+			Integer[] array = assetForm.getState();
+			for (Integer integer : array) {
+				statusArray.add(integer);
+			}
+
+			paramMap.put("state", statusArray);
 		}
-		
+		if (assetForm.getTransType() != null) {
+
+			ArrayList<Integer> statusArray = new ArrayList();
+			Integer[] array = assetForm.getTransType();
+			for (Integer integer : array) {
+				statusArray.add(integer);
+			}
+			paramMap.put("trans_type", statusArray);
+		}
+
 		paramMap.put("page_limit", assetForm.getPageLimit());
 		paramMap.put("page_no", assetForm.getPageNo());
 		paramMap.put("timestamp", System.currentTimeMillis() / 1000);

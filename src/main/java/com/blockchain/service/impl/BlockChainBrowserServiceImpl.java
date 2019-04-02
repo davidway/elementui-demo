@@ -17,6 +17,7 @@ import com.blockchain.dto.BlockChainInfoDto;
 import com.blockchain.dto.BlockDetailsInfo;
 import com.blockchain.dto.BlockTransChainInfoDto;
 import com.blockchain.dto.BlockTransDto;
+import com.blockchain.dto.ConfigDto;
 import com.blockchain.dto.TransDetailsVo;
 import com.blockchain.dto.TransHeightDto;
 import com.blockchain.dto.TransInfoDto;
@@ -38,21 +39,21 @@ public class BlockChainBrowserServiceImpl implements BlockChainBrowserService {
 	@Override
 	public List<BlockTransDto> getBlockInfoList(TransHeightDto transHeightDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
 		String applyString = TencentChainUtils.generateTransHeightInfo(transHeightDto);
-		ConfigUtils configUtils = new ConfigUtils();
-		String applyUrl = configUtils.getHost() + "/GetTxinfoByHeight";
+		ConfigDto configDto = transHeightDto.getConfigDto();
+		String applyUrl = configDto.getHost() + "/GetTxinfoByHeight";
 		applyUrl = applyUrl.replace("15910", "15909");// 腾讯区块链在这里设置了15909的端口，与原来数字资产的端口不同
 
 		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
 		ResultUtil.checkResultIfSuccess("获取节点列表接口", applyResultString);
-
-		List<BlockTransDto> blockChainInfoDtoList = TencentChainUtils.getTransHeightInfoResult(applyResultString);
+		
+		List<BlockTransDto> blockChainInfoDtoList = TencentChainUtils.getTransHeightInfoResult(applyResultString,configDto);
 
 		return blockChainInfoDtoList;
 	}
 
 	@Override
-	public BlockChainInfoDto getChainInfo() throws UnsupportedEncodingException, TrustSDKException, Exception {
-		String applyString = TencentChainUtils.generateBlockChainInfo();
+	public BlockChainInfoDto getChainInfo(ConfigDto configDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
+		String applyString = TencentChainUtils.generateBlockChainInfo(configDto);
 		String applyUrl = "https://baas.qq.com/cgi-bin/v1.0/nbaas_getchaininfo.cgi";
 		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
 		ResultUtil.checkResultIfSuccess("获取联盟链节点接口", applyResultString);
@@ -84,7 +85,9 @@ public class BlockChainBrowserServiceImpl implements BlockChainBrowserService {
 	@Override
 	public TransDetailsVo getTransInfoDetailsByHash(AssetTransQueryFormDTO queryTransInfoDto) throws ServiceException, TrustSDKException, Exception {
 		TransDetailsVo transDetailsVo = null;
-		queryTransInfoDto.setState(TransStatus.SUBMIT_SUCCESS);
+		
+		queryTransInfoDto.setState(new Integer[]{TransStatus.SUBMIT_SUCCESS});
+		queryTransInfoDto.setConfigDto(queryTransInfoDto.getConfigDto());
 		List<TransInfoDto> transInfoDtoList = TencentChainUtils.transQuery(queryTransInfoDto);
 		TransInfoDto transInfoDto = null;
 		// 获取单笔交易
@@ -96,17 +99,18 @@ public class BlockChainBrowserServiceImpl implements BlockChainBrowserService {
 			TransHeightDto transHeightDto = new TransHeightDto();
 			Long beginHeight = 0L;
 			Long endHeight = 0L;
+			ConfigDto configDto = queryTransInfoDto.getConfigDto();
 			if (transInfoDto != null) {
 				beginHeight = transInfoDto.getTransHeight();
 				endHeight = transInfoDto.getTransHeight();
 				transHeightDto.setEndHeight(endHeight);
 				transHeightDto.setBeginHeight(beginHeight);
-
+				transHeightDto.setConfigDto(configDto);
 				List<BlockTransDto> blockTransDtoList = getBlockInfoList(transHeightDto);
 				BlockTransDto blockTransDto = blockTransDtoList.get(0);
 				transDetailsVo.setBlockTransDto(blockTransDto);
 
-				BlockTransChainInfoDto blockTransChainInfoDto = getChainInfoByTransHash(queryTransInfoDto.getTransHash());
+				BlockTransChainInfoDto blockTransChainInfoDto = getChainInfoByTransHash(queryTransInfoDto.getTransHash(),configDto);
 				transDetailsVo.setBlockChainInfoDto(blockTransChainInfoDto);
 				return transDetailsVo;
 			}
@@ -116,12 +120,12 @@ public class BlockChainBrowserServiceImpl implements BlockChainBrowserService {
 
 	}
 
-	private BlockTransChainInfoDto getChainInfoByTransHash(String transHash) throws Exception {
-		String applyString = TencentChainUtils.generateBlockChainInfo();
+	private BlockTransChainInfoDto getChainInfoByTransHash(String transHash,ConfigDto configDto) throws Exception {
+		String applyString = TencentChainUtils.generateBlockChainInfo(configDto);
 		String applyUrl = "https://baas.qq.com/cgi-bin/v1.0/nbaas_getchaininfo.cgi";
 		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
 
-		BlockTransChainInfoDto blockTransChainInfoDto = TencentChainUtils.genereateChainInfoResultForTrans(applyResultString, transHash);
+		BlockTransChainInfoDto blockTransChainInfoDto = TencentChainUtils.genereateChainInfoResultForTrans(applyResultString, transHash,configDto);
 
 		return blockTransChainInfoDto;
 	}
@@ -132,14 +136,14 @@ public class BlockChainBrowserServiceImpl implements BlockChainBrowserService {
 	public BlockDetailsInfo getBlockInfoDetails(TransHeightDto transHeightDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
 		BlockDetailsInfo bockDetailsInfo = new BlockDetailsInfo();
 		String applyString = TencentChainUtils.generateTransHeightInfo(transHeightDto);
-		ConfigUtils configUtils = new ConfigUtils();
-		String applyUrl = configUtils.getHost() + "/GetTxinfoByHeight";
+		ConfigDto configDto = transHeightDto.getConfigDto();
+		String applyUrl = configDto.getHost() + "/GetTxinfoByHeight";
 		applyUrl = applyUrl.replace("15910", "15909");// 腾讯区块链在这里设置了15909的端口，与原来数字资产的端口不同
 
 		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
 		ResultUtil.checkResultIfSuccess("获取节点详情接口", applyResultString);
 
-		bockDetailsInfo = TencentChainUtils.generateBlockInfoDetails(applyResultString, transHeightDto.getBeginHeight());
+		bockDetailsInfo = TencentChainUtils.generateBlockInfoDetails(applyResultString, transHeightDto.getBeginHeight(),transHeightDto.getConfigDto());
 
 		return bockDetailsInfo;
 	}
@@ -147,23 +151,25 @@ public class BlockChainBrowserServiceImpl implements BlockChainBrowserService {
 	@Override
 	public List<TransInfoDto> getTransInfoList(AssetTransQueryFormDTO assetTransQueryFormDTO) throws TrustSDKException, Exception {
 		List<TransInfoDto> transInfoList = new ArrayList<TransInfoDto>();
-		assetTransQueryFormDTO.setState(TransStatus.SUBMIT_SUCCESS);
+		assetTransQueryFormDTO.setConfigDto(assetTransQueryFormDTO.getConfigDto());
+		assetTransQueryFormDTO.setState(new Integer[]{TransStatus.SUBMIT_SUCCESS});
 		transInfoList = TencentChainUtils.transQuery(assetTransQueryFormDTO);
 		for (TransInfoDto transInfoDto : transInfoList) {
-			String blockHash = getBlockHashByHeight(transInfoDto.getTransHeight());
+			String blockHash = getBlockHashByHeight(transInfoDto.getTransHeight(),assetTransQueryFormDTO.getConfigDto());
 			transInfoDto.setBlockHash(blockHash);
 		}
 		return transInfoList;
 	}
 
-	private String getBlockHashByHeight(long transHeight) throws Exception {
+	private String getBlockHashByHeight(long transHeight, ConfigDto configDto) throws Exception {
 
 		TransHeightDto transHeightDto = new TransHeightDto();
 		transHeightDto.setBeginHeight(transHeight);
 		transHeightDto.setEndHeight(transHeight);
+		transHeightDto.setConfigDto(configDto);
 		String applyString = TencentChainUtils.generateTransHeightInfo(transHeightDto);
-		ConfigUtils configUtils = new ConfigUtils();
-		String applyUrl = configUtils.getHost() + "/GetTxinfoByHeight";
+
+		String applyUrl = configDto.getHost() + "/GetTxinfoByHeight";
 		applyUrl = applyUrl.replace("15910", "15909");// 腾讯区块链在这里设置了15909的端口，与原来数字资产的端口不同
 		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
 		ResultUtil.checkResultIfSuccess("获取区块hash接口", applyResultString);

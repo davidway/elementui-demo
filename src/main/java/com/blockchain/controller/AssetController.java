@@ -70,7 +70,7 @@ public class AssetController {
 		String jsonString = "";
 		try {
 			ValidatorUtil.validate(bindingResult);
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			ParamUtils.checkAssetNum(assetTransferFormDTO.getSrcAsset());
 			ParamUtils.checkSumAmount(assetTransferFormDTO);
 			TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetTransferFormDTO.getUserPrivateKey(), assetTransferFormDTO.getSrcAccount());
@@ -116,7 +116,7 @@ public class AssetController {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetSettleFormDTO.getUserPrivateKey(), assetSettleFormDTO.getOwnerAccount());
 			ValidatorUtil.validate(bindingResult);
 			ParamUtils.checkAssetNum(assetSettleFormDTO.getSrcAsset());
@@ -162,8 +162,8 @@ public class AssetController {
 		String jsonString = "";
 		try {
 
-			ConfigUtils.check();
-			CrmUtils.checkAuth();
+			//ConfigUtils.check();
+			//CrmUtils.checkAuth();
 			ValidatorUtil.validate(bindingResult);
 			AssetIssueDTO assetIssueDTO = assetService.issue(assetFormDTO);
 			phpSystemJsonContentVO.setData(assetIssueDTO);
@@ -210,7 +210,7 @@ public class AssetController {
 		String jsonString = "";
 		try {
 
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			CrmUtils.checkAuth();
 			ValidatorUtil.validate(bindingResult);
 			AssetSubmitFormDTO assetSubmitFormDTO = assetService.issueApply(assetFormDTO);
@@ -256,8 +256,8 @@ public class AssetController {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-			ConfigUtils.check();
-			CrmUtils.checkAuth();
+			//ConfigUtils.check();
+			//CrmUtils.checkAuth();
 			ValidatorUtil.validate(bindingResult);
 			AssetIssueDTO assetIssueDTO = assetService.issueSubmit(assetForm);
 			phpSystemJsonContentVO.setData(assetIssueDTO);
@@ -297,7 +297,7 @@ public class AssetController {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 			AssetTransferDTO assetTransferDTO = assetService.transSubmit(assetForm);
 			phpSystemJsonContentVO.setData(assetTransferDTO);
@@ -340,7 +340,7 @@ public class AssetController {
 		String jsonString = "";
 		try {
 			ValidatorUtil.validate(bindingResult);
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			ParamUtils.checkAssetNum(assetTransferFormDTO.getSrcAsset());
 			ParamUtils.checkSumAmount(assetTransferFormDTO);
 			TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetTransferFormDTO.getUserPrivateKey(), assetTransferFormDTO.getSrcAccount());
@@ -386,7 +386,7 @@ public class AssetController {
 		String jsonString = "";
 		try {
 			ValidatorUtil.validate(bindingResult);
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			AssetSettleDTO assetSettleDTO = assetService.settleSubmit(assetForm);
 			phpSystemJsonContentVO.setData(assetSettleDTO);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO, SerializerFeature.WriteMapNullValue);
@@ -427,7 +427,7 @@ public class AssetController {
 		String jsonString = "";
 
 		try {
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			TrustSDKUtil.checkPrivateKeyAccountIsMatch(assetSettleFormDTO.getUserPrivateKey(), assetSettleFormDTO.getOwnerAccount());
 			ValidatorUtil.validate(bindingResult);
 			ParamUtils.checkAssetNum(assetSettleFormDTO.getSrcAsset());

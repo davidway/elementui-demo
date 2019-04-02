@@ -19,6 +19,7 @@ import com.blockchain.dto.AssetSettleSubmitFormDTO;
 import com.blockchain.dto.AssetSubmitFormDTO;
 import com.blockchain.dto.AssetTransferFormDTO;
 import com.blockchain.dto.AssetTransferSubmitFormDTO;
+import com.blockchain.dto.ConfigDto;
 import com.blockchain.service.AssetService;
 import com.tencent.trustsql.sdk.TrustSDK;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
@@ -31,12 +32,12 @@ public class AssetUtil {
 	private static Logger log = Logger.getLogger(AssetUtil.class);
 
 	public String generateIssueApplyParam(AssetFormDTO assetFormDTO) throws TrustSDKException, Exception {
-		ConfigUtils configUtils = new ConfigUtils();
-		String mchId = configUtils.getMchId();
-		String prvKey = configUtils.getCreateUserPrivateKey();
+		ConfigDto configDto = assetFormDTO.getConfigDto();
+		String mchId = configDto.getMchId();
+		String prvKey = configDto.getCreateUserPrivateKey();
 
-		String chainId = configUtils.getChainId();
-		String createUserPublicKey = configUtils.getCreateUserPublicKey();
+		String chainId = configDto.getChainId();
+		String createUserPublicKey = configDto.getCreateUserPublicKey();
 
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 		paramMap.put("version", "2.0");
@@ -72,14 +73,14 @@ public class AssetUtil {
 	}
 
 	public String generateIssueSubmitParam(AssetSubmitFormDTO assetSubmitFormDTO) throws UnsupportedEncodingException, TrustSDKException, Exception {
-		ConfigUtils configUtils = new ConfigUtils();
-		String mchId = configUtils.getMchId();
-		String prvKey = configUtils.getCreateUserPrivateKey();
+		ConfigDto configDto = assetSubmitFormDTO.getConfigDto();
+		String mchId = configDto.getMchId();
+		String prvKey = configDto.getCreateUserPrivateKey();
 
-		String mchPublicKey = configUtils.getCreateUserPublicKey();
+		String mchPublicKey = configDto.getCreateUserPublicKey();
 		String userPrivateKey = assetSubmitFormDTO.getUserPrivateKey();
 
-		String chainId = configUtils.getChainId();
+		String chainId = configDto.getChainId();
 
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 
@@ -131,11 +132,11 @@ public class AssetUtil {
 	}
 
 	public String generateTransferApplyParam(AssetTransferFormDTO assetTransferFormDTO) throws TrustSDKException, Exception {
-		ConfigUtils configUtils = new ConfigUtils();
-		String mchId = configUtils.getMchId();
-		String prvKey = configUtils.getCreateUserPrivateKey();
-		String createUserPublicKey = configUtils.getCreateUserPublicKey();
-		String chainId = configUtils.getChainId();
+		ConfigDto configDto = assetTransferFormDTO.getConfigDto();
+		String mchId = configDto.getMchId();
+		String prvKey = configDto.getCreateUserPrivateKey();
+		String createUserPublicKey = configDto.getCreateUserPublicKey();
+		String chainId = configDto.getChainId();
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 		paramMap.put("version", "2.0");
 		paramMap.put("sign_type", "ECDSA");
@@ -177,21 +178,17 @@ public class AssetUtil {
 	}
 
 	public String generateSettleApplyParam(AssetSettleFormDTO assetSettleFormDTO) throws TrustSDKException, Exception {
-		ConfigUtils configUtils = new ConfigUtils();
-		String mchId = configUtils.getMchId();
-		String mchPublicKey = configUtils.getCreateUserPublicKey();
-
-		String prvKey = configUtils.getCreateUserPrivateKey();
-
-		String chainId = configUtils.getChainId();
+		ConfigDto configDto = assetSettleFormDTO.getConfigDto();
+		
+		
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 		paramMap.put("version", "2.0");
 		paramMap.put("sign_type", "ECDSA");
-		paramMap.put("mch_id", mchId);
+		paramMap.put("mch_id", configDto.getMchId());
 
-		paramMap.put("mch_pubkey", mchPublicKey);
+		paramMap.put("mch_pubkey", configDto.getCreateUserPublicKey());
 
-		paramMap.put("chain_id", chainId);
+		paramMap.put("chain_id", configDto.getChainId());
 
 		paramMap.put("src_account", assetSettleFormDTO.getOwnerAccount());
 		paramMap.put("src_account_pubkey", assetSettleFormDTO.getOwnerPublickey());
@@ -207,7 +204,7 @@ public class AssetUtil {
 		paramMap.put("extra_info", jsonObj);
 
 		paramMap.put("timestamp", System.currentTimeMillis() / 1000);
-		paramMap.put("mch_sign", TrustSDK.signString(prvKey, SignStrUtil.mapToKeyValueStr(paramMap).getBytes("UTF-8"), false));
+		paramMap.put("mch_sign", TrustSDK.signString(configDto.getCreateUserPrivateKey(), SignStrUtil.mapToKeyValueStr(paramMap).getBytes("UTF-8"), false));
 		// generate post data
 		JSONObject postJson = new JSONObject();
 		for (String key : paramMap.keySet()) {
@@ -217,11 +214,11 @@ public class AssetUtil {
 	}
 
 	public String generateTransferSubmitParam(AssetTransferSubmitFormDTO assetSubmitForm) throws Exception {
-		ConfigUtils configUtils = new ConfigUtils();
-		String mchId = configUtils.getMchId();
-		String prvKey = configUtils.getCreateUserPrivateKey();
-		String mchPublicKey = configUtils.getCreateUserPublicKey();
-		String chainId = configUtils.getChainId();
+		ConfigDto configDto = assetSubmitForm.getConfigDto();
+		String mchId = configDto.getMchId();
+		String prvKey = configDto.getCreateUserPrivateKey();
+		String mchPublicKey = configDto.getCreateUserPublicKey();
+		String chainId = configDto.getChainId();
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 		paramMap.put("version", "2.0");
 		paramMap.put("sign_type", "ECDSA");
@@ -253,14 +250,14 @@ public class AssetUtil {
 	}
 
 	public String generateSettleSubmitParam(AssetSettleSubmitFormDTO assetSettleSubmitFormDTO) throws Exception {
-		ConfigUtils configUtils = new ConfigUtils();
-		String mchId = configUtils.getMchId();
-		String prvKey = configUtils.getCreateUserPrivateKey();
-		String mchPublicKey = configUtils.getCreateUserPublicKey();
+		ConfigDto configDto = assetSettleSubmitFormDTO.getConfigDto();
+		String mchId = configDto.getMchId();
+		String prvKey = configDto.getCreateUserPrivateKey();
+		String mchPublicKey = configDto.getCreateUserPublicKey();
 
-		String nodeId = configUtils.getNodeId();
-		String chainId = configUtils.getChainId();
-		String ledgerId = configUtils.getLedgerId();
+		String nodeId = configDto.getNodeId();
+		String chainId = configDto.getChainId();
+	
 		Map<String, Object> paramMap = new TreeMap<String, Object>();
 		paramMap.put("version", "2.0");
 		paramMap.put("sign_type", "ECDSA");
@@ -270,8 +267,7 @@ public class AssetUtil {
 		paramMap.put("mch_pubkey", mchPublicKey);
 		
 		paramMap.put("chain_id", chainId);
-		paramMap.put("ledger_id", ledgerId);
-
+		
 		paramMap.put("asset_type", 1);
 		JSONArray signList = JSONArray.parseArray(assetSettleSubmitFormDTO.getSignList());
 

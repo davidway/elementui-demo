@@ -2,6 +2,7 @@ package com.blockchain.controller;
 
 import java.util.List;
 
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -21,6 +22,7 @@ import com.blockchain.dto.AssetTransQueryFormDTO;
 import com.blockchain.dto.BlockChainInfoDto;
 import com.blockchain.dto.BlockDetailsInfo;
 import com.blockchain.dto.BlockTransDto;
+import com.blockchain.dto.ConfigDto;
 import com.blockchain.dto.TransDetailsVo;
 import com.blockchain.dto.TransHeightDto;
 import com.blockchain.dto.TransInfoDetailsDto;
@@ -57,14 +59,14 @@ public class BlockChainBrowserController {
 			@ApiResponse(code = StatusCode.TIME_OUT, message = StatusCode.TIME_OUT_MESSAGE, response = StatusCode.class),
 
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	public void getChainInfo() {
+	public void getChainInfo(@Valid @RequestBody ConfigDto configDto, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 
 		try {
-			ConfigUtils.check();
-
-			BlockChainInfoDto blockTransChainInfoDto = blockChainBrowserService.getChainInfo();
+			//ConfigUtils.check();
+			ValidatorUtil.validate(bindingResult);
+			BlockChainInfoDto blockTransChainInfoDto = blockChainBrowserService.getChainInfo(configDto);
 			phpSystemJsonContentVO.setData(blockTransChainInfoDto);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO, SerializerFeature.WriteMapNullValue);
 			ResponseUtil.echo(response, jsonString);
@@ -97,7 +99,7 @@ public class BlockChainBrowserController {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 			ParamUtils.checkNum(transHeightDto.getBeginHeight(), transHeightDto.getEndHeight());
 			List<BlockTransDto> blockChainInfoDtoList = blockChainBrowserService.getBlockInfoList(transHeightDto);
@@ -132,7 +134,7 @@ public void getTransInfoList(@Valid @RequestBody TransInfoListDto transInfoListD
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 
 			AssetTransQueryFormDTO assetTransQueryFormDTO = new AssetTransQueryFormDTO();
@@ -140,7 +142,8 @@ public void getTransInfoList(@Valid @RequestBody TransInfoListDto transInfoListD
 			Integer pageLimit = transInfoListDto.getPageLimit();
 			assetTransQueryFormDTO.setPageNo(pageNo);
 			assetTransQueryFormDTO.setPageLimit(pageLimit);
-			
+			ConfigDto configDto = transInfoListDto.getConfigDto();
+			assetTransQueryFormDTO.setConfigDto(configDto);
 			List<TransInfoDto> blockChainInfoDtoList = blockChainBrowserService.getTransInfoList(assetTransQueryFormDTO);
 			phpSystemJsonContentVO.setData(blockChainInfoDtoList);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO, SerializerFeature.WriteMapNullValue);
@@ -173,10 +176,11 @@ public void getTransInfoDetails(@Valid @RequestBody TransInfoDetailsDto transInf
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-			ConfigUtils.check();
+			
 			ValidatorUtil.validate(bindingResult);
 			AssetTransQueryFormDTO assetTransQueryFormDTO = new AssetTransQueryFormDTO();
 			assetTransQueryFormDTO.setTransHash(transInfoDetailsDto.getTransHash());
+			assetTransQueryFormDTO.setConfigDto(transInfoDetailsDto.getConfigDto());
 			TransDetailsVo transDetailsVo = blockChainBrowserService.getTransInfoDetailsByHash(assetTransQueryFormDTO);
 			phpSystemJsonContentVO.setData(transDetailsVo);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO, SerializerFeature.WriteMapNullValue);
@@ -209,7 +213,7 @@ public void getBlockInfoDetails(@Valid @RequestBody TransHeightDto transHeightDt
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 		try {
-			ConfigUtils.check();
+			//ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
 			ParamUtils.checkNumForDetails(transHeightDto.getBeginHeight(), transHeightDto.getEndHeight());
 			BlockDetailsInfo blockDetail = blockChainBrowserService.getBlockInfoDetails(transHeightDto);

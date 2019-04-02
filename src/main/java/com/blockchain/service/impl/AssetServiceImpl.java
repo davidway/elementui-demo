@@ -21,6 +21,7 @@ import com.blockchain.dto.AssetSubmitFormDTO;
 import com.blockchain.dto.AssetTransferDTO;
 import com.blockchain.dto.AssetTransferFormDTO;
 import com.blockchain.dto.AssetTransferSubmitFormDTO;
+import com.blockchain.dto.ConfigDto;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.service.AssetService;
 import com.blockchain.util.AssetPrepareUtil;
@@ -42,9 +43,9 @@ public class AssetServiceImpl implements AssetService {
 
 	@Override
 	public AssetIssueDTO issue(AssetFormDTO assetFormDTO) throws Exception {
-		ConfigUtils configUtils = new ConfigUtils();
+		ConfigDto configDto = assetFormDTO.getConfigDto();
 		issueLogger.info("issue调试");
-		String applyUrl = configUtils.getHost() + "/asset_issue_apply";
+		String applyUrl = configDto.getHost() + "/asset_issue_apply";
 		String applyString = assetUtil.generateIssueApplyParam(assetFormDTO);
 		
 		issueLogger.info("请求的链接{}", applyUrl);
@@ -57,10 +58,10 @@ public class AssetServiceImpl implements AssetService {
 		String userPrivateKey = assetFormDTO.getUserPrivateKey();
 		AssetSubmitFormDTO assetSubmitFormDTO = assetPrepareUtil.prepareAssetSubmitForm(applyResultString);
 		assetSubmitFormDTO.setUserPrivateKey(userPrivateKey);
-
+		assetSubmitFormDTO.setConfigDto(configDto);
 		String submitString = assetUtil.generateIssueSubmitParam(assetSubmitFormDTO);
 
-		String submitUrl = configUtils.getHost() + "/asset_issue_submit";
+		String submitUrl = configDto.getHost() + "/asset_issue_submit";
 		issueLogger.info("请求的链接{}", submitUrl);
 		issueLogger.info("调用【发行提交】前的参数{}",  submitString);
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
@@ -80,8 +81,8 @@ public class AssetServiceImpl implements AssetService {
 		transferLogger.info("transfer调试开始");
 		String applyString = assetUtil.generateTransferApplyParam(assetTransferFormDTO);
 		transferLogger.info("调用【转账申请前】的参数" + applyString);
-		ConfigUtils configUtils = new ConfigUtils();
-		String applyUrl = configUtils.getHost() + "/asset_transfer_apply";
+		ConfigDto configDto = assetTransferFormDTO.getConfigDto();
+		String applyUrl = configDto.getHost() + "/asset_transfer_apply";
 		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
 		transferLogger.info("调用【转账申请后】的参数" + applyResultString);
 
@@ -89,10 +90,10 @@ public class AssetServiceImpl implements AssetService {
 
 		AssetTransferSubmitFormDTO asseTransfertSubmitForm = assetPrepareUtil.perpareTransferSubmitForm(assetTransferFormDTO, applyResultString);
 		transferLogger.info("调用【转账申请后】的参数" + asseTransfertSubmitForm);
-
+		asseTransfertSubmitForm.setConfigDto(configDto);
 		String submitString = assetUtil.generateTransferSubmitParam(asseTransfertSubmitForm);
 		transferLogger.info("调用【转账提交前】的参数" + submitString);
-		String submitUrl = configUtils.getHost() + "/asset_transfer_submit";
+		String submitUrl = configDto.getHost() + "/asset_transfer_submit";
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
 		transferLogger.info("调用【转账提交后】的参数" + submitResultString);
 
@@ -111,18 +112,19 @@ public class AssetServiceImpl implements AssetService {
 		String applyString = assetUtil.generateSettleApplyParam(assetSettleFormDTO);
 
 		settleLogger.info("调用【兑换申请前】" + applyString);
-		ConfigUtils configUtils = new ConfigUtils();
-		String applyUrl = configUtils.getHost() + "/asset_settle_apply";
+		ConfigDto configDto = assetSettleFormDTO.getConfigDto();
+		String applyUrl = configDto.getHost() + "/asset_settle_apply";
 		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
 		settleLogger.info("调用【兑换申请后】" + applyResultString);
 
 		ResultUtil.checkResultIfSuccess("资产兑换申请接口", applyResultString);
 
 		AssetSettleSubmitFormDTO assetSettleSubmitFormDTO = assetPrepareUtil.perpareSettleSubmitForm(assetSettleFormDTO, applyResultString);
+		assetSettleSubmitFormDTO.setConfigDto(configDto);
 		String submitString = assetUtil.generateSettleSubmitParam(assetSettleSubmitFormDTO);
 
 		settleLogger.info("【兑换【调用提交前】" + submitString);
-		String submitUrl = configUtils.getHost() + "/asset_settle_submit";
+		String submitUrl = configDto.getHost() + "/asset_settle_submit";
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
 		settleLogger.info("【兑换【调用提交】后" + submitResultString);
 
@@ -139,8 +141,8 @@ public class AssetServiceImpl implements AssetService {
 		issueLogger.debug("传入的参数{}",  assetSubmitFormDTO);
 		String submitString = assetUtil.generateIssueSubmitParam(assetSubmitFormDTO);
 		issueLogger.debug("调用【资产发行前{}",  submitString);
-		ConfigUtils configUtils = new ConfigUtils();
-		String submitUrl = configUtils.getHost() + "/asset_issue_submit";
+		ConfigDto configDto = assetSubmitFormDTO.getConfigDto();
+		String submitUrl = configDto.getHost() + "/asset_issue_submit";
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
 		ResultUtil.checkResultIfSuccess("资产提交接口", submitResultString);
 		issueLogger.debug("调用【资产只发行后】{}",  submitResultString);
@@ -157,8 +159,8 @@ public class AssetServiceImpl implements AssetService {
 		String submitString = assetUtil.generateTransferSubmitParam(asseTransfertSubmitForm);
 
 		transferLogger.info("调用【转账只提交前】" + submitString);
-		ConfigUtils configUtils = new ConfigUtils();
-		String submitUrl = configUtils.getHost() + "/asset_transfer_submit";
+		ConfigDto configDto = asseTransfertSubmitForm.getConfigDto();
+		String submitUrl = configDto.getHost() + "/asset_transfer_submit";
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
 		transferLogger.info("调用【转账只提交后】" + submitResultString);
 
@@ -176,8 +178,8 @@ public class AssetServiceImpl implements AssetService {
 
 		String submitString = assetUtil.generateSettleSubmitParam(assetSettleSubmitFormDTO);
 		settleLogger.info("调用【兑换只提交前】" + submitString);
-		ConfigUtils configUtils = new ConfigUtils();
-		String submitUrl = configUtils.getHost() + "/asset_settle_submit";
+		ConfigDto configDto = assetSettleSubmitFormDTO.getConfigDto();
+		String submitUrl = configDto.getHost() + "/asset_settle_submit";
 
 		String submitResultString = HttpClientUtil.post(submitUrl, submitString);
 		settleLogger.info("调用【兑换只提交后】" + submitResultString);
@@ -194,8 +196,8 @@ public class AssetServiceImpl implements AssetService {
 		transferLogger.info("transfer调试开始");
 		String applyString = assetUtil.generateTransferApplyParam(assetTransferFormDTO);
 		transferLogger.info("调用【转账申请前】的参数" + applyString);
-		ConfigUtils configUtils = new ConfigUtils();
-		String applyUrl = configUtils.getHost() + "/asset_transfer_apply";
+		ConfigDto configDto = assetTransferFormDTO.getConfigDto();
+		String applyUrl = configDto.getHost() + "/asset_transfer_apply";
 		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
 		transferLogger.info("调用【转账申请后】的参数" + applyString);
 
@@ -210,9 +212,9 @@ public class AssetServiceImpl implements AssetService {
 
 	@Override
 	public AssetSubmitFormDTO issueApply(AssetFormDTO assetFormDTO) throws ServiceException, TrustSDKException, Exception {
-		ConfigUtils configUtils = new ConfigUtils();
+		ConfigDto configDto =assetFormDTO.getConfigDto();
 		issueLogger.info("issue调试");
-		String applyUrl = configUtils.getHost() + "/asset_issue_apply";
+		String applyUrl = configDto.getHost() + "/asset_issue_apply";
 		String applyString = assetUtil.generateIssueApplyParam(assetFormDTO);
 
 		issueLogger.info("请求的链接{}", applyUrl);
@@ -234,8 +236,8 @@ public class AssetServiceImpl implements AssetService {
 		String applyString = assetUtil.generateSettleApplyParam(assetSettleFormDTO);
 
 		settleLogger.info("调用【兑换申请前】" + applyString);
-		ConfigUtils configUtils = new ConfigUtils();
-		String applyUrl = configUtils.getHost() + "/asset_settle_apply";
+		ConfigDto configDto = assetSettleFormDTO.getConfigDto();
+		String applyUrl = configDto.getHost() + "/asset_settle_apply";
 		String applyResultString = HttpClientUtil.post(applyUrl, applyString);
 		settleLogger.info("调用【兑换申请后】" + applyResultString);
 

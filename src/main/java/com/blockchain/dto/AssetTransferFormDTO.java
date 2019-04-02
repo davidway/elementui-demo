@@ -1,5 +1,6 @@
 package com.blockchain.dto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -12,12 +13,13 @@ import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "转账表单")
-public class AssetTransferFormDTO {
+public class AssetTransferFormDTO extends BaseDto {
 	@NotEmpty(message = "金额不能为空")
 	@ApiModelProperty(value = "份额", required = true)
 	@Min(value = 1, message = "金额必须大于0,而且为整数，最大数字为大数字为18个9")
-	@Max(value=1_000_000_000_000_000_000L,message="最大数字为大数字为18个9")
-	//@Max(value = 10_000_000_000_000L, message = "金额必须大于0,而且为整数，最大数字为10_000_000_000_000L")
+	@Max(value = 1_000_000_000_000_000_000L, message = "最大数字为大数字为18个9")
+	// @Max(value = 10_000_000_000_000L, message =
+	// "金额必须大于0,而且为整数，最大数字为10_000_000_000_000L")
 	private String amount;
 
 	@NotEmpty(message = "资产转出帐户不能为空")
@@ -34,8 +36,9 @@ public class AssetTransferFormDTO {
 	private String feeAccount;
 	@ApiModelProperty(value = "手续费份额,64位长", required = false)
 	@Min(value = 1, message = "金额必须大于0,而且为整数，最大数字为18个9")
-	@Max(value=1_000_000_000_000_000_000L,message="最大数字为大数字为18个9")
-	//@Max(value = 9_999_999_999_999L, message = "金额必须大于0,而且为整数，最大数字为9_999_999_999_999L")
+	@Max(value = 1_000_000_000_000_000_000L, message = "最大数字为大数字为18个9")
+	// @Max(value = 9_999_999_999_999L, message =
+	// "金额必须大于0,而且为整数，最大数字为9_999_999_999_999L")
 	private String feeAmount;
 	@NotEmpty(message = "转出账户用户私钥")
 	@ApiModelProperty(value = "转出账户用户私钥", required = false)
@@ -56,6 +59,8 @@ public class AssetTransferFormDTO {
 	@NotEmpty(message = "转出账户用户id不能为空")
 	@ApiModelProperty(value = "转出账户用户公钥", required = false)
 	private String srcAccountUid;
+
+	
 
 	public String getAmount() {
 		return amount;
@@ -112,8 +117,6 @@ public class AssetTransferFormDTO {
 	public void setUserPrivateKey(String userPrivateKey) {
 		this.userPrivateKey = userPrivateKey;
 	}
-
-
 
 	public String getDstAccountPublicKey() {
 		return dstAccountPublicKey;

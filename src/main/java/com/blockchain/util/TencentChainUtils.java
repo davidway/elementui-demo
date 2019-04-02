@@ -2,6 +2,7 @@ package com.blockchain.util;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,6 +26,7 @@ import com.blockchain.dto.BlockDetailsInfo;
 import com.blockchain.dto.BlockInfoDto;
 import com.blockchain.dto.BlockTransChainInfoDto;
 import com.blockchain.dto.BlockTransDto;
+import com.blockchain.dto.ConfigDto;
 import com.blockchain.dto.NodeInfo;
 import com.blockchain.dto.NodeTransInfo;
 import com.blockchain.dto.TransHeightDto;
@@ -135,13 +137,13 @@ public class TencentChainUtils {
 		return list;
 	}
 
-	public static String generateBlockChainInfo() throws UnsupportedEncodingException, TrustSDKException, Exception {
-		ConfigUtils configUtils = new ConfigUtils();
+	public static String generateBlockChainInfo(ConfigDto configDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
+		
 
-		String mchId = configUtils.getMchId();
-		String prvKey = configUtils.getCreateUserPrivateKey();
+		String mchId = configDto.getMchId();
+		String prvKey = configDto.getCreateUserPrivateKey();
 
-		String chainId = configUtils.getChainId();
+		String chainId = configDto.getChainId();
 
 		long timeStamp = System.currentTimeMillis() / 1000;
 
@@ -208,15 +210,15 @@ public class TencentChainUtils {
 	}
 
 	public static String generateTransHeightInfo(TransHeightDto transHeightDto) throws UnsupportedEncodingException, TrustSDKException, Exception {
-		ConfigUtils configUtils = new ConfigUtils();
-		String nodeId = configUtils.getNodeId();
-		String mchId = configUtils.getMchId();
-		String prvKey = configUtils.getCreateUserPrivateKey();
-		String publicKey = configUtils.getCreateUserPublicKey();
+		ConfigDto configDto = transHeightDto.getConfigDto();
+		String nodeId = configDto.getNodeId();
+		String mchId = configDto.getMchId();
+		String prvKey = configDto.getCreateUserPrivateKey();
+		String publicKey = configDto.getCreateUserPublicKey();
 		Long beginHeight = transHeightDto.getBeginHeight();
 		Long endHeight = transHeightDto.getEndHeight();
 
-		String chainId = configUtils.getChainId();
+		String chainId = configDto.getChainId();
 
 		long timeStamp = System.currentTimeMillis() / 1000;
 
@@ -239,7 +241,7 @@ public class TencentChainUtils {
 		return postJson.toJSONString();
 	}
 
-	public static List<BlockTransDto> getTransHeightInfoResult(String applyResultString) throws ServiceException, TrustSDKException, Exception {
+	public static List<BlockTransDto> getTransHeightInfoResult(String applyResultString, ConfigDto configDto) throws ServiceException, TrustSDKException, Exception {
 		JSONObject resultObject = JSON.parseObject(applyResultString);
 
 		LinkedList<BlockTransDto> blockTransDtoList = new LinkedList<BlockTransDto>();
@@ -261,14 +263,16 @@ public class TencentChainUtils {
 					blockTransDto.setBlockHeight(blockHeight);
 					blockTransDto.setBlockHash(blockHash);
 					blockTransDto.setCreateTime(timeStamp);
-
+				
 					for (int j = 0; j < transArray.size(); j++) {
 						// TODO:
 						JSONObject transJson = transArray.getJSONObject(j);
 						AssetTransQueryFormDTO assetForm = new AssetTransQueryFormDTO();
 						String transHash = transJson.getString("hash");
 						assetForm.setTransHash(transHash);
-						assetForm.setState(TransStatus.SUBMIT_SUCCESS);
+						
+						assetForm.setConfigDto(configDto);
+						assetForm.setState(new Integer[]{TransStatus.SUBMIT_SUCCESS});
 						List<TransInfoDto> assetList = TencentChainUtils.transQuery(assetForm);
 						long sum = 0;
 						for (TransInfoDto transInfoDto : assetList) {
@@ -297,8 +301,8 @@ public class TencentChainUtils {
 	public static List<TransInfoDto> transQuery(AssetTransQueryFormDTO assetForm) throws TrustSDKException, Exception {
 		String accountQueryString = UserUtil.generateTransQueryParam(assetForm);
 		 logger.debug("调用【交易查询前】{}",  accountQueryString);
-		ConfigUtils configUtils = new ConfigUtils();
-		String url = configUtils.getHost() + "/trans_batch_query";
+		ConfigDto configDto = assetForm.getConfigDto();
+		String url = configDto.getHost() + "/trans_batch_query";
 		 logger.info("调用的接口名称是{}",  url);
 		String accountQueryResult = HttpClientUtil.post(url, accountQueryString);
 		ResultUtil.checkResultIfSuccess("交易查询接口", accountQueryResult);
@@ -436,7 +440,7 @@ public class TencentChainUtils {
 		return postJson.toJSONString();
 	}
 
-	public static BlockTransChainInfoDto genereateChainInfoResultForTrans(String applyResultString, String transHash) throws TrustSDKException, Exception {
+	public static BlockTransChainInfoDto genereateChainInfoResultForTrans(String applyResultString, String transHash,ConfigDto configDto) throws TrustSDKException, Exception {
 
 		JSONObject resultObject = JSON.parseObject(applyResultString);
 		BlockTransChainInfoDto blockTransChainInfoDto = new BlockTransChainInfoDto();
@@ -449,12 +453,15 @@ public class TencentChainUtils {
 
 			AssetTransQueryFormDTO assetForm = new AssetTransQueryFormDTO();
 			assetForm.setTransHash(transHash);
-			assetForm.setState(TransStatus.SUBMIT_SUCCESS);
+			assetForm.setState(new Integer[]{TransStatus.SUBMIT_SUCCESS});
+			assetForm.setConfigDto(configDto);
 			List<TransInfoDto> assetList = TencentChainUtils.transQuery(assetForm);
 			if (assetList != null && assetList.size() > 0) {
 				TransInfoDto transInfoDto = assetList.get(0);
 				int status = transInfoDto.getTransState();
-				long transTime =  Long.valueOf(transInfoDto.getTransTime());
+				String dateTimeString = transInfoDto.getTransTime();
+				String timeString = date2TimeStamp(dateTimeString,"yyyy-MM-dd HH:mm:ss");
+				long transTime =  Long.valueOf(timeString);
 
 				if (jsonArray != null) {
 					for (int i = 0; i < jsonArray.size(); i++) {
@@ -485,8 +492,18 @@ public class TencentChainUtils {
 		return blockTransChainInfoDto;
 
 	}
+	public static String date2TimeStamp(String date_str,String format){  
+		 try {  
+	            SimpleDateFormat sdf = new SimpleDateFormat(format);  
+	            return String.valueOf(sdf.parse(date_str).getTime());  
+	        } catch (Exception e) {  
+	        	logger.error("转换时间出错{}",e);
+	            e.printStackTrace();  
+	        }  
+	        return "";  
+	}
 
-	public static BlockDetailsInfo generateBlockInfoDetails(String applyResultString, Long beginHeight) throws TrustSDKException, Exception {
+	public static BlockDetailsInfo generateBlockInfoDetails(String applyResultString, Long beginHeight, ConfigDto configDto) throws TrustSDKException, Exception {
 		BlockDetailsInfo blockDetailsInfo =null;
 		JSONObject resultObject = JSON.parseObject(applyResultString);
 		
@@ -519,14 +536,16 @@ public class TencentChainUtils {
 					blockInfoDto.setPreHash(preHash);
 					blockInfoDto.setCreateTime(timeStamp);
 					blockInfoDto.setTransTotalNum(transTotalNum);
-
+					
 					for (int j = 0; j < transArray.size(); j++) {
 						// TODO:
 						JSONObject transJson = transArray.getJSONObject(j);
 						AssetTransQueryFormDTO assetForm = new AssetTransQueryFormDTO();
 						String transHash = transJson.getString("hash");
 						assetForm.setTransHash(transHash);
-						assetForm.setState(TransStatus.SUBMIT_SUCCESS);
+						assetForm.setConfigDto(configDto );
+						assetForm.setState(new Integer[]{TransStatus.SUBMIT_SUCCESS});
+						assetForm.setConfigDto(configDto);
 						List<TransInfoDto> assetList = TencentChainUtils.transQuery(assetForm);
 						if (assetList != null&&assetList.size()>0) {
 							TransInfoDto transInfoDto = assetList.get(0);

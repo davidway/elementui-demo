@@ -19,6 +19,21 @@ import com.blockchain.exception.StatusCode;
 import com.tencent.trustsql.sdk.TrustSDK;
 import com.tencent.trustsql.sdk.exception.TrustSDKException;
 
+@Deprecated
+/**
+ * 
+ * 版权所有：2019-微三云 
+ * 项目名称：blockchain     
+ *  
+ * 类描述：  
+ * 类名称：com.blockchain.util.ConfigUtils       
+ * 创建人：weekend   
+ * 创建时间：2019年3月29日 上午10:40:01     
+ * 修改人：  
+ * 修改时间：2019年3月29日 上午10:40:01     
+ * 修改备注：已经改为ConfigDto，由Saas平台下 由应用系统（客户端）发送请求配置信息   
+ * @version   V1.0
+ */
 public class ConfigUtils {
 	static Logger logger = Logger.getLogger(ConfigUtils.class);
 	static Properties prop = new Properties();
@@ -29,8 +44,6 @@ public class ConfigUtils {
 	private String ledgerId;
 	private String mchId;
 	private String coin_privateKey;
-	private String serverId;
-	private String serverCode;
 	private String host;
 
 	public String getCreateUserPrivateKey() {

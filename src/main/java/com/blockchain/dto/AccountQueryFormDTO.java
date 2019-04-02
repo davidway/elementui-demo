@@ -2,6 +2,7 @@ package com.blockchain.dto;
 
 import java.util.Arrays;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -17,8 +18,8 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 
 
 @ApiModel(value="资产查询")
-public class AccountQueryFormDTO {
 
+public class AccountQueryFormDTO {
 	@ApiModelProperty(value= "用户id")
 	private String ownerUid;
 	@ApiModelProperty(value= "用户账户")
@@ -38,6 +39,18 @@ public class AccountQueryFormDTO {
 	private JSONObject content;
 	
 	
+	@ApiModelProperty(value="配置文件信息",required=true)
+	@NotNull(message="配置信息")
+	@Valid
+	private ConfigDto configDto;
+
+	
+	public ConfigDto getConfigDto() {
+		return configDto;
+	}
+	public void setConfigDto(ConfigDto configDto) {
+		this.configDto = configDto;
+	}
 	public String getOwnerUid() {
 		return ownerUid;
 	}

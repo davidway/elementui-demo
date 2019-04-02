@@ -7,6 +7,7 @@ import com.blockchain.dto.AssetTransQueryFormDTO;
 import com.blockchain.dto.BlockChainInfoDto;
 import com.blockchain.dto.BlockDetailsInfo;
 import com.blockchain.dto.BlockTransDto;
+import com.blockchain.dto.ConfigDto;
 import com.blockchain.dto.TransDetailsVo;
 import com.blockchain.dto.TransHeightDto;
 import com.blockchain.dto.TransInfoDto;
@@ -29,7 +30,7 @@ public interface BlockChainBrowserService {
 
 	BlockDetailsInfo getBlockInfoDetails(TransHeightDto transHeightDto) throws UnsupportedEncodingException, TrustSDKException, Exception;
 
-	BlockChainInfoDto getChainInfo() throws UnsupportedEncodingException, TrustSDKException, Exception;
+	BlockChainInfoDto getChainInfo(ConfigDto configDto) throws UnsupportedEncodingException, TrustSDKException, Exception;
 
 
 }

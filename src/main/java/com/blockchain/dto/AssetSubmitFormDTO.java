@@ -1,12 +1,15 @@
 package com.blockchain.dto;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value="资产发行表单")
-public class AssetSubmitFormDTO {
+public class AssetSubmitFormDTO extends BaseDto{
 	@ApiModelProperty(value="平台唯一标识一次交易的ID",required=true)
 	@NotEmpty(message="平台交易id不能为空")
 	private String transactionId;
@@ -20,6 +23,9 @@ public class AssetSubmitFormDTO {
 	@ApiModelProperty(value="用户私钥",required=true)
 	@NotEmpty(message="用户私钥不能为空")
 	private String userPrivateKey;
+	
+
+	
 	public String getSignStr() {
 		return signStr;
 	}
