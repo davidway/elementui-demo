@@ -133,6 +133,7 @@ public class AssetServiceImpl implements AssetService {
 
 		AssetSettleDTO assetSettleDTO = new AssetSettleDTO();
 		assetSettleDTO = assetPrepareUtil.generateAssetSettleDTO(assetSettleSubmitFormDTO, submitResultString);
+
 		return assetSettleDTO;
 	}
 
@@ -204,7 +205,7 @@ public class AssetServiceImpl implements AssetService {
 		ResultUtil.checkResultIfSuccess("资产转让申请接口", applyResultString);
 
 		AssetTransferSubmitFormDTO asseTransfertSubmitForm = assetPrepareUtil.perpareTransferSubmitForm(assetTransferFormDTO, applyResultString);
-
+		asseTransfertSubmitForm.setConfigDto(configDto);
 		transferLogger.info("apply调试结束");
 
 		return asseTransfertSubmitForm;
@@ -227,6 +228,7 @@ public class AssetServiceImpl implements AssetService {
 		String userPrivateKey = assetFormDTO.getUserPrivateKey();
 		AssetSubmitFormDTO assetSubmitFormDTO = assetPrepareUtil.prepareAssetSubmitForm(applyResultString);
 		assetSubmitFormDTO.setUserPrivateKey(userPrivateKey);
+		assetSubmitFormDTO.setConfigDto(configDto);
 		return assetSubmitFormDTO;
 	}
 
@@ -244,7 +246,7 @@ public class AssetServiceImpl implements AssetService {
 		ResultUtil.checkResultIfSuccess("资产兑换申请接口", applyResultString);
 
 		AssetSettleSubmitFormDTO assetSettleSubmitFormDTO = assetPrepareUtil.perpareSettleSubmitForm(assetSettleFormDTO, applyResultString);
-
+		assetSettleSubmitFormDTO.setConfigDto(configDto);
 		return assetSettleSubmitFormDTO;
 	}
 

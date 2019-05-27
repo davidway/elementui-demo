@@ -228,8 +228,8 @@ public class UserController {
 	}
 
 	@ResponseBody
-	@RequestMapping(value = { "/addUserHasBaseAccount" }, method = RequestMethod.POST, consumes = "application/json")
-	@ApiOperation(value = "创建用户只有基础钱包账户", httpMethod = "POST", response = UserInfoVO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = { "/addUserHasBaseAccount" }, method = RequestMethod.POST)
+	@ApiOperation(value = "创建用户只有基础钱包账户", httpMethod = "POST", response = UserInfoVO.class, consumes = "application/json", produces = "application/json")
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),
@@ -273,7 +273,7 @@ public class UserController {
 
 	@ResponseBody
 	@RequestMapping(value = { "/checkPairKey" }, method = RequestMethod.POST, consumes = "application/json")
-	@ApiOperation(value = "验证用户公私是否匹配", httpMethod = "POST", response = UserInfoVO.class, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "验证用户公私是否匹配", httpMethod = "POST", response = UserInfoVO.class, consumes = "application/json", produces = "application/json")
 	@ApiResponses(value = { @ApiResponse(code = StatusCode.THREAD_ERROR, message = StatusCode.THREAD_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.PARAM_ERROR, message = StatusCode.PARAM_ERROR_MESSAGE, response = StatusCode.class),
 			@ApiResponse(code = StatusCode.SUCCESS, message = StatusCode.SUCCESS_MESSAGE, response = StatusCode.class),

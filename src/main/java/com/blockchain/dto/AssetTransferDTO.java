@@ -21,7 +21,13 @@ public class AssetTransferDTO {
 	private String srcAmount;
 	@ApiModelProperty(value = "手续费资产份额", dataType = "String")
 	private String feeAssetAmount;
-	
+	@ApiModelProperty(value = "交易成交后的区块高度", dataType = "Long")
+	private long transBHeight;
+	@ApiModelProperty(value = "交易成交后的时间戳", dataType = "Long")
+	private long transBTimestamp;
+
+
+
 	public String getTransactionId() {
 		return transactionId;
 	}
@@ -87,12 +93,36 @@ public class AssetTransferDTO {
 		this.feeAssetAmount = feeAssetAmount;
 	}
 
-	@Override
-	public String toString() {
-		return "AssetTransfer [transactionId=" + transactionId + ", srcAssetId=" + srcAssetId + ", dstAssetId=" + dstAssetId + ", feeAssetId=" + feeAssetId + ", dstAssetAmount=" + dstAssetAmount
-				+ ", transHash=" + transHash + ", leftAssetAmount=" + srcAmount + ", feeAssetAmount=" + feeAssetAmount + "]";
+
+	public long getTransBHeight() {
+		return transBHeight;
 	}
 
-	
+	public void setTransBHeight(long transBHeight) {
+		this.transBHeight = transBHeight;
+	}
 
+	public long getTransBTimestamp() {
+		return transBTimestamp;
+	}
+
+	public void setTransBTimestamp(long transBTimestamp) {
+		this.transBTimestamp = transBTimestamp;
+	}
+
+	@Override
+	public String toString() {
+		return "AssetTransferDTO{" +
+				"transactionId='" + transactionId + '\'' +
+				", srcAssetId='" + srcAssetId + '\'' +
+				", dstAssetId='" + dstAssetId + '\'' +
+				", feeAssetId='" + feeAssetId + '\'' +
+				", dstAssetAmount='" + dstAssetAmount + '\'' +
+				", transHash='" + transHash + '\'' +
+				", srcAmount='" + srcAmount + '\'' +
+				", feeAssetAmount='" + feeAssetAmount + '\'' +
+				", transBHeight=" + transBHeight +
+				", transBTimestamp=" + transBTimestamp +
+				'}';
+	}
 }
