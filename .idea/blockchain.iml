@@ -30,7 +30,7 @@
             <entry key="com.zeroturnaround.jrebel.remoting.DeleteUnindexedFiles" value="false" />
             <entry key="com.zeroturnaround.jrebel.remoting.ModuleRemoteServerSelection" value="off" />
             <entry key="jrebelEnabled" value="true" />
-            <entry key="lastExternalPluginCheckTime" value="1558925993741" />
+            <entry key="lastExternalPluginCheckTime" value="1561718194273" />
           </map>
         </option>
         <option name="masterModuleName" />
@@ -138,5 +138,6 @@
     <orderEntry type="library" name="Maven: io.github.benas:random-beans:3.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.objenesis:objenesis:2.5.1" level="project" />
     <orderEntry type="library" name="Maven: io.github.lukehutch:fast-classpath-scanner:2.2.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Tomcat 8.0.47" level="application_server_libraries" />
   </component>
 </module>

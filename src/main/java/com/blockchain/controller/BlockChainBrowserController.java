@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.blockchain.dto.*;
 import org.apache.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -18,16 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.blockchain.dto.AssetTransQueryFormDTO;
-import com.blockchain.dto.BlockChainInfoDto;
-import com.blockchain.dto.BlockDetailsInfo;
-import com.blockchain.dto.BlockTransDto;
-import com.blockchain.dto.ConfigDto;
-import com.blockchain.dto.TransDetailsVo;
-import com.blockchain.dto.TransHeightDto;
-import com.blockchain.dto.TransInfoDetailsDto;
-import com.blockchain.dto.TransInfoDto;
-import com.blockchain.dto.TransInfoListDto;
 import com.blockchain.exception.ServiceException;
 import com.blockchain.exception.StatusCode;
 import com.blockchain.service.BlockChainBrowserService;
@@ -59,13 +50,14 @@ public class BlockChainBrowserController {
 			@ApiResponse(code = StatusCode.TIME_OUT, message = StatusCode.TIME_OUT_MESSAGE, response = StatusCode.class),
 
 			@ApiResponse(code = StatusCode.CONFIG_NOT_SET, message = StatusCode.CONFIG_NOT_SET_MESSAGE, response = StatusCode.class) })
-	public void getChainInfo(@Valid @RequestBody ConfigDto configDto, BindingResult bindingResult) {
+	public void getChainInfo(@Valid @RequestBody ChainInfoDto chainInfoDto, BindingResult bindingResult) {
 		PhpSystemJsonContentVO phpSystemJsonContentVO = new PhpSystemJsonContentVO();
 		String jsonString = "";
 
 		try {
 			//ConfigUtils.check();
 			ValidatorUtil.validate(bindingResult);
+			ConfigDto configDto = chainInfoDto.getConfigDto();
 			BlockChainInfoDto blockTransChainInfoDto = blockChainBrowserService.getChainInfo(configDto);
 			phpSystemJsonContentVO.setData(blockTransChainInfoDto);
 			jsonString = JSON.toJSONString(phpSystemJsonContentVO, SerializerFeature.WriteMapNullValue);

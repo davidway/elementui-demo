@@ -5,7 +5,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 
 
-public class ConfigDto {
+public class ConfigDto  {
 	
 	@NotEmpty(message="createUserPrivateKey不能为空")
 	private String createUserPrivateKey;
