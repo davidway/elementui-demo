@@ -30,7 +30,7 @@ public class SignStrUtil {
 			Object v = map.get(key);
 			if (map.get(key) instanceof String) {
 				String s = (String) map.get(key);
-				if (s.length() <= 0) {
+				if (s.length() <= 0 &&!key.equals("sign")) {
 					continue;
 				}
 			} else if (map.get(key).getClass().equals(ArrayList.class)) {
